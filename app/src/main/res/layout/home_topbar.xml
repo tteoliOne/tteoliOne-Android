@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="?actionBarSize"
+    android:background="@color/white"
+    android:elevation="4dp">
+
+
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/appNameTextView"
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/main_font"
+        android:text="31"
+        android:textColor="#588F11"
+        android:textSize="40sp"
+        />
+
+    <androidx.appcompat.widget.LinearLayoutCompat
+
+        android:id="@+id/nicknameSettingButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        >
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nicknameTextView"
+            android:layout_gravity="start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:text="내이"
+            android:layout_marginStart="10dp"
+            android:textColor="@drawable/color_click_nickname"
+            android:textStyle="bold"
+            android:textSize="20sp"
+            />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/nicknameSeverTextView"
+            android:layout_gravity="start"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="님"
+            android:textColor="@drawable/color_click_nickname"
+            android:textSize="20sp"
+            />
+        <androidx.appcompat.widget.AppCompatImageView
+            android:paddingTop="5dp"
+            android:id="@+id/nicknameSettingImageView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:tint="@drawable/color_click_nickname"
+            android:src="@drawable/ic_baseline_keyboard_arrow_down_24"
+            />
+    </androidx.appcompat.widget.LinearLayoutCompat>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/search_btn"
+        android:layout_width="37dp"
+        android:layout_height="37dp"
+        android:src="@drawable/search"
+        android:layout_gravity="end"
+        android:tint="@drawable/color_click_nickname"
+        android:layout_marginEnd="22dp"
+        />
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/notify_btn"
+        android:layout_width="34dp"
+        android:layout_height="30dp"
+        android:src="@drawable/notify"
+        android:layout_gravity="end"
+        android:tint="@drawable/color_click_nickname"
+        android:layout_marginEnd="10dp"
+        />
+
+
+
+
+</androidx.appcompat.widget.Toolbar>

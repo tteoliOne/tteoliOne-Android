@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <include
+        android:id="@+id/topBar"
+        layout="@layout/home_topbar" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/vegetableTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="50dp"
+                android:fontFamily="@font/main_font"
+                android:text="채소"
+                android:textColor="@color/app_main"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/vegetableRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                tools:listitem="@layout/item_home_product"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/fruitsTextView"
+                app:layout_constraintTop_toBottomOf="@id/vegetableTextView" />
+
+            <TextView
+                android:id="@+id/fruitsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="300dp"
+                android:fontFamily="@font/main_font"
+                android:text="과일"
+                android:textColor="@color/app_main"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/vegetableTextView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/fruitsRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/festFoodTextView"
+                app:layout_constraintTop_toBottomOf="@id/fruitsTextView" />
+
+            <TextView
+                android:id="@+id/festFoodTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="300dp"
+                android:fontFamily="@font/main_font"
+                android:text="간편식"
+                android:textColor="@color/app_main"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fruitsTextView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/festFoodRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/meatTextView"
+                app:layout_constraintTop_toBottomOf="@id/festFoodTextView" />
+
+            <TextView
+                android:id="@+id/meatTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="300dp"
+                android:fontFamily="@font/main_font"
+                android:text="정육"
+                android:textColor="@color/app_main"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/festFoodTextView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/meatRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/seafoodTextView"
+                app:layout_constraintTop_toBottomOf="@id/meatTextView" />
+
+            <TextView
+                android:id="@+id/seafoodTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="300dp"
+                android:fontFamily="@font/main_font"
+                android:text="수산물"
+                android:textColor="@color/app_main"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/meatTextView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/seafoodRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/etcTextView"
+                app:layout_constraintTop_toBottomOf="@id/seafoodTextView" />
+
+            <TextView
+                android:id="@+id/etcTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="30dp"
+                android:layout_marginTop="300dp"
+                android:fontFamily="@font/main_font"
+                android:text="기타"
+                android:textColor="@color/app_main"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/seafoodTextView" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/etcRecyclerView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/bottomView"
+                app:layout_constraintTop_toBottomOf="@id/etcTextView" />
+
+            <View
+                app:layout_constraintTop_toBottomOf="@id/etcTextView"
+                android:layout_marginTop="300dp"
+                android:id="@+id/bottomView"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
+
+
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/homeAddButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="18dp"
+        android:layout_marginBottom="70dp"
+        android:text="상품등록"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:icon="@drawable/ic_baseline_add_24"
+        app:iconTint="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

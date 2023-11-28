@@ -1,0 +1,24 @@
+<resources>
+    <string name="app_name">sharingapp</string>
+    <string name="nickname">닉네임</string>
+    <string name="goodPoint">따봉</string>
+    <string name="share_list">내 공유글 목록</string>
+    <string name="share_complete_list">공유완료 목록</string>
+    <string name="save_list">저장글 목록</string>
+    <string name="my_info_setting">내정보 수정</string>
+    <string name="logout">로그아웃</string>
+    <string name="unregister">회원탈퇴</string>
+    <string name="divide_line">|</string>
+    <string name="no_introduction">소개글이 없습니다.</string>
+    <string name="change_profile">프로필 변경</string>
+    <string name="get_nickname">닉네임을 입력해주세요</string>
+    <string name="message_same">중복입니다!!</string>
+    <string name="introduction">소개</string>
+    <string name="get_introduction">소개글을 입력해주세요</string>
+    <string name="save">저장</string>
+    <string name="image_count">%d/%d</string>
+    <string name="buy_date">%d.%d.%d</string>
+    <string name="next">다음</string>
+    <string name="buy_date_local">%d-%02d-%02dT15:53:16</string>
+    <string name="walking_time">%dm 도보 %d분</string>
+</resources>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.demo.sharingapp.domain.chat.ChatFragment"
+        android:label="ChatFragment"
+        tools:layout="@layout/fragment_chat"
+        />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.demo.sharingapp.domain.home.HomeFragment"
+        android:label="HomeFragment"
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_homeFragment_to_homePartProductFragment"
+            app:destination="@id/homePartProductFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/userFragment"
+        android:name="com.demo.sharingapp.domain.user.UserFragment"
+        android:label="UserFragment"
+        tools:layout="@layout/fragment_user">
+        <action
+            android:id="@+id/action_userFragment_to_userSettingFragment"
+            app:destination="@id/userSettingFragment"
+            app:enterAnim="@anim/slide_in_up"
+            app:exitAnim="@anim/slide_out_down"
+            app:popEnterAnim="@anim/slide_pop_in_down"
+            app:popExitAnim="@anim/slide_pop_out_up" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/userSettingFragment"
+        android:name="com.demo.sharingapp.domain.user.UserSettingFragment"
+        android:label="UserSettingFragment"
+        tools:layout="@layout/fragment_user_setting"/>
+
+    <fragment
+        android:id="@+id/homePartProductFragment"
+        android:name="com.demo.sharingapp.domain.home.HomePartProductFragment"
+        android:label="HomePartProductFragment"
+        tools:layout="@layout/fragment_home_part_product" >
+        <argument
+            android:name="data"
+            app:argType="com.demo.sharingapp.login.data.ProductsData[]" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+    </fragment>
+</navigation>

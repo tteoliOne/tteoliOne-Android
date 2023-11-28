@@ -1,0 +1,10 @@
+{
+  "success": true,
+  "code": 0,
+  "message": "Ok",
+  "data": {
+    "accessToken": "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJlbWFpbCIsImF1dGgiOiJST0xFX1VTRVIiLCJleHAiOjE2OTc0NDMxODd9.4yZvZR7POI9Wvcpu41AuP_2BQhjiyj4ubwCSUWCC-QLyKN-SXy7yNq56ALuDdJjRqskZn35tZv2JXAjkO_vC2g",
+    "refreshToken": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2OTg2NTA5ODd9.ykBtHDTAjZdd1894YuLSTddNBmmYSpcX03WXpJgd0Yk",
+    "nickname": "상혁"
+  }
+}
