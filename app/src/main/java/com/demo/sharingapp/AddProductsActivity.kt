@@ -137,7 +137,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
-    // 다음 버튼 클lee릭 함수
+    // 다음 버튼 클릭 함수
     private fun nextButtonClick() {
 
         // 다음 버튼 클릭 시

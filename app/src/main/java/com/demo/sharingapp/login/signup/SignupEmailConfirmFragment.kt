@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
@@ -28,6 +29,8 @@ class SignupEmailConfirmFragment : Fragment(R.layout.fragment_signup_email_confi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentSignupEmailConfirmBinding.bind(view)
+
+
 
         //
         Log.e("email1",SharedPreferencesData.getData(this.requireContext(), SIGNUP_EMAIL))
@@ -73,11 +76,14 @@ class SignupEmailConfirmFragment : Fragment(R.layout.fragment_signup_email_confi
 
     // 이전화면으로 이동 함수
     private fun beforeScreen() {
+
+        timer?.cancel()
         // 이메일 삭제 함수 호출
         removeEmail()
 
-        timer?.cancel()
         findNavController().popBackStack()
+
+
     }
 
     // 이메일 삭제 함수
@@ -92,10 +98,10 @@ class SignupEmailConfirmFragment : Fragment(R.layout.fragment_signup_email_confi
         var countdownSeconds = countdownMinutes * 60
 
         timer = timer(initialDelay = 0, period = 1000) {
-            if (countdownSeconds == 0) {
+            if (countdownSeconds <= 0) {
 
                 // 이전화면으로 이동 함수 호출
-                beforeScreen()
+                binding.root.post { beforeScreen() }
 
             } else {
                 countdownSeconds -= 1
@@ -118,7 +124,7 @@ class SignupEmailConfirmFragment : Fragment(R.layout.fragment_signup_email_confi
                 if (it){
                     nextScreen()
                 }else{
-                    //todo 알림창
+                    binding.errorMessageTextView.isVisible=true
                 }
             })
         }

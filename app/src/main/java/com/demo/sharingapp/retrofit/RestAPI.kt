@@ -21,6 +21,9 @@ interface RestAPI {
     @POST(API.CHECK_ID) // Replace with your API endpoint
     fun postCheckId(@Body loginId: IdData): Call<EmailResponse>
 
+    // 닉네임 중복 확인 보내기
+    @POST(API.CHECK_NICKNAME) // Replace with your API endpoint
+    fun postCheckNickname(@Body nicknameData: NicknameData): Call<EmailResponse>
 
     // 로그인 정보 보내기
     @POST(API.LOGIN) // Replace with your API endpoint

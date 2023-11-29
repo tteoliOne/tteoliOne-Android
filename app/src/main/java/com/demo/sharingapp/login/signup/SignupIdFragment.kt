@@ -79,7 +79,8 @@ class SignupIdFragment: Fragment(R.layout.fragment_signup_id) {
                     val action = SignupIdFragmentDirections.actionSignupIdFragmentToSignupPasswordFragment()
                     findNavController().navigate(action)
                 }else{
-                    Log.e("checkId", idMessage)
+                    Log.e("checkid","실패")
+                    showDialog(idMessage)
                 }
             }
 
@@ -96,4 +97,15 @@ class SignupIdFragment: Fragment(R.layout.fragment_signup_id) {
             findNavController().popBackStack()
         }
     }
+
+
+    // 알림창 띄우기
+    private fun showDialog(message: String) {
+        val dialog = SignupDialog(message)
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this@SignupIdFragment.requireActivity().supportFragmentManager,
+            "SignupDialog")
+    }
+
 }

@@ -4,12 +4,14 @@ import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentSignupNicknameBinding
+import com.demo.sharingapp.login.signup.data.NicknameData
 import com.demo.sharingapp.login.signup.data.SignupData
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -18,7 +20,7 @@ import com.demo.sharingapp.utils.Constants.SIGNUP_ID
 import com.demo.sharingapp.utils.Constants.SIGNUP_NAME
 import com.demo.sharingapp.utils.Constants.SIGNUP_PASSWORD
 
-class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname) {
+class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),ConfirmDialogInterface {
 
     private lateinit var binding: FragmentSignupNicknameBinding
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,12 +28,13 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname) {
         binding = FragmentSignupNicknameBinding.bind(view)
 
         binding.backButton.setOnClickListener {
+//            showUseDialog()
             findNavController().popBackStack()
             SharedPreferencesData.removeData(this.requireContext(),SIGNUP_PASSWORD)
         }
 
         binding.finishButton.setOnClickListener {
-            requireActivity().finish()
+
             val loginId = SharedPreferencesData.getData(this.requireContext(), SIGNUP_ID)
             val email = SharedPreferencesData.getData(this.requireContext(), SIGNUP_EMAIL)
             val username = SharedPreferencesData.getData(this.requireContext(), SIGNUP_NAME)
@@ -40,9 +43,15 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname) {
 
             val signupData = SignupData(loginId,email,username,nickname,password)
 
-            RetrofitManager.instance.postSignup(signupData){
-                if (it){
-                    Toast.makeText(this.requireContext(),"회원가입을 성공합니다", Toast.LENGTH_SHORT).show()
+            RetrofitManager.instance.postCheckNickname(NicknameData(nickname)){ NicknameBoolean, message ->
+                if(NicknameBoolean){
+                    // 서버에 회원가입 정보 보내기 함수 호출
+                    showUseDialog(signupData)
+
+                }else{
+                    // todo 실패 원인 알림창 띄우기
+                    showDialog(message)
+//                    Log.e("nickname",message)
                 }
             }
 
@@ -64,5 +73,38 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname) {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+    }
+
+    // 서버에 회원가입 정보 보내기 함수
+    private fun sendSignupData(signupData: SignupData) {
+        RetrofitManager.instance.postSignup(signupData) {
+            if (it) {
+                Toast.makeText(this.requireContext(), "회원가입을 성공합니다", Toast.LENGTH_SHORT).show()
+                requireActivity().finish()
+            }
+        }
+    }
+
+    // 실패 알림창 띄우기
+    private fun showDialog(message: String) {
+        val dialog = SignupDialog(message)
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this@SignupNicknameFragment.requireActivity().supportFragmentManager,
+            "SignupDialog")
+    }
+
+    // 성공 알림창 띄우기
+    private fun showUseDialog(signupData:SignupData) {
+        val dialog = SignupDialogNickname(this,signupData)
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this@SignupNicknameFragment.requireActivity().supportFragmentManager,
+            "SignupDialog")
+    }
+
+    override fun onYesButtonClick(signupData: SignupData) {
+        Log.e("nickname","성공")
+        //sendSignupData(signupData)
     }
 }

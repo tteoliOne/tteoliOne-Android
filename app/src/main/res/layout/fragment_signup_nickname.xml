@@ -61,6 +61,38 @@
         app:layout_constraintStart_toStartOf="@id/nicknameIconImageView"
         app:layout_constraintTop_toBottomOf="@id/nicknameIconImageView" />
 
+    <TextView
+        android:id="@+id/descriptionTextView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="5dp"
+        android:text="한글, 숫자, 영문 (2 ~ 10자리)"
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@id/nicknameEditText"
+        app:layout_constraintTop_toBottomOf="@id/nicknameEditText" />
+
+    <TextView
+        android:id="@+id/descriptionTextView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="5dp"
+        android:text="닉네임은 커뮤니 활동을 할 때 표시 됩니다."
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@id/nicknameEditText"
+        app:layout_constraintTop_toBottomOf="@id/descriptionTextView1" />
+    <TextView
+        android:id="@+id/descriptionTextView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="5dp"
+        android:text="닉네임은 사용자 설정에서 변경이 가능합니다."
+        android:textColor="@color/black"
+        app:layout_constraintStart_toStartOf="@id/nicknameEditText"
+        app:layout_constraintTop_toBottomOf="@id/descriptionTextView2" />
+
 
     <Button
         android:id="@+id/finishButton"
