@@ -12,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentSignupEmailConfirmBinding
 import com.demo.sharingapp.login.signup.data.AuthCodeData
+import com.demo.sharingapp.login.signup.data.EmailData
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.SIGNUP_EMAIL
@@ -119,8 +120,9 @@ class SignupEmailConfirmFragment : Fragment(R.layout.fragment_signup_email_confi
     private fun clickConfirmButton() {
         binding.confirmButton.setOnClickListener {
             val emailCode = binding.emailConfirmEditText.text.toString()
-            val code = AuthCodeData(emailCode)
-            RetrofitManager.instance.postEmailVerify(code, nextScreen = {
+            val email = SharedPreferencesData.getData(this.requireContext(), SIGNUP_EMAIL)
+            val code = AuthCodeData(emailCode,email)
+            RetrofitManager.instance.postEmailVerify(code,  nextScreen = {
                 if (it){
                     nextScreen()
                 }else{
