@@ -16,6 +16,7 @@ import com.demo.sharingapp.databinding.ActivityLoginViewBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.login.data.AccessTokenRequest
 import com.demo.sharingapp.login.data.LoginData
+import com.demo.sharingapp.login.find_id.FindIdActivity
 import com.demo.sharingapp.login.signup.SignUpActivity
 
 import com.demo.sharingapp.retrofit.RetrofitManager
@@ -75,6 +76,10 @@ class LoginView : AppCompatActivity() {
 
         binding.signUpButton.setOnClickListener {
             startActivity(Intent(this, SignUpActivity::class.java))
+        }
+
+        binding.findIdButton.setOnClickListener {
+            startActivity(Intent(this, FindIdActivity::class.java))
         }
 
         //

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="아이디 찾기"
+        android:textColor="@color/black"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="@id/backButton"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toTopOf="@id/backButton" />
+
+    <ImageView
+        android:id="@+id/emailConfirmIconImageView"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:src="@drawable/confirm"
+        app:layout_constraintBottom_toBottomOf="@id/emailConfirmTextView"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toTopOf="@id/emailConfirmTextView" />
+
+    <TextView
+        android:id="@+id/emailConfirmTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="70dp"
+        android:text="인증번호"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toEndOf="@id/emailConfirmIconImageView"
+        app:layout_constraintTop_toBottomOf="@id/backButton" />
+
+    <EditText
+        android:id="@+id/emailConfirmEditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="30dp"
+        android:hint="인증번호"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/emailConfirmIconImageView"
+        app:layout_constraintTop_toBottomOf="@id/emailConfirmTextView" />
+
+    <TextView
+        android:id="@+id/emailConfirmTimeTitleTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="6dp"
+        android:layout_marginTop="5dp"
+        android:text="남은시간"
+        android:textColor="#FF0000"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toBottomOf="@id/errorMessageTextView" />
+
+    <TextView
+        android:id="@+id/emailConfirmTimeTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="5dp"
+        android:text="03:00"
+        android:textColor="#FF0000"
+        app:layout_constraintStart_toEndOf="@id/emailConfirmTimeTitleTextView"
+        app:layout_constraintTop_toTopOf="@id/emailConfirmTimeTitleTextView" />
+
+    <TextView
+        android:id="@+id/errorMessageTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        tools:visibility="visible"
+        android:text="인증번호를 다시 입력해주세요."
+        android:textColor="#FF0000"
+        android:layout_marginStart="6dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/emailConfirmEditText"
+        app:layout_constraintStart_toStartOf="@id/emailConfirmEditText"/>
+
+
+    <Button
+        android:id="@+id/confirmButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="18dp"
+        android:backgroundTint="#CDCFCECE"
+        android:clickable="false"
+        android:text="본인인증"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/emailConfirmEditText"
+        app:layout_constraintStart_toEndOf="@id/backButton" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

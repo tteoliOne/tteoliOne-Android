@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_find_id"
+    app:startDestination="@id/findIdEmailFragment">
+
+    <fragment
+        android:id="@+id/findIdEmailFragment"
+        android:name="com.demo.sharingapp.login.find_id.FindIdEmailFragment"
+        android:label="FindIdEmailFragment"
+        tools:layout="@layout/fragment_find_id_email">
+        <action
+            android:id="@+id/action_findIdEmailFragment_to_findIdEmailConfirmFragment"
+            app:destination="@id/findIdEmailConfirmFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/findIdEmailConfirmFragment"
+        android:name="com.demo.sharingapp.login.find_id.FindIdEmailConfirmFragment"
+        android:label="FindIdEmailConfirmFragment"
+        tools:layout="@layout/fragment_find_id_email_confirm"/>
+</navigation>
