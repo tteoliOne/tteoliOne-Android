@@ -44,91 +44,66 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentHomeBinding.bind(view)
 
-
-        // 야채 어댑터 설정
-        homeVegetableAdepter = HomeAdepter(){
-            // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it,"채소")
-        }
-        // 과일 어댑터 설정
-        homeFruitsAdepter = HomeAdepter(){
-            // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it,"과일")
-        }
-        // 간편식 어댑터 설정
-        homeFastFoodAdepter = HomeAdepter(){
-            // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it,"간편식")
-        }
-        // 정육 어댑터 설정
-        homeMeatAdepter = HomeAdepter(){
-            // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it,"정육")
-        }
-        // 수산물 어댑터 설정
-        homeSeafoodAdepter = HomeAdepter(){
-            // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it,"수산물")
-        }
-        // 기타 어댑터 설정
-        homeEtcAdepter = HomeAdepter(){
-            // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it,"기타")
-        }
-
-
         // 초기 nickname 설정 함수 호출
         initNickname()
-
-        val vegetableRecyclerView = binding.vegetableRecyclerView
-        val fruitsRecyclerView = binding.fruitsRecyclerView
-        val fastFoodRecyclerView = binding.festFoodRecyclerView
-        val meatRecyclerView = binding.meatRecyclerView
-        val seafoodRecyclerView = binding.seafoodRecyclerView
-        val etcRecyclerView = binding.etcRecyclerView
-
-        initRecyclerView(homeVegetableAdepter, vegetableRecyclerView)
-        initRecyclerView(homeFruitsAdepter, fruitsRecyclerView)
-        initRecyclerView(homeFastFoodAdepter, fastFoodRecyclerView)
-        initRecyclerView(homeMeatAdepter, meatRecyclerView)
-        initRecyclerView(homeSeafoodAdepter, seafoodRecyclerView)
-        initRecyclerView(homeEtcAdepter, etcRecyclerView)
 
         val longitude = mainViewModel.longitude.value
         val latitude = mainViewModel.latitude.value
         val accessToken = SharedPreferencesData.getData(this.requireContext(),ACCESS_TOKEN)
         val userId = SharedPreferencesData.getLongData(this.requireContext(),USER_ID)
+
         Log.e("aa", mainViewModel.longitude.value.toString())
+
+        // 초기 전체 리사이클러 뷰 설정 함수 호출
+        initAllRecyclerView(accessToken)
+
 
         // 서버에서 상품 데이터 불러오기
         getProducts(longitude, latitude, accessToken, userId)
 
-
-//        RetrofitManager.instance.data.observe(this.requireActivity()) {
-//            val productData= it.groupBy {
-//                it.categoryId
-//            }
-//            val va = productData[1]
-//
-//            va?.forEach {
-//                homeAdepter.submitList(it.products)
-//                Log.e("maova","상품 등록 시작")
-//            }
-//            Log.e("maova",va.toString())
-//
-//            Log.e("mao",productData[1].toString())
-//            Log.e("mao",productData[2].toString())
-//            Log.e("mao",productData[3].toString())
-//            Log.e("mao",productData[4].toString())
-//            Log.e("mao",productData[5].toString())
-//
-//        }
-
-
-
         // 상품 등록 버튼 클릭 시
         addProductButton()
 
+    }
+
+    // 초기 전체 리사이클러 뷰 설정 함수
+    private fun initAllRecyclerView(accessToken: String) {
+        // 야채 어댑터 설정
+        homeVegetableAdepter = homeAdepter(accessToken, "채소")
+        // 과일 어댑터 설정
+        homeFruitsAdepter = homeAdepter(accessToken, "과일")
+        // 간편식 어댑터 설정
+        homeFastFoodAdepter = homeAdepter(accessToken, "간편식")
+        // 정육 어댑터 설정
+        homeMeatAdepter = homeAdepter(accessToken, "정육")
+        // 수산물 어댑터 설정
+        homeSeafoodAdepter = homeAdepter(accessToken, "수산물")
+        // 기타 어댑터 설정
+        homeEtcAdepter = homeAdepter(accessToken, "기타")
+
+        initRecyclerView(homeVegetableAdepter, binding.vegetableRecyclerView)
+        initRecyclerView(homeFruitsAdepter, binding.fruitsRecyclerView)
+        initRecyclerView(homeFastFoodAdepter, binding.festFoodRecyclerView)
+        initRecyclerView(homeMeatAdepter, binding.meatRecyclerView)
+        initRecyclerView(homeSeafoodAdepter, binding.seafoodRecyclerView)
+        initRecyclerView(homeEtcAdepter, binding.etcRecyclerView)
+    }
+
+    // homeAdepter 초기화 함수
+    private fun homeAdepter(accessToken: String, category: String) = HomeAdepter(
+        onMoreClick = {
+            // 더보기 화면으로 이동 함수 호출
+            movePartProductFragment(it, category)
+        },
+        onLikeClick = {
+            // 좋아요 클릭 시 함수 호출
+            likeClick(it, accessToken)
+        },
+    )
+
+    // 좋아요 클릭 시 함수
+    private fun likeClick(it: Long, accessToken: String) {
+        RetrofitManager.instance.postProductLike(this.requireContext(), it, accessToken)
     }
 
     // 더보기 화면으로 이동 함수
@@ -137,8 +112,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         findNavController().navigate(action)
     }
 
+    // 각 리사이클러뷰 초기 설정 함수
     private fun initRecyclerView(adepter: HomeAdepter, recyclerView: RecyclerView) {
-
         recyclerView.apply {
             adapter = adepter
             layoutManager = LinearLayoutManager(this@HomeFragment.requireContext()).also {
@@ -147,6 +122,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    // 데이터 받는 함수
     private fun getProducts(
         longitude: Double?,
         latitude: Double?,
@@ -162,18 +138,37 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 val productData = it.groupBy {
                     it.categoryId
                 }
-                val va = productData[1]
 
-                va?.forEach {
+                // 채소 리사이클러뷰에 데이터 추가
+                productData[1]?.forEach {
                     homeVegetableAdepter.submitList(it.products)
-                    homeFruitsAdepter.submitList(it.products)
-                    homeFastFoodAdepter.submitList(it.products)
-                    homeMeatAdepter.submitList(it.products)
-                    homeSeafoodAdepter.submitList(it.products)
-                    homeEtcAdepter.submitList(it.products)
-                    Log.e("maova", "상품 등록 시작")
                 }
-                Log.e("maova", va.toString())
+
+                // 과일 리사이클러뷰에 데이터 추가
+                productData[2]?.forEach {
+                    homeFruitsAdepter.submitList(it.products)
+                }
+
+                // 간편식 리사이클러뷰에 데이터 추가
+                productData[3]?.forEach {
+                    homeFastFoodAdepter.submitList(it.products)
+                }
+
+                // 정육 리사이클러뷰에 데이터 추가
+                productData[4]?.forEach {
+                    homeMeatAdepter.submitList(it.products)
+                }
+
+                // 수산물 리사이클러뷰에 데이터 추가
+                productData[5]?.forEach {
+                    homeSeafoodAdepter.submitList(it.products)
+                }
+
+                // 기타 리사이클러뷰에 데이터 추가
+                productData[6]?.forEach {
+                    homeEtcAdepter.submitList(it.products)
+                }
+
 
                 Log.e("mao", productData[1].toString())
                 Log.e("mao", productData[2].toString())

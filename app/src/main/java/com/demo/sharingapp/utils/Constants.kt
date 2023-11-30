@@ -42,6 +42,10 @@ object API {
 
     const val CHECK_ID : String="/api/users/check/login-id"
 
+    const val CHECK_NICKNAME : String="/api/users/check/nickname"
+
+    const val PRODUCT_LIKE : String="/api/products/{productId}/likes"
+
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
 }

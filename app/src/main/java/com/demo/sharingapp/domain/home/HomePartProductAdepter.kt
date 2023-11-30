@@ -1,5 +1,6 @@
 package com.demo.sharingapp.domain.home
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -7,11 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemHomePartProductBinding
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
 
-class HomePartProductAdepter :
+class HomePartProductAdepter(val onLikeClick: (Long) -> Unit) :
     ListAdapter<ProductsData, HomePartProductAdepter.HomePartProductViewHolder>(object :
         DiffUtil.ItemCallback<ProductsData>() {
         override fun areItemsTheSame(oldItem: ProductsData, newItem: ProductsData): Boolean {
@@ -25,9 +27,20 @@ class HomePartProductAdepter :
     inner class HomePartProductViewHolder(val binding: ItemHomePartProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ProductsData) {
+
+            var liked = item.liked
+            var likePoint = item.totalLikes
+
             Glide.with(binding.imageView)
                 .load(item.imageUrl)
                 .into(binding.imageView)
+
+            if (liked) {
+                binding.pickImageView.setImageResource(R.drawable.heart_fill)
+            } else {
+                binding.pickImageView.setImageResource(R.drawable.heart)
+            }
+
 
             binding.priceTextView.text = String.format("개당 %d원",item.unitPrice)
             binding.titleTextView.text = item.title
@@ -39,6 +52,23 @@ class HomePartProductAdepter :
                     String.format("%.1fm 도보 %d분", item.walkingDistance, item.walkingTime)
             }
             binding.likeTextView.text = item.totalLikes.toString()
+
+            binding.pickImageView.setOnClickListener {
+                Log.e("liked",liked.toString())
+                if (liked){
+                    binding.pickImageView.setImageResource(R.drawable.heart)
+                    likePoint -= 1
+                    binding.likeTextView.text = likePoint.toString()
+                    liked = !liked
+                }else{
+                    binding.pickImageView.setImageResource(R.drawable.heart_fill)
+                    likePoint += 1
+                    binding.likeTextView.text = likePoint.toString()
+                    liked = !liked
+                }
+                onLikeClick(item.productId)
+            }
+
         }
     }
 

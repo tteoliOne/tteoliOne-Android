@@ -21,6 +21,13 @@ interface RestAPI {
     @POST(API.CHECK_ID) // Replace with your API endpoint
     fun postCheckId(@Body loginId: IdData): Call<EmailResponse>
 
+    // 상품 좋아요 여부 보내기
+    @POST(API.PRODUCT_LIKE) // Replace with your API endpoint
+    fun postProductLike(
+        @Header("Authorization") Authorization: String,
+        @Path ("productId") productId: Long
+    ): Call<EmailResponse>
+
     // 닉네임 중복 확인 보내기
     @POST(API.CHECK_NICKNAME) // Replace with your API endpoint
     fun postCheckNickname(@Body nicknameData: NicknameData): Call<EmailResponse>
@@ -33,7 +40,7 @@ interface RestAPI {
     @POST(API.REISSUE) // Replace with your API endpoint
     fun postReissueData(@Body tokenData: TokenData): Call<ReissueData>
 
-    // 이메일 보내기
+    // 이메일 인증 코드 보내기
     @POST(API.EMAIL_VERIFY) // Replace with your API endpoint
     fun postEmailVerifyData(@Body authCode: AuthCodeData): Call<EmailResponse>
 
