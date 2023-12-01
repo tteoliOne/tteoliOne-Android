@@ -35,6 +35,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 로그인 상태 확인 함수 호출
+        checkHasLogin()
+
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
         val latitude = intent.getDoubleExtra(Constants.LATITUDE,0.0)
@@ -61,8 +64,7 @@ class MainActivity : AppCompatActivity() {
         // 해쉬 키 확인 함수 호출
         //findKeyHash()
 
-        // 로그인 상태 확인 함수 호출
-        checkHasLogin()
+
 
 
 

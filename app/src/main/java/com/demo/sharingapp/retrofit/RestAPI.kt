@@ -1,6 +1,9 @@
 package com.demo.sharingapp.retrofit
 
 import com.demo.sharingapp.login.data.*
+import com.demo.sharingapp.login.find_id.data.FindIdData
+import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
+import com.demo.sharingapp.login.find_id.data.FindIdResponse
 import com.demo.sharingapp.login.signup.data.*
 import com.demo.sharingapp.utils.API
 import okhttp3.MultipartBody
@@ -43,6 +46,14 @@ interface RestAPI {
     // 이메일 인증 코드 보내기
     @POST(API.EMAIL_VERIFY) // Replace with your API endpoint
     fun postEmailVerifyData(@Body authCode: AuthCodeData): Call<EmailResponse>
+
+    // 아이디 찾기 이메일 인증 코드 받기
+    @POST(API.FIND_ID) // Replace with your API endpoint
+    fun postFindId(@Body findId: FindIdData): Call<EmailResponse>
+
+    // 아이디 찾기 이메일 인증 코드 보내기
+    @POST(API.FIND_ID_EMAIL_VERIFY) // Replace with your API endpoint
+    fun postFindIdEmailVerify(@Body findIdEmailVerify: FindIdEmailVerifyData): Call<FindIdResponse>
 
 
     // 카카오 토큰 보내기

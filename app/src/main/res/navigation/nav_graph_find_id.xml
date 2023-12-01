@@ -19,5 +19,12 @@
         android:id="@+id/findIdEmailConfirmFragment"
         android:name="com.demo.sharingapp.login.find_id.FindIdEmailConfirmFragment"
         android:label="FindIdEmailConfirmFragment"
-        tools:layout="@layout/fragment_find_id_email_confirm"/>
+        tools:layout="@layout/fragment_find_id_email_confirm">
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="email"
+            app:argType="string" />
+    </fragment>
 </navigation>

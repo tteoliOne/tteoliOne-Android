@@ -46,6 +46,10 @@ object API {
 
     const val PRODUCT_LIKE : String="/api/products/{productId}/likes"
 
+    const val FIND_ID : String="/api/users/find/login-id"
+
+    const val FIND_ID_EMAIL_VERIFY : String="/api/users/verify/login-id"
+
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
 }

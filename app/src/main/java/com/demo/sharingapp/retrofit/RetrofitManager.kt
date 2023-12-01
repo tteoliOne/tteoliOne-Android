@@ -10,6 +10,10 @@ import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.MainActivity
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.login.data.*
+import com.demo.sharingapp.login.find_id.data.FindIdData
+import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
+import com.demo.sharingapp.login.find_id.data.FindIdResponse
+import com.demo.sharingapp.login.find_id.data.LonginId
 import com.demo.sharingapp.login.signup.data.*
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.API
@@ -21,6 +25,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
+import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -211,6 +216,57 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("postCheckId", "fail ${t} $call")
+            }
+        })
+    }
+
+    fun postFindIdEmailVerify(findIdEmailVerifyData: FindIdEmailVerifyData, onCheckCode: (Boolean, String, LonginId?)-> Unit){
+        val call = retrofitInterface?.postFindIdEmailVerify(findIdEmailVerifyData)
+        call?.enqueue(object : Callback<FindIdResponse>{
+            override fun onResponse(
+                call: Call<FindIdResponse>,
+                response: Response<FindIdResponse>,
+            ) {
+                if (response.isSuccessful){
+                    Log.e("postFindIdEmailVerify", "success Signup data ${response.body()?.data}")
+                    Log.e("postFindIdEmailVerify", "success Signup success ${response.body()?.success}")
+                    Log.e("postFindIdEmailVerify", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindIdEmailVerify", "success Signup code ${response.body()?.code}")
+                    if (response.body()?.success != null && response.body()?.message != null){
+                        onCheckCode(response.body()!!.success, response.body()!!.message, response.body()?.data)
+                    }
+                }else{
+                    Log.e("postFindIdEmailVerify", "succes, Signup but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<FindIdResponse>, t: Throwable) {
+                Log.e("postFindIdEmailVerify", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 아이디 찾기 이메일 인증 코드 받기
+    fun postFindIdEmail(findIdData: FindIdData, onCheckEmail: (Boolean, String) -> Unit){
+        val call = retrofitInterface?.postFindId(findIdData)
+        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful){
+                    Log.e("postFindIdEmail", "success Signup data ${response.body()?.data}")
+                    Log.e("postFindIdEmail", "success Signup success ${response.body()?.success}")
+                    Log.e("postFindIdEmail", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindIdEmail", "success Signup code ${response.body()?.code}")
+                    if (response.body()?.success != null && response.body()?.message != null){
+                        onCheckEmail(response.body()!!.success, response.body()!!.message)
+                    }
+
+                }else{
+                    Log.e("postFindIdEmail", "succes, Signup but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postFindIdEmail", "fail ${t} $call")
             }
         })
     }
