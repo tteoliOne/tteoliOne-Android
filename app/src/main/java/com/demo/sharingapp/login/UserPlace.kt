@@ -9,11 +9,14 @@ import android.location.Location
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.util.Log
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.demo.sharingapp.MainActivity
 import com.demo.sharingapp.R
@@ -46,6 +49,10 @@ class UserPlace : AppCompatActivity() {
     // 현제 위치 권한 여부 확인 변수
     private var locationPermissionGranted = false
     private lateinit var addressAdepter: UserPlaceAdepter
+    // 검색창 입력 단어
+    private var searchFor: String = ""
+    // 핸들러
+    private val handler = Handler(Looper.getMainLooper())
 
 
     private lateinit var binding: ActivityUserPlaceBinding
@@ -67,6 +74,19 @@ class UserPlace : AppCompatActivity() {
         // 검색버튼 클릭 함수 호출
         searchButtonClick()
 
+        val runnable = Runnable {
+            searchAddress()
+        }
+
+        binding.addressEditText.addTextChangedListener {
+            searchFor = it.toString()
+            handler.removeCallbacks(runnable)
+            handler.postDelayed(
+                runnable,
+                300
+            )
+        }
+
 
         binding.myPlaceButton.setOnClickListener {
             checkPermissionLocation()
@@ -78,34 +98,39 @@ class UserPlace : AppCompatActivity() {
     private fun searchButtonClick() {
 
         // 검색 버튼 클릭 시
-        binding.searchButton.setOnClickListener {
-
-            val searchValue = binding.addressEditText.text
-
-            // 레트로핏
-            val retrofit = Retrofit.Builder().baseUrl("https://business.juso.go.kr/")
-                .addConverterFactory(GsonConverterFactory.create()).build();
-            val service = retrofit.create(RestAPI::class.java)
-            service.getAddress("U01TX0FVVEgyMDIzMTEwNzIwNTk1NTExNDI1MzU=",
-                searchValue.toString(),
-                "json").enqueue(object : Callback<AddressRequest> {
-                override fun onResponse(
-                    call: Call<AddressRequest>,
-                    response: Response<AddressRequest>,
-                ) {
-                    if (response.isSuccessful) {
-                        Log.e("address", response.body().toString())
-                        val data = response.body()?.results?.juso
-                        addressAdepter.submitList(data)
-                    } else {
-                        Log.e("address", "실패")
-                    }
-                }
-                override fun onFailure(call: Call<AddressRequest>, t: Throwable) {
-                    Log.e("address", t.message.toString())
-                }
-            })
+        binding.deleteButton.setOnClickListener {
+            Log.e("aa","cancel")
+            binding.addressEditText.text.clear()
         }
+    }
+
+    private fun searchAddress() {
+        val searchValue = binding.addressEditText.text
+
+        // 레트로핏
+        val retrofit = Retrofit.Builder().baseUrl("https://business.juso.go.kr/")
+            .addConverterFactory(GsonConverterFactory.create()).build();
+        val service = retrofit.create(RestAPI::class.java)
+        service.getAddress("U01TX0FVVEgyMDIzMTEwNzIwNTk1NTExNDI1MzU=",
+            searchValue.toString(),
+            "json").enqueue(object : Callback<AddressRequest> {
+            override fun onResponse(
+                call: Call<AddressRequest>,
+                response: Response<AddressRequest>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("address", response.body().toString())
+                    val data = response.body()?.results?.juso
+                    addressAdepter.submitList(data)
+                } else {
+                    Log.e("address", "실패")
+                }
+            }
+
+            override fun onFailure(call: Call<AddressRequest>, t: Throwable) {
+                Log.e("address", t.message.toString())
+            }
+        })
     }
 
     // 권한 체크 함수

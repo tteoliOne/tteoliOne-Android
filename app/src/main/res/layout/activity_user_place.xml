@@ -36,14 +36,17 @@
         android:layout_marginTop="20dp"
         android:layout_marginStart="20dp"
         android:hint="주소를 입력해주세요"
-        app:layout_constraintEnd_toStartOf="@+id/searchButton"
+        android:layout_marginEnd="10dp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cancel_button" />
     <ImageView
-        android:id="@+id/searchButton"
+        android:id="@+id/deleteButton"
         app:layout_constraintTop_toTopOf="@id/addressEditText"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/search"
+        app:layout_constraintEnd_toEndOf="@id/addressEditText"
+        android:layout_marginEnd="5dp"
+        app:layout_constraintBottom_toBottomOf="@id/addressEditText"
+        android:src="@drawable/edit_text_cancle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
