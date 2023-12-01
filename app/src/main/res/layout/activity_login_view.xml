@@ -101,10 +101,10 @@
         app:layout_constraintTop_toBottomOf="@id/passwordEditTextLayout" />
 
     <TextView
-        android:id="@+id/loginGuideTextView"
+        android:id="@+id/loginGuide1TextView"
         app:layout_constraintTop_toBottomOf="@id/loginButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/findIdButton"
+        app:layout_constraintEnd_toStartOf="@id/changPasswordButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingTop="8dp"
@@ -112,28 +112,61 @@
         android:fontFamily="@font/main_font"
         android:textColor="@color/black"
         android:textSize="16sp"/>
+
+    <TextView
+        android:id="@+id/loginGuide2TextView"
+        app:layout_constraintTop_toBottomOf="@id/loginButton"
+        app:layout_constraintStart_toEndOf="@id/changPasswordButton"
+        app:layout_constraintEnd_toStartOf="@id/signUpButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="8dp"
+        android:text="|"
+        android:fontFamily="@font/main_font"
+        android:textColor="@color/black"
+        android:textSize="16sp"/>
+
     <TextView
         android:id="@+id/signUpButton"
-        app:layout_constraintTop_toBottomOf="@id/loginButton"
-        app:layout_constraintEnd_toStartOf="@id/loginGuideTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
-        android:text="회원가입"
-        android:padding="8dp"
         android:fontFamily="@font/main_font"
+        android:padding="8dp"
+        android:text="회원가입"
         android:textColor="@color/black"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        app:layout_constraintEnd_toEndOf="@id/loginButton"
+        app:layout_constraintStart_toEndOf="@+id/loginGuide2TextView"
+        app:layout_constraintTop_toBottomOf="@id/loginButton" />
+
+    <TextView
+        android:id="@+id/changPasswordButton"
+        android:layout_width="0dp"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/main_font"
+        android:padding="8dp"
+        android:text="비밀번호 변경"
+        android:textColor="@color/black"
+        android:textSize="15sp"
+        app:layout_constraintEnd_toStartOf="@id/loginGuide2TextView"
+        app:layout_constraintStart_toEndOf="@+id/loginGuide1TextView"
+        app:layout_constraintTop_toBottomOf="@id/loginButton" />
+
     <TextView
         android:id="@+id/findIdButton"
-        app:layout_constraintTop_toBottomOf="@id/loginButton"
-        app:layout_constraintStart_toEndOf="@id/loginGuideTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
+        android:fontFamily="@font/main_font"
         android:padding="8dp"
         android:text="아이디 찾기"
-        android:fontFamily="@font/main_font"
         android:textColor="@color/black"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        app:layout_constraintStart_toStartOf="@id/loginButton"
+        app:layout_constraintEnd_toStartOf="@id/loginGuide1TextView"
+        app:layout_constraintTop_toBottomOf="@id/loginButton" />
 
 
 

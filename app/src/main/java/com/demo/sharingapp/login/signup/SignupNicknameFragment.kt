@@ -7,6 +7,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
@@ -46,6 +47,9 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),Confir
             RetrofitManager.instance.postCheckNickname(NicknameData(nickname)){ NicknameBoolean, message ->
                 if(NicknameBoolean){
                     // 서버에 회원가입 정보 보내기 함수 호출
+                    binding.finishButton.isVisible = false
+                    binding.completeButton.isVisible = true
+
                     showUseDialog(signupData)
 
                 }else{
@@ -62,6 +66,8 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),Confir
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.toString().trim().isNotEmpty()){
+                    binding.finishButton.isVisible = true
+                    binding.completeButton.isVisible = false
                     binding.finishButton.setBackgroundColor(Color.parseColor("#588F11"))
                     binding.finishButton.isClickable = true
                 }else{
