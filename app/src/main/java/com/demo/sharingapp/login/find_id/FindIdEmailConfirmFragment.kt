@@ -73,7 +73,9 @@ class FindIdEmailConfirmFragment : Fragment(R.layout.fragment_find_id_email_conf
                     code,
                     email)){ checkBoolean, message, id ->
                     if (checkBoolean){
-                        showSuccessDialog(String.format("아이디 : %s 입니다.",id!!.loginId))
+                        //showSuccessDialog(String.format("아이디 : %s 입니다.",id!!.loginId))
+                        val action = FindIdEmailConfirmFragmentDirections.actionFindIdEmailConfirmFragmentToFindIdFinalFragment(id!!.loginId)
+                        findNavController().navigate(action)
                     }else{
                         showDialog(message)
                     }

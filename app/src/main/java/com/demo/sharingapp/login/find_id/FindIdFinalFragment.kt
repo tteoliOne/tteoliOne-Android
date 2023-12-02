@@ -1,0 +1,34 @@
+package com.demo.sharingapp.login.find_id
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
+import com.demo.sharingapp.R
+import com.demo.sharingapp.databinding.FragmentFindIdFinalBinding
+
+class FindIdFinalFragment: Fragment(R.layout.fragment_find_id_final) {
+
+    private val args: FindIdFinalFragmentArgs by navArgs()
+
+    private lateinit var binding: FragmentFindIdFinalBinding
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = FragmentFindIdFinalBinding.bind(view)
+
+        val findId = args.findId
+
+        binding.idTextView.text = findId
+
+        binding.moveLoginButton.setOnClickListener {
+            this@FindIdFinalFragment.requireActivity().finish()
+        }
+
+        binding.moveChangePasswordButton.setOnClickListener {
+            //todo 비밀번호 변경 화면으로 이동
+        }
+
+
+    }
+}

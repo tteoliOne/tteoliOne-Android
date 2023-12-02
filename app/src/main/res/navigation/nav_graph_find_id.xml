@@ -26,5 +26,17 @@
         <argument
             android:name="email"
             app:argType="string" />
+        <action
+            android:id="@+id/action_findIdEmailConfirmFragment_to_findIdFinalFragment"
+            app:destination="@id/findIdFinalFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/findIdFinalFragment"
+        android:name="com.demo.sharingapp.login.find_id.FindIdFinalFragment"
+        android:label="FindIdFinalFragment"
+        tools:layout="@layout/fragment_find_id_final">
+        <argument
+            android:name="findId"
+            app:argType="string" />
     </fragment>
 </navigation>
