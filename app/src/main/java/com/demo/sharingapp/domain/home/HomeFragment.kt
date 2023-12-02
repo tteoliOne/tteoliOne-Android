@@ -57,12 +57,19 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // 초기 전체 리사이클러 뷰 설정 함수 호출
         initAllRecyclerView(accessToken)
 
+        if (accessToken!= ""){
+            // 서버에서 상품 데이터 불러오기
+            getProducts(longitude, latitude, accessToken, userId)
+        }
 
-        // 서버에서 상품 데이터 불러오기
-        getProducts(longitude, latitude, accessToken, userId)
 
         // 상품 등록 버튼 클릭 시
         addProductButton()
+
+        binding.vegetableTextView.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToSelectProductFragment()
+            findNavController().navigate(action)
+        }
 
     }
 

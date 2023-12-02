@@ -20,6 +20,9 @@
         <action
             android:id="@+id/action_homeFragment_to_homePartProductFragment"
             app:destination="@id/homePartProductFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_selectProductFragment"
+            app:destination="@id/selectProductFragment" />
     </fragment>
 
     <fragment
@@ -53,5 +56,13 @@
         <argument
             android:name="name"
             app:argType="string" />
+        <action
+            android:id="@+id/action_homePartProductFragment_to_selectProductFragment"
+            app:destination="@id/selectProductFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/selectProductFragment"
+        android:name="com.demo.sharingapp.domain.home.part.SelectProductFragment"
+        android:label="SelectProductFragment"
+        tools:layout="@layout/fragment_home_select_product"/>
 </navigation>
