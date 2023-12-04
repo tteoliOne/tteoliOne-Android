@@ -1,15 +1,21 @@
 package com.demo.sharingapp
 
 import android.content.Intent
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Gravity
+import android.view.View
+import android.view.WindowManager
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.demo.sharingapp.databinding.ActivityMainBinding
 import com.demo.sharingapp.domain.MainViewModel
+import com.demo.sharingapp.domain.home.HomeFragment
 import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -25,7 +31,7 @@ import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var navHostFragment: NavHostFragment
@@ -34,6 +40,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+
+        binding.navHostFragment
+
+        binding.likeListCloseButton.setOnClickListener {
+            binding.drawerView.closeDrawer(Gravity.LEFT)
+            binding.navHostFragment.bringToFront()
+        }
+
 
         // 로그인 상태 확인 함수 호출
         checkHasLogin()
@@ -49,6 +65,7 @@ class MainActivity : AppCompatActivity() {
 
         // 바텀네비 초기 설정 함수 호출
         initNavigation()
+
 
         navHostFragment.navController.addOnDestinationChangedListener{ a,b,c ->
             //Log.e("bb", " a = $a , b = ${b.id} , ${R.id.userFragment} , c = $c")
@@ -137,6 +154,15 @@ class MainActivity : AppCompatActivity() {
         val refreshToken = SharedPreferencesData.getData(this, REFRESH_TOKEN)
         val nickname = SharedPreferencesData.getData(this, NICKNAME)
         Log.e("getSharedData", "accessToken : $accessToken, refreshToken : $refreshToken, nickname : $nickname ")
+    }
+
+
+    // 홈프레그먼트에서 버튼 클릭시 동작 함수
+    override fun onButtonClicked() {
+        binding.drawerView.openDrawer(Gravity.LEFT)
+        Log.e("aa","MyFragmentListener")
+        binding.drawerView.bringToFront()
+        binding.drawerView.setScrimColor(Color.TRANSPARENT)
     }
 
 
