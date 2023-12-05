@@ -325,7 +325,7 @@ class RetrofitManager() : Application() {
     }
 
     // 비밀번호 찾기 - 재변경한 비밀번호 보내기
-    fun postFindPasswordReset(findPasswordRestData: FindPasswordResetData){
+    fun postFindPasswordReset(findPasswordRestData: FindPasswordResetData, onCheckPassword: (Boolean,String)->Unit){
         val call = retrofitInterface?.postFindPasswordReset(findPasswordRestData)
         call?.enqueue(object : retrofit2.Callback<EmailResponse>{
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
@@ -334,7 +334,9 @@ class RetrofitManager() : Application() {
                     Log.e("postFindPasswordReset", "success Signup success ${response.body()?.success}")
                     Log.e("postFindPasswordReset", "success Signup message ${response.body()?.message}")
                     Log.e("postFindPasswordReset", "success Signup code ${response.body()?.code}")
-
+                    if (response.body()?.success != null && response.body()?.message != null){
+                        onCheckPassword(response.body()!!.success, response.body()!!.message)
+                    }
                 }else{
                     Log.e("postFindPasswordReset", "succes, Signup but ${response.errorBody()}")
                 }

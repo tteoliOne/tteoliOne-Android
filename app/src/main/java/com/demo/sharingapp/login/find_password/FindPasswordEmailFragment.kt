@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
@@ -26,6 +27,12 @@ class FindPasswordEmailFragment : Fragment(R.layout.fragment_find_password_email
         // 다음 버튼 클릭 시 함수 호출
         clickNextButton()
 
+        // 이전 버튼 클릭 함수 호출
+        clickBackButton()
+    }
+
+    // 이전 버튼 클릭 함수
+    private fun clickBackButton() {
         binding.backButton.setOnClickListener {
             this@FindPasswordEmailFragment.requireActivity().finish()
         }
@@ -48,6 +55,7 @@ class FindPasswordEmailFragment : Fragment(R.layout.fragment_find_password_email
                                 id,
                                 email)
                         findNavController().navigate(action)
+                        Toast.makeText(this.requireContext(),message,Toast.LENGTH_SHORT).show()
                     }else{
                         showDialog(message)
                     }

@@ -5,11 +5,13 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentFindPasswordResetBinding
 import com.demo.sharingapp.login.find_password.data.FindPasswordResetData
+import com.demo.sharingapp.login.signup.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import java.util.regex.Pattern
 
@@ -29,10 +31,24 @@ class FindPasswordResetFragment:Fragment(R.layout.fragment_find_password_reset) 
         // 패스워드 입력시 유효성 검사 함수 호출
         checkInputPassword()
 
+        // 다음 버튼 클릭 함수 호출
+        clickNextButton(name, email, id)
+    }
+
+    // 다음 버튼 클릭 함수
+    private fun clickNextButton(name: String, email: String, id: String) {
         binding.nextButton.setOnClickListener {
             val password = binding.passwordEditText.text.toString()
-            val passwordResetData = FindPasswordResetData(name,email,id,password)
-            RetrofitManager.instance.postFindPasswordReset(passwordResetData)
+            val passwordResetData = FindPasswordResetData(name, email, id, password)
+            RetrofitManager.instance.postFindPasswordReset(passwordResetData) { checkBoolean, message ->
+                if (checkBoolean) {
+                    this@FindPasswordResetFragment.requireActivity().finish()
+                    Toast.makeText(this.requireContext(), message, Toast.LENGTH_SHORT).show()
+                } else {
+                    showDialog(message)
+                }
+
+            }
         }
     }
 
@@ -99,5 +115,14 @@ class FindPasswordResetFragment:Fragment(R.layout.fragment_find_password_reset) 
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    // 알림창 띄우기
+    private fun showDialog(message: String) {
+        val dialog = SignupDialog(message)
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this@FindPasswordResetFragment.requireActivity().supportFragmentManager,
+            "SignupDialog")
     }
 }
