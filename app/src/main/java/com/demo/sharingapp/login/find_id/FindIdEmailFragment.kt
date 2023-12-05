@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
@@ -49,6 +50,7 @@ class FindIdEmailFragment : Fragment(R.layout.fragment_find_id_email) {
             if (Pattern.matches("^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})",
                     binding.emailEditText.text) && binding.nameEditText.text.toString().isNotEmpty()
             ) {
+                showProgress()
                 val email = binding.emailEditText.text.toString()
                 val name = binding.nameEditText.text.toString()
 
@@ -61,11 +63,13 @@ class FindIdEmailFragment : Fragment(R.layout.fragment_find_id_email) {
                                 name,
                                 email)
                         findNavController().navigate(action)
+                        hideProgress()
                         Toast.makeText(this@FindIdEmailFragment.requireContext(),
                             "인증코드가 발송 되었습니다.",
                             Toast.LENGTH_SHORT).show()
                     } else { // 실패 했을때
                         showDialog(message)
+                        hideProgress()
                     }
                 }
             }
@@ -125,6 +129,17 @@ class FindIdEmailFragment : Fragment(R.layout.fragment_find_id_email) {
             override fun afterTextChanged(s: Editable?) {}
         })
     }
+
+    // 로딩바 띄우기 함수
+    private fun showProgress() {
+        binding.progressBarLayout.isVisible = true
+    }
+    // 로딩바 내리기 함수
+    private fun hideProgress() {
+        binding.progressBarLayout.isVisible = false
+    }
+
+
     // 알림창 띄우기
     private fun showDialog(message: String) {
         val dialog = SignupDialog(message)

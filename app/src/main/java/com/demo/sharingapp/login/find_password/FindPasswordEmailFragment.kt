@@ -6,6 +6,7 @@ import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
@@ -31,6 +32,15 @@ class FindPasswordEmailFragment : Fragment(R.layout.fragment_find_password_email
         clickBackButton()
     }
 
+    // 로딩바 띄우기 함수
+    private fun showProgress() {
+        binding.progressBarLayout.isVisible = true
+    }
+    // 로딩바 내리기 함수
+    private fun hideProgress() {
+        binding.progressBarLayout.isVisible = false
+    }
+
     // 이전 버튼 클릭 함수
     private fun clickBackButton() {
         binding.backButton.setOnClickListener {
@@ -42,6 +52,7 @@ class FindPasswordEmailFragment : Fragment(R.layout.fragment_find_password_email
     private fun clickNextButton() {
         binding.nextButton.setOnClickListener {
             if (checkAll()) {
+                showProgress()
                 val name = binding.nameEditText.text.toString()
                 val email = binding.emailEditText.text.toString()
                 val id = binding.idEditText.text.toString()
@@ -55,9 +66,11 @@ class FindPasswordEmailFragment : Fragment(R.layout.fragment_find_password_email
                                 id,
                                 email)
                         findNavController().navigate(action)
+                        hideProgress()
                         Toast.makeText(this.requireContext(),message,Toast.LENGTH_SHORT).show()
                     }else{
                         showDialog(message)
+                        hideProgress()
                     }
                 }
             }
