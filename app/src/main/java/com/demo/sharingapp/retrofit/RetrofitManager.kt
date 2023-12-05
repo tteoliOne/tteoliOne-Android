@@ -7,13 +7,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.demo.sharingapp.MainActivity
-import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
 import com.demo.sharingapp.login.find_id.data.FindIdResponse
 import com.demo.sharingapp.login.find_id.data.LonginId
+import com.demo.sharingapp.login.find_password.data.FindPasswordEmailData
+import com.demo.sharingapp.login.find_password.data.FindPasswordEmailVerifyData
+import com.demo.sharingapp.login.find_password.data.FindPasswordResetData
 import com.demo.sharingapp.login.signup.data.*
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.API
@@ -220,6 +221,7 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 아이디 찾기 - 이메일 인증코드 보내기
     fun postFindIdEmailVerify(findIdEmailVerifyData: FindIdEmailVerifyData, onCheckCode: (Boolean, String, LonginId?)-> Unit){
         val call = retrofitInterface?.postFindIdEmailVerify(findIdEmailVerifyData)
         call?.enqueue(object : Callback<FindIdResponse>{
@@ -267,6 +269,79 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("postFindIdEmail", "fail ${t} $call")
+            }
+        })
+    }
+
+
+    // 비밀번호 찾기 - 이메일 인증코드 받기
+    fun postFindPasswordEmail(findPasswordData: FindPasswordEmailData, onCheckEmail: (Boolean, String) -> Unit){
+        val call = retrofitInterface?.postFindPasswordEmail(findPasswordData)
+        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful){
+                    Log.e("postFindPasswordEmail", "success Signup data ${response.body()?.data}")
+                    Log.e("postFindPasswordEmail", "success Signup success ${response.body()?.success}")
+                    Log.e("postFindPasswordEmail", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindPasswordEmail", "success Signup code ${response.body()?.code}")
+                    if (response.body()?.success != null && response.body()?.message != null){
+                        onCheckEmail(response.body()!!.success, response.body()!!.message)
+                    }
+
+                }else{
+                    Log.e("postFindPasswordEmail", "succes, Signup but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postFindPasswordEmail", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 비밀번호 찾기 - 이메일 인증코드 보내기
+    fun postFindPasswordEmailVerify(findPasswordEmailVerifyData: FindPasswordEmailVerifyData, onCheckCode: (Boolean, String) -> Unit){
+        val call = retrofitInterface?.postFindPasswordEmailVerify(findPasswordEmailVerifyData)
+        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful){
+                    Log.e("postFindPasswordEmailVerify", "success Signup data ${response.body()?.data}")
+                    Log.e("postFindPasswordEmailVerify", "success Signup success ${response.body()?.success}")
+                    Log.e("postFindPasswordEmailVerify", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindPasswordEmailVerify", "success Signup code ${response.body()?.code}")
+                    if (response.body()?.success != null && response.body()?.message != null){
+                        onCheckCode(response.body()!!.success, response.body()!!.message)
+                    }
+
+                }else{
+                    Log.e("postFindPasswordEmailVerify", "succes, Signup but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postFindPasswordEmailVerify", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 비밀번호 찾기 - 재변경한 비밀번호 보내기
+    fun postFindPasswordReset(findPasswordRestData: FindPasswordResetData){
+        val call = retrofitInterface?.postFindPasswordReset(findPasswordRestData)
+        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful){
+                    Log.e("postFindPasswordReset", "success Signup data ${response.body()?.data}")
+                    Log.e("postFindPasswordReset", "success Signup success ${response.body()?.success}")
+                    Log.e("postFindPasswordReset", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindPasswordReset", "success Signup code ${response.body()?.code}")
+
+                }else{
+                    Log.e("postFindPasswordReset", "succes, Signup but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postFindPasswordReset", "fail ${t} $call")
             }
         })
     }

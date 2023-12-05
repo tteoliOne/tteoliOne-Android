@@ -17,6 +17,7 @@ import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.login.data.AccessTokenRequest
 import com.demo.sharingapp.login.data.LoginData
 import com.demo.sharingapp.login.find_id.FindIdActivity
+import com.demo.sharingapp.login.find_password.FindPasswordActivity
 import com.demo.sharingapp.login.signup.SignUpActivity
 
 import com.demo.sharingapp.retrofit.RetrofitManager
@@ -60,27 +61,17 @@ class LoginView : AppCompatActivity() {
         // 카카오 버튼 클릭 함수 호출
         clickKakaoButton()
 
-        binding.loginButton.setOnClickListener {
-            val id = binding.idEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
-            val loginData = LoginData(id,password)
-            RetrofitManager.instance.postLogin(this,loginData){
-                if(it){
-                    val intent = Intent(this, UserPlace::class.java)
-                    startActivity(intent)
-                }else{
-                    // todo 실패 알림창 표시
-                }
-            }
-        }
+        // 로그인 버튼 클릭 함수 호출
+        clickLogin()
 
-        binding.signUpButton.setOnClickListener {
-            startActivity(Intent(this, SignUpActivity::class.java))
-        }
+        // 비밀번호 변경 버튼 클릭 함수 호출
+        clickChangePassword()
 
-        binding.findIdButton.setOnClickListener {
-            startActivity(Intent(this, FindIdActivity::class.java))
-        }
+        // 회원가입 버튼 클릭 함수 호출
+        clickSignupButton()
+
+        // 아이디 찾기 버튼 클릭 함수 호출
+        clickFindIdButton()
 
         //
         binding.googleLoginButton.setOnClickListener {
@@ -88,6 +79,44 @@ class LoginView : AppCompatActivity() {
         }
 
 
+    }
+
+    // 아이디 찾기 버튼 클릭 함수
+    private fun clickFindIdButton() {
+        binding.findIdButton.setOnClickListener {
+            startActivity(Intent(this, FindIdActivity::class.java))
+        }
+    }
+
+    // 회원가입 버튼 클릭 함수
+    private fun clickSignupButton() {
+        binding.signUpButton.setOnClickListener {
+            startActivity(Intent(this, SignUpActivity::class.java))
+        }
+    }
+
+    // 비밀번호 변경 버튼 클릭 함수
+    private fun clickChangePassword() {
+        binding.changPasswordButton.setOnClickListener {
+            startActivity(Intent(this, FindPasswordActivity::class.java))
+        }
+    }
+
+    // 로그인 버튼 클릭 함수
+    private fun clickLogin() {
+        binding.loginButton.setOnClickListener {
+            val id = binding.idEditText.text.toString()
+            val password = binding.passwordEditText.text.toString()
+            val loginData = LoginData(id, password)
+            RetrofitManager.instance.postLogin(this, loginData) {
+                if (it) {
+                    val intent = Intent(this, UserPlace::class.java)
+                    startActivity(intent)
+                } else {
+                    // todo 실패 알림창 표시
+                }
+            }
+        }
     }
 
     // editText 포커스 clear 함수

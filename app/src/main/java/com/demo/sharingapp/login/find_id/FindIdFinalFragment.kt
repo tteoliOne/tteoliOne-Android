@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentFindIdFinalBinding
+import com.demo.sharingapp.login.find_password.FindPasswordActivity
 
 class FindIdFinalFragment: Fragment(R.layout.fragment_find_id_final) {
 
@@ -26,7 +27,8 @@ class FindIdFinalFragment: Fragment(R.layout.fragment_find_id_final) {
         }
 
         binding.moveChangePasswordButton.setOnClickListener {
-            //todo 비밀번호 변경 화면으로 이동
+            startActivity(Intent(this@FindIdFinalFragment.requireActivity(),FindPasswordActivity::class.java))
+            this@FindIdFinalFragment.requireActivity().finish()
         }
 
 

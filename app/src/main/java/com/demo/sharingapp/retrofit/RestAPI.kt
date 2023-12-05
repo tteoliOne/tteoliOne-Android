@@ -4,6 +4,9 @@ import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
 import com.demo.sharingapp.login.find_id.data.FindIdResponse
+import com.demo.sharingapp.login.find_password.data.FindPasswordEmailData
+import com.demo.sharingapp.login.find_password.data.FindPasswordEmailVerifyData
+import com.demo.sharingapp.login.find_password.data.FindPasswordResetData
 import com.demo.sharingapp.login.signup.data.*
 import com.demo.sharingapp.utils.API
 import okhttp3.MultipartBody
@@ -54,6 +57,18 @@ interface RestAPI {
     // 아이디 찾기 이메일 인증 코드 보내기
     @POST(API.FIND_ID_EMAIL_VERIFY) // Replace with your API endpoint
     fun postFindIdEmailVerify(@Body findIdEmailVerify: FindIdEmailVerifyData): Call<FindIdResponse>
+
+    // 비밀번호 찾기 - 이메일 인증 코드 받기
+    @POST(API.FIND_PASSWORD_EMAIL) // Replace with your API endpoint
+    fun postFindPasswordEmail(@Body findPassword: FindPasswordEmailData): Call<EmailResponse>
+
+    // 비밀번호 찾기 - 이메일 인증 코드 보내기
+    @POST(API.FIND_PASSWORD_EMAIL_VERIFY) // Replace with your API endpoint
+    fun postFindPasswordEmailVerify(@Body findPasswordEmailVerify: FindPasswordEmailVerifyData): Call<EmailResponse>
+
+    // 비밀번호 찾기 - 바꾼 비밀번호 보내기
+    @PATCH(API.FIND_PASSWORD_RESET) // Replace with your API endpoint
+    fun postFindPasswordReset(@Body findPasswordEmailVerify: FindPasswordResetData): Call<EmailResponse>
 
 
     // 카카오 토큰 보내기

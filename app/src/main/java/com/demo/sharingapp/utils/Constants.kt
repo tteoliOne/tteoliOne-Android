@@ -50,6 +50,12 @@ object API {
 
     const val FIND_ID_EMAIL_VERIFY : String="/api/users/verify/login-id"
 
+    const val FIND_PASSWORD_EMAIL : String="/api/users/find/password"
+
+    const val FIND_PASSWORD_EMAIL_VERIFY : String="/api/users/verify/password"
+
+    const val FIND_PASSWORD_RESET : String="/api/users/reset/password"
+
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
 }
