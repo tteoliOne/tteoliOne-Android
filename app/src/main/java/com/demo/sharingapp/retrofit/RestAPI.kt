@@ -1,5 +1,6 @@
 package com.demo.sharingapp.retrofit
 
+import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -93,6 +94,13 @@ interface RestAPI {
         @Query("longitude") longitude: Double,
         @Query("latitude") latitude: Double
     ): Call<GetProductsResponse>
+
+    // 찜목록 가져오기
+    @GET(API.SAVE_PRODUCTS)
+    fun getSaveProducts(
+        @Header("Authorization") Authorization: String,
+    ): Call<GetSaveProductData>
+
 
     // 도로명 주소 정보 가져오기
     @GET("addrlink/addrLinkApi.do")

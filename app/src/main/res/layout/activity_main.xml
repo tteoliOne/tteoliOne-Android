@@ -19,27 +19,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         >
-        <com.google.android.material.navigation.NavigationView
-            android:layout_gravity="start"
-            android:layout_width="150dp"
-            android:background="@drawable/round_right_30"
-            android:layout_height="match_parent">
-            <ImageView
-                android:id="@+id/likeListCloseButton"
-                android:layout_margin="30dp"
-                android:layout_gravity="right"
-                android:src="@drawable/cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
 
-          <androidx.recyclerview.widget.RecyclerView
-              android:id="@+id/likeListRecyclerView"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_marginTop="60dp"/>
-
-
-        </com.google.android.material.navigation.NavigationView>
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
@@ -67,6 +47,30 @@
                 app:navGraph="@navigation/nav_graph" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <com.google.android.material.navigation.NavigationView
+            android:layout_gravity="start"
+            android:layout_width="150dp"
+            android:background="@drawable/round_right_30"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/likeListCloseButton"
+                android:layout_margin="20dp"
+                android:layout_gravity="right"
+                android:src="@drawable/cancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/likeListRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="30dp"
+                android:scrollbars="vertical"
+                android:layout_marginBottom="30dp"/>
+
+
+        </com.google.android.material.navigation.NavigationView>
 
 
 

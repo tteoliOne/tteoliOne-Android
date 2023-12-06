@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.demo.sharingapp.databinding.ActivityMainBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.HomeFragment
@@ -36,6 +37,9 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var binding:ActivityMainBinding
+
+    private lateinit var saveProductAdapter: LikeListAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -66,6 +70,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         // 바텀네비 초기 설정 함수 호출
         initNavigation()
 
+        initRecyclerView()
+
 
         navHostFragment.navController.addOnDestinationChangedListener{ a,b,c ->
             //Log.e("bb", " a = $a , b = ${b.id} , ${R.id.userFragment} , c = $c")
@@ -84,7 +90,14 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
 
 
+    }
 
+    private fun initRecyclerView() {
+        saveProductAdapter = LikeListAdapter()
+        binding.likeListRecyclerView.apply {
+            adapter = saveProductAdapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
     }
 
     // 바텀네비 초기 설정 함수
@@ -159,6 +172,13 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     // 홈프레그먼트에서 버튼 클릭시 동작 함수
     override fun onButtonClicked() {
+        RetrofitManager.instance.getSaveProduct(this@MainActivity){
+            it.let {
+                saveProductAdapter.submitList(it.products)
+            }
+
+        }
+
         binding.drawerView.openDrawer(Gravity.LEFT)
         Log.e("aa","MyFragmentListener")
         binding.drawerView.bringToFront()

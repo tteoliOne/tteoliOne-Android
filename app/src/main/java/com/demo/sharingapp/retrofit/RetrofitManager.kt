@@ -7,6 +7,9 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.demo.sharingapp.data.GetSaveProductData
+import com.demo.sharingapp.data.SaveProductsData
+import com.demo.sharingapp.data.SaveProductsListData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -56,6 +59,37 @@ class RetrofitManager() : Application() {
     private val retrofitInterface: RestAPI? =
         RetrofitClient.getClient(API.BASE_URL)?.create(RestAPI::class.java)
 
+
+    // 찜목록 가져오기
+    fun getSaveProduct(context: Context, onSuccessData:(SaveProductsListData)->Unit){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getSaveProducts(Authorization = authorization)
+
+        getCall.enqueue(object : retrofit2.Callback<GetSaveProductData>{
+            override fun onResponse(
+                call: Call<GetSaveProductData>,
+                response: Response<GetSaveProductData>,
+            ) {
+                if (response.isSuccessful){
+                    Log.e("getSaveProduct", "success Login data ${response.body()?.data}")
+                    Log.e("getSaveProduct", "success Login success ${response.body()?.success}")
+                    Log.e("getSaveProduct", "success Login message ${response.body()?.message}")
+                    Log.e("getSaveProduct", "success Login code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                        onSuccessData(data)
+
+                }
+                Log.e("getSaveProduct", "succes, Login but ${response.errorBody()}")
+            }
+
+            override fun onFailure(call: Call<GetSaveProductData>, t: Throwable) {
+                Log.e("getSaveProduct", "fail ${t} $call")
+            }
+        })
+    }
 
     // 상품 가져오기
     fun getProduct(

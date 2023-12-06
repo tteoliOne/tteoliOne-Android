@@ -56,6 +56,8 @@ object API {
 
     const val FIND_PASSWORD_RESET : String="/api/users/reset/password"
 
+    const val SAVE_PRODUCTS : String="/api/products/saved"
+
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
 }
