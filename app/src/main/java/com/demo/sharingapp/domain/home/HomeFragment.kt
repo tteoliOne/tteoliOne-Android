@@ -31,6 +31,8 @@ import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.API
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
+import com.demo.sharingapp.utils.Constants.LATITUDE
+import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.USER_ID
 
@@ -44,6 +46,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var homeMeatAdepter: HomeAdepter
     private lateinit var homeSeafoodAdepter: HomeAdepter
     private lateinit var homeEtcAdepter: HomeAdepter
+
+
+    private var longitude = 0.0
+    private var latitude = 0.0
 
     //
     private var listener: MyFragmentListener? = null
@@ -67,8 +73,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // 초기 nickname 설정 함수 호출
         initNickname()
 
-        val longitude = mainViewModel.longitude.value
-        val latitude = mainViewModel.latitude.value
+//        val longitude = mainViewModel.longitude.value
+//       val latitude = mainViewModel.latitude.value
+
+        if (checkSharedPreferencesData(LONGITUDE) && checkSharedPreferencesData(LATITUDE)){
+            longitude = SharedPreferencesData.getData(this.requireContext(), LONGITUDE).toDouble()
+            latitude = SharedPreferencesData.getData(this.requireContext(), LATITUDE).toDouble()
+        }
         val accessToken = SharedPreferencesData.getData(this.requireContext(),ACCESS_TOKEN)
         val userId = SharedPreferencesData.getLongData(this.requireContext(),USER_ID)
 
@@ -270,6 +281,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.topBar.nicknameTextView.text = SharedPreferencesData.getData(this.requireContext(),NICKNAME)
 
     }
+
+    private fun checkSharedPreferencesData(dataName: String): Boolean{
+        return SharedPreferencesData.containsData(this.requireContext(),dataName)
+    }
+
     interface MyFragmentListener {
         fun onButtonClicked()
     }

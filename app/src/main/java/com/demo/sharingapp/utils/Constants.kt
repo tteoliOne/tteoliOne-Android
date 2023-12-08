@@ -10,6 +10,8 @@ object Constants{
     const val USER_ID = "userId"
     const val LATITUDE = "latitude"
     const val LONGITUDE = "longitude"
+    const val FIND_LATITUDE = "latitude1"
+    const val FIND_LONGITUDE = "longitude1"
     const val SIGNUP_EMAIL = "email"
     const val SIGNUP_ID = "id"
     const val SIGNUP_NAME = "name"

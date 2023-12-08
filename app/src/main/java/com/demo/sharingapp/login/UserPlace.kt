@@ -72,7 +72,7 @@ class UserPlace : AppCompatActivity() {
         }
 
         // 검색버튼 클릭 함수 호출
-        searchButtonClick()
+        deleteButtonClick()
 
         val runnable = Runnable {
             searchAddress()
@@ -95,7 +95,7 @@ class UserPlace : AppCompatActivity() {
     }
 
     // 검색버튼 클릭 함수
-    private fun searchButtonClick() {
+    private fun deleteButtonClick() {
 
         // 검색 버튼 클릭 시
         binding.deleteButton.setOnClickListener {
@@ -225,10 +225,19 @@ class UserPlace : AppCompatActivity() {
     private fun getCurrentPlace() {
         // 안드로이드 위치 api
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-        fusedLocationClient.lastLocation.addOnSuccessListener {
+        fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
 
-            // mainActivity 로 위치정보와 함께 이동하는 함수 호출
-            moveMainActivity(it.latitude, it.longitude)
+            location?.let {
+                Log.e("place",it.toString())
+
+                savePlace(it.longitude,it.latitude)
+                // mainActivity 로 위치정보와 함께 이동하는 함수 호출
+                moveMainActivity(it.latitude, it.longitude)
+            } ?: kotlin.run {
+                Log.e("place", "Location is null")
+            }
+
+
 
         }
     }
@@ -271,6 +280,7 @@ class UserPlace : AppCompatActivity() {
                 Location("").apply {
                     latitude = it[0].latitude
                     longitude = it[0].longitude
+                    savePlace(longitude,latitude)
                     moveMainActivity(latitude,longitude)
                 }
             } ?: Location("").apply {
@@ -281,5 +291,11 @@ class UserPlace : AppCompatActivity() {
             e.printStackTrace()
             Log.e("adress", e.toString())
         }
+    }
+
+    // 내부 저장소에 위치 값 저장
+    private fun savePlace(longitude: Double,latitude: Double){
+        SharedPreferencesData.saveData(this, LONGITUDE,longitude.toString())
+        SharedPreferencesData.saveData(this, LATITUDE,latitude.toString())
     }
 }

@@ -121,7 +121,7 @@ class ProductBottomSheet : BottomSheetDialogFragment() {
 
                         val uri = saveBitmapToGallery(this.requireContext(),bitmap)
                         if (uri != null){
-                            val file = File(requireContext().cacheDir, "image.jpeg")
+                            val file = File(requireContext().cacheDir, "image")
                             val fileOutputStream = FileOutputStream(file)
                             convertUriToJpeg(uri).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
                             fileOutputStream.flush()

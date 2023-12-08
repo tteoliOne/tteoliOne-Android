@@ -46,9 +46,6 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         setContentView(binding.root)
 
 
-
-        binding.navHostFragment
-
         binding.likeListCloseButton.setOnClickListener {
             binding.drawerView.closeDrawer(Gravity.LEFT)
             binding.navHostFragment.bringToFront()
@@ -122,6 +119,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         val checkIsRefreshToken = SharedPreferencesData.containsData(this, REFRESH_TOKEN)
 
+
         if (!checkIsRefreshToken){
             moveLogin()
         }
@@ -159,6 +157,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     private fun moveLogin() {
         val intent = Intent(this, LoginView::class.java)
         startActivity(intent)
+        finish()
     }
 
     // 쉐어드프리퍼런스에서 데이터 들고 오는 함수

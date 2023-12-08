@@ -39,6 +39,10 @@ import com.demo.sharingapp.login.data.Products
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
+import com.demo.sharingapp.utils.Constants.FIND_LATITUDE
+import com.demo.sharingapp.utils.Constants.FIND_LONGITUDE
+import com.demo.sharingapp.utils.Constants.LATITUDE
+import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -99,8 +103,8 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         // 카테고리 선택 함수 호출
         categoryCheck()
 
-        // 적은 데이터 불러오기 함수 호출
-        importData()
+        // 위치 데이터 불러 오기 함수 호출
+        initPlaceData()
 
         // 불러온 데이터 넣기 함수 호출
         puttingData()
@@ -161,6 +165,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     // 뷰모델로 데이터 보내는 함수
     private fun sendViewModel() {
         productViewModel = ViewModelProvider(this)[ProductViewModel::class.java]
+
         val imageFileList: ArrayList<MultipartBody.Part> = ArrayList()
         imageList.forEach {
             val file = File(cacheDir, "image.jpeg")
@@ -171,13 +176,13 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
             val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
             val imagePart = MultipartBody.Part.createFormData("photos", file.name, requestFile)
-            Log.e("aa" , imagePart.body.contentType().toString())
+            Log.e("aa", imagePart.body.contentType().toString())
             imageFileList.add(imagePart)
         }
+        productViewModel.updateProductImage(imageFileList)
 
         // 뷰모델에 데이터 업데이트
         productViewModel.updateProductImage(
-            imageJpegList =  imageFileList,
             title = title,
             buyPrice = buyPrice.toInt(),
             buyCount = buyCount.toInt(),
@@ -187,7 +192,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
             longitude = longitude,
             latitude = latitude,
             categoryId = categoryId,
-            buyDate = getString(R.string.buy_date_local,year,month,day)
+            buyDate = getString(R.string.buy_date_local, year, month, day)
         )
 
     }
@@ -400,15 +405,28 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                     }
                 }
                 300 -> {
-                        latitude = data?.getDoubleExtra("latitude",0.0) ?:return
-                        longitude = data?.getDoubleExtra("longitude",0.0) ?:return
-                        // 결과 데이터 사용
-                        Log.d("SendingActivity", "Received result: $latitude, $longitude")
-                        if(latitude != null && longitude != null)
-                         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude,longitude), 15f))
+                    latitude = data?.getDoubleExtra("latitude", 0.0) ?: return
+                    longitude = data?.getDoubleExtra("longitude", 0.0) ?: return
+
+                    saveSharedString(FIND_LONGITUDE, longitude.toString())
+                    saveSharedString(FIND_LATITUDE, latitude.toString())
+
+                    Log.e("SendingActivity","현제 ${SharedPreferencesData.getData(this, LATITUDE)} 바꾼 ${SharedPreferencesData.getData(this,
+                        FIND_LATITUDE)}")
+                    // 결과 데이터 사용
+                    Log.d("SendingActivity", "Received result: $latitude, $longitude")
+                    if (latitude != null && longitude != null)
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(latitude,
+                            longitude), 15f))
+                    marker.position = mMap.cameraPosition.target
+
                 }
             }
         }
+    }
+
+    private fun saveSharedString(title: String, data: String) {
+        SharedPreferencesData.saveData(this, title, data)
     }
 
     // 비트맵 이미지를 갤러리에 저장하는 함수
@@ -514,15 +532,14 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         binding.mapBigSizeButton.setOnClickListener {
             // 작서한 데이터 저장하고 화면 이동 함수 호출
             saveDataAndMove()
-
-
         }
     }
 
     // 이전버튼 눌렀을 때 함수
     private fun movePrevious() {
         binding.movePreviousButton.setOnClickListener {
-            startActivity(Intent(this, MainActivity::class.java))
+//            startActivity(Intent(this, MainActivity::class.java))
+            finish()
         }
     }
 
@@ -549,26 +566,29 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
     // 적은 데이터 불러오기 함수
-    private fun importData() {
-        title = intent.getStringExtra("title") ?: ""
-        buyPrice = intent.getStringExtra("buyPrice") ?: ""
-        buyCount = intent.getStringExtra("buyCount") ?: ""
-        sharePrice = intent.getStringExtra("sharePrice") ?: ""
-        shareCount = intent.getStringExtra("shareCount") ?: ""
-        latitude = intent.getDoubleExtra("latitude", 37.566381)
-        longitude = intent.getDoubleExtra("longitude", 126.977717)
-        categoryId = intent.getIntExtra("categoryId", 0)
-        description = intent.getStringExtra("description") ?: ""
-        year = intent.getIntExtra("year", year)
-        month = intent.getIntExtra("month", month)
-        day = intent.getIntExtra("day", day)
+    private fun initPlaceData() {
+        latitude = SharedPreferencesData.getData(this@AddProductsActivity, LATITUDE).toDouble()
+        longitude = SharedPreferencesData.getData(this@AddProductsActivity, LONGITUDE).toDouble()
+
+        Log.e("SendingActivity","시작 위치 $latitude, $longitude")
+//        title = intent.getStringExtra("title") ?: ""
+//        buyPrice = intent.getStringExtra("buyPrice") ?: ""
+//        buyCount = intent.getStringExtra("buyCount") ?: ""
+//        sharePrice = intent.getStringExtra("sharePrice") ?: ""
+//        shareCount = intent.getStringExtra("shareCount") ?: ""
+
+//        categoryId = intent.getIntExtra("categoryId", 0)
+//        description = intent.getStringExtra("description") ?: ""
+//        year = intent.getIntExtra("year", year)
+//        month = intent.getIntExtra("month", month)
+//        day = intent.getIntExtra("day", day)
 //        imageList = intent.getSerializableExtra("imageList")
     }
 
     // 작서한 데이터 저장하고 화면 이동 함수
     private fun saveDataAndMove() {
 
-        startActivityForResult(Intent(this,BigSizeMapActivity::class.java),300)
+        startActivityForResult(Intent(this, BigSizeMapActivity::class.java), 300)
         // 입력한 데이터 넣기 함수호출
 //        inputDate()
 //        startActivity(Intent(this, BigSizeMapActivity::class.java).apply {
@@ -684,12 +704,6 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         return super.dispatchTouchEvent(ev)
     }
-
-
-
-
-
-
 
 
 }

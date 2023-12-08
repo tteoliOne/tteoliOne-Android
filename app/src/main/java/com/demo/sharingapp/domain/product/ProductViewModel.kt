@@ -91,7 +91,6 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
 
     // 제품 데이터 업데이트 함수
     fun updateProductImage(
-        imageJpegList: ArrayList<MultipartBody.Part>,
         title: String,
         buyPrice: Int,
         buyCount: Int,
@@ -113,7 +112,11 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         this._currentLatitude.value = latitude
         this._currentCategoryId.value = categoryId
         this._currentBuyDate.value = buyDate
-        this._currentImageList.value = imageJpegList
+    }
+
+    fun updateProductImage(productsImage: List<MultipartBody.Part>){
+        Log.e("updata","상품 업데이트")
+       this._currentImageList.value = productsImage
     }
 
     // 영수증 이미지 데이터 파일로 받기
@@ -142,6 +145,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
             RetrofitManager.instance.postProduct(context = getApplication(),accessToken = accessToken, request = products,
                 receipt = currentReceipt.value!!,
                 photos = currentImageList.value!!)
+
         }
 
 

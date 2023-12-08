@@ -17,7 +17,13 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import com.demo.sharingapp.databinding.ActivityBigSizeMapBinding
 import com.demo.sharingapp.domain.MainViewModel
+import com.demo.sharingapp.shared.SharedPreferencesData
+import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_FINE_LOCATION_CODE
+import com.demo.sharingapp.utils.Constants.FIND_LATITUDE
+import com.demo.sharingapp.utils.Constants.FIND_LONGITUDE
+import com.demo.sharingapp.utils.Constants.LATITUDE
+import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -36,6 +42,8 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
     var latitude: Double = 42.0
     var longitude: Double = 127.5
 
+
+
     private var locationPermissionGranted = false
 
 
@@ -44,6 +52,16 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         super.onCreate(savedInstanceState)
         binding = ActivityBigSizeMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        if (checkPlace(FIND_LATITUDE) && checkPlace(FIND_LONGITUDE)){
+            latitude = SharedPreferencesData.getData(this, Constants.FIND_LATITUDE).toDouble()
+            longitude = SharedPreferencesData.getData(this, Constants.FIND_LONGITUDE).toDouble()
+        }
+        else if (checkPlace(LATITUDE) && checkPlace(LONGITUDE)){
+            latitude = SharedPreferencesData.getData(this, Constants.LATITUDE).toDouble()
+            longitude = SharedPreferencesData.getData(this, Constants.LONGITUDE).toDouble()
+        }
+
 
         val title = intent.getStringExtra("title")
         val buyPrice = intent.getStringExtra("buyPrice")
@@ -73,12 +91,7 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         }
 
 
-        latitude = intent.getDoubleExtra("latitude", 36.0)
-        longitude = intent.getDoubleExtra("longitude", 127.5)
-
         binding.allMapCloseButton.setOnClickListener {
-
-
 //            startActivity(Intent(this, AddProductsActivity::class.java).apply {
 //                putExtra("title", title)
 //                putExtra("buyPrice", buyPrice)
@@ -98,6 +111,7 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
             val resultIntent = Intent()
             resultIntent.putExtra("latitude", latitude)
             resultIntent.putExtra("longitude", longitude)
+            Log.e("SendingActivity","$latitude, $longitude")
             setResult(Activity.RESULT_OK, resultIntent)
             finish()
         }
@@ -144,7 +158,9 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         // 안드로이드 위치 api
         val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         fusedLocationClient.lastLocation.addOnSuccessListener {
-            Log.e("location", it.toString())
+            Log.e("location", it.longitude.toString())
+            longitude = it.longitude
+            latitude = it.latitude
             val currentPlace = LatLng(it.latitude, it.longitude)
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentPlace, 17.0f))
             marker.position = currentPlace
@@ -211,6 +227,10 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
             .show()
     }
 
+    private fun checkPlace(place:String):Boolean{
+        return SharedPreferencesData.containsData(this,place)
+    }
+
 
     @SuppressLint("MissingPermission")
     override fun onMapReady(googleMap: GoogleMap) {
@@ -239,6 +259,8 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
         marker.position = newLatLng
         latitude = marker.position.latitude
         longitude = marker.position.longitude
+
+        Log.e("SendingActivity","$latitude, $longitude")
     }
 
 

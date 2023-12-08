@@ -551,8 +551,9 @@ class RetrofitManager() : Application() {
         val api = retrofit.create(RestAPI::class.java)
         val call = api.postProducts(Authorization = "Bearer $token",
             request = request,
+            photos = photos,
             receipt = receipt,
-            photos = photos)
+            )
 
         call.enqueue(object : retrofit2.Callback<ProductsResponse> {
             override fun onResponse(
