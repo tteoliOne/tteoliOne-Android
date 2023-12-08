@@ -30,9 +30,9 @@
 
     <ImageView
         android:id="@+id/nameIconImageView"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
-        android:src="@drawable/user_image"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/signup_name"
         app:layout_constraintBottom_toBottomOf="@id/nameTextView"
         app:layout_constraintStart_toEndOf="@id/backButton"
         app:layout_constraintTop_toTopOf="@id/nameTextView" />
@@ -47,7 +47,7 @@
         android:textColor="@color/black"
         android:textSize="18sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@id/emailIconImageView"
+        app:layout_constraintStart_toEndOf="@id/nameIconImageView"
         app:layout_constraintTop_toBottomOf="@id/backButton" />
 
     <EditText
@@ -64,8 +64,8 @@
 
     <ImageView
         android:id="@+id/emailIconImageView"
-        android:layout_width="22dp"
-        android:layout_height="22dp"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
         android:src="@drawable/email"
         app:layout_constraintBottom_toBottomOf="@id/emailTextView"
         app:layout_constraintStart_toEndOf="@id/backButton"

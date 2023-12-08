@@ -31,7 +31,7 @@
         android:id="@+id/nameIconImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/user_image"
+        android:src="@drawable/signup_name"
         app:layout_constraintBottom_toBottomOf="@id/nameTitleTextView"
         app:layout_constraintStart_toEndOf="@id/backButton"
         app:layout_constraintTop_toTopOf="@id/nameTitleTextView" />
