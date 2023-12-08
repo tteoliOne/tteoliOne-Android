@@ -67,9 +67,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // 초기 nickname 설정 함수 호출
         initNickname()
 
-
-
-
         val longitude = mainViewModel.longitude.value
         val latitude = mainViewModel.latitude.value
         val accessToken = SharedPreferencesData.getData(this.requireContext(),ACCESS_TOKEN)
@@ -80,22 +77,37 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // 초기 전체 리사이클러 뷰 설정 함수 호출
         initAllRecyclerView(accessToken)
 
-        if (accessToken!= ""){
-            // 서버에서 상품 데이터 불러오기
-            getProducts(longitude, latitude, accessToken, userId)
-        }
-
+        initProduct(accessToken, longitude, latitude, userId)
 
         // 상품 등록 버튼 클릭 시
         addProductButton()
 
+        clickNicknameButton()
+
+        binding.homeScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            if (scrollY == 0){
+                binding.homeAddButton.extend()
+            }else{
+                binding.homeAddButton.shrink()
+            }
+        }
+
+        //
+        binding.vegetableTextView.setOnClickListener {
+            val action = HomeFragmentDirections.actionHomeFragmentToSelectProductFragment()
+            findNavController().navigate(action)
+        }
+
+    }
+
+    private fun clickNicknameButton() {
         binding.topBar.nicknameSettingButton.setOnClickListener {
 
-            val popup = PopupMenu(this@HomeFragment.requireContext(),it)
+            val popup = PopupMenu(this@HomeFragment.requireContext(), it)
             popup.menuInflater.inflate(R.menu.menu_like_list, popup.menu)
 
-            popup.setOnMenuItemClickListener {  menuItem: MenuItem ->
-                when(menuItem.itemId) {
+            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                when (menuItem.itemId) {
                     R.id.showLikeListMenu -> {
                         (activity as? MyFragmentListener)?.onButtonClicked()
                         return@setOnMenuItemClickListener true
@@ -104,22 +116,25 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
                         return@setOnMenuItemClickListener true
                     }
-                    else ->{
+                    else -> {
                         return@setOnMenuItemClickListener true
                     }
                 }
             }
             popup.show()
-
         }
+    }
 
-
-        //
-        binding.vegetableTextView.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToSelectProductFragment()
-            findNavController().navigate(action)
+    private fun initProduct(
+        accessToken: String,
+        longitude: Double?,
+        latitude: Double?,
+        userId: Long,
+    ) {
+        if (accessToken != "") {
+            // 서버에서 상품 데이터 불러오기
+            getProducts(longitude, latitude, accessToken, userId)
         }
-
     }
 
     // 초기 전체 리사이클러 뷰 설정 함수

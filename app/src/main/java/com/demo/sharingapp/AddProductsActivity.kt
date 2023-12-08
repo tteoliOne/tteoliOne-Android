@@ -129,12 +129,6 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         // 다음 버튼 클릭 함수 호출
         nextButtonClick()
 
-        val accessToken = SharedPreferencesData.getData(this,"accessToken")
-
-        Log.e("ac", accessToken)
-
-
-
     }
 
     // 다음 버튼 클릭 함수
@@ -510,7 +504,6 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     // 맵 설정 함수
     private fun settingMap() {
-
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
