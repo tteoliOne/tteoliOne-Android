@@ -23,6 +23,9 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import com.demo.sharingapp.PermissionUtil
 import com.demo.sharingapp.R
+import com.demo.sharingapp.shared.SharedPreferencesData
+import com.demo.sharingapp.utils.Constants.FIND_LATITUDE
+import com.demo.sharingapp.utils.Constants.FIND_LONGITUDE
 import com.demo.sharingapp.utils.Constants.FLAG_REQ_CAMERA
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -82,12 +85,18 @@ class ProductBottomSheet : BottomSheetDialogFragment() {
                 // 뷰 모델로 데이터 전달 함수 호출
                 productViewModel.postProduct()
                 this@ProductBottomSheet.requireActivity().finish()
+                removeFindPlace()
                 dismiss()
             }else{
                 view?.findViewById<TextView>(R.id.errorMessageTextView)?.isVisible=true
             }
         }
 
+    }
+
+    private fun removeFindPlace() {
+        SharedPreferencesData.removeData(this.requireContext(), FIND_LATITUDE)
+        SharedPreferencesData.removeData(this.requireContext(), FIND_LONGITUDE)
     }
 
     // 카메라 함수

@@ -86,7 +86,12 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 
         // 완료 버튼
         binding.completeButton.setOnClickListener {
-
+            val resultIntent = Intent()
+            resultIntent.putExtra("latitude", latitude)
+            resultIntent.putExtra("longitude", longitude)
+            Log.e("SendingActivity","$latitude, $longitude")
+            setResult(Activity.RESULT_OK, resultIntent)
+            finish()
 
         }
 
@@ -109,10 +114,7 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
 //
 //            })
             val resultIntent = Intent()
-            resultIntent.putExtra("latitude", latitude)
-            resultIntent.putExtra("longitude", longitude)
-            Log.e("SendingActivity","$latitude, $longitude")
-            setResult(Activity.RESULT_OK, resultIntent)
+            setResult(Activity.RESULT_CANCELED, resultIntent)
             finish()
         }
 

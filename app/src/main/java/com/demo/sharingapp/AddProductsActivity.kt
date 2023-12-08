@@ -539,6 +539,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun movePrevious() {
         binding.movePreviousButton.setOnClickListener {
 //            startActivity(Intent(this, MainActivity::class.java))
+            removeFindPlace()
             finish()
         }
     }
@@ -703,6 +704,11 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
             getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         return super.dispatchTouchEvent(ev)
+    }
+
+    private fun removeFindPlace() {
+        SharedPreferencesData.removeData(this, FIND_LATITUDE)
+        SharedPreferencesData.removeData(this, FIND_LONGITUDE)
     }
 
 
