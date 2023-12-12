@@ -1,6 +1,7 @@
 package com.demo.sharingapp.retrofit
 
 import com.demo.sharingapp.data.GetSaveProductData
+import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -100,6 +101,13 @@ interface RestAPI {
     fun getSaveProducts(
         @Header("Authorization") Authorization: String,
     ): Call<GetSaveProductData>
+
+    // 상세 상품 데이터 가져오기
+    @GET(API.DETAILED_PRODUCT)
+    fun getDetailedProduct(
+        @Header("Authorization") Authorization: String,
+        @Path ("productId") productId: Long
+    ): Call<DetailedProductResponseData>
 
 
     // 도로명 주소 정보 가져오기

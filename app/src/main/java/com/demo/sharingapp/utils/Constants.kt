@@ -60,6 +60,8 @@ object API {
 
     const val SAVE_PRODUCTS : String="/api/products/saved"
 
+    const val DETAILED_PRODUCT : String="/api/products/{productId}"
+
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
 }

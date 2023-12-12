@@ -22,6 +22,7 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.addproduct.ProductImageAdapter
 import com.demo.sharingapp.databinding.FragmentHomeBinding
 import com.demo.sharingapp.domain.MainViewModel
+import com.demo.sharingapp.domain.home.part.DetailedProductActivity
 import com.demo.sharingapp.login.data.DataGetProducts
 import com.demo.sharingapp.login.data.ProductsData
 import com.demo.sharingapp.retrofit.RestAPI
@@ -105,8 +106,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         //
         binding.vegetableTextView.setOnClickListener {
-            val action = HomeFragmentDirections.actionHomeFragmentToSelectProductFragment()
-            findNavController().navigate(action)
+            val intent = Intent(this.requireActivity(),DetailedProductActivity::class.java)
+            startActivity(intent)
         }
 
     }
@@ -217,6 +218,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 latitude,
                 accessToken,
                 userId) {
+
                 val productData = it.groupBy {
                     it.categoryId
                 }

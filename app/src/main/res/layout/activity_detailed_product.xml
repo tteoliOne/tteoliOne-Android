@@ -1,0 +1,478 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".domain.home.part.DetailedProductActivity">
+
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/productImageViewPager"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:background="@color/app_main"
+                app:layout_constraintDimensionRatio="H, 1.2:1"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabLayout"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                app:layout_constraintBottom_toTopOf="@id/productAllLayout"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:tabBackground="@drawable/selector_tab"
+                app:tabIndicator="@null" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/productAllLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-70dp"
+                android:background="@drawable/round_top"
+                app:layout_constraintTop_toBottomOf="@id/productImageViewPager">
+
+                <ImageView
+                    android:id="@+id/profileImageView"
+                    android:layout_width="75dp"
+                    android:layout_height="75dp"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="20dp"
+                    android:src="@drawable/heart_fill"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+                <TextView
+                    android:id="@+id/userNicknameTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="내 이"
+                    android:textColor="@color/black"
+                    android:textSize="20sp"
+                    app:layout_constraintEnd_toEndOf="@id/profileImageView"
+                    app:layout_constraintStart_toStartOf="@id/profileImageView"
+                    app:layout_constraintTop_toBottomOf="@id/profileImageView" />
+
+                <TextView
+                    android:id="@+id/productTitleTextView"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:text="양파 10개 공유요!!"
+                    android:textColor="@color/black"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="@id/profileImageView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/profileImageView"
+                    app:layout_constraintTop_toTopOf="@id/profileImageView" />
+
+                <View
+                    android:id="@+id/LineView"
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="10dp"
+                    android:background="#4D000000"
+                    app:layout_constraintTop_toBottomOf="@id/userNicknameTextView" />
+
+                <ImageView
+                    android:id="@+id/likeImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:src="@drawable/heart"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/LineView" />
+
+                <TextView
+                    android:id="@+id/likeCountTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="0"
+                    android:textSize="16sp"
+                    app:layout_constraintEnd_toEndOf="@id/likeImageView"
+                    app:layout_constraintStart_toStartOf="@id/likeImageView"
+                    app:layout_constraintTop_toBottomOf="@id/likeImageView" />
+
+                <TextView
+                    android:id="@+id/buyDateTitleTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/main_font"
+                    android:text="구매일자"
+                    android:textColor="@color/app_main"
+                    android:textSize="18sp"
+                    app:layout_constraintEnd_toStartOf="@id/likeImageView"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/likeImageView" />
+
+                <TextView
+                    android:id="@+id/buyDateTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2023.09.12(화)"
+                    android:textColor="@color/black"
+                    android:textSize="13sp"
+                    app:layout_constraintEnd_toEndOf="@id/buyDateTitleTextView"
+                    app:layout_constraintStart_toStartOf="@id/buyDateTitleTextView"
+                    app:layout_constraintTop_toTopOf="@id/likeCountTextView" />
+
+                <ImageView
+                    android:id="@+id/receiptImageView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/receipt"
+                    app:layout_constraintBottom_toBottomOf="@id/likeImageView"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/likeImageView"
+                    app:layout_constraintTop_toTopOf="@id/likeImageView" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="영수증"
+                    android:textColor="@color/black"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@id/likeCountTextView"
+                    app:layout_constraintEnd_toEndOf="@id/receiptImageView"
+                    app:layout_constraintStart_toStartOf="@id/receiptImageView" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/buyPriceLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/round_30_green"
+                    app:layout_constraintEnd_toStartOf="@id/buyCountLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/buyDateTextView">
+
+                    <ImageView
+                        android:id="@+id/buyPriceImageView"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="18dp"
+                        android:background="@drawable/round_30"
+                        android:padding="8dp"
+                        android:src="@drawable/cash"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/buyPriceTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="18dp"
+                        android:text="구입 가격"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toTopOf="@id/buyPriceTextView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/buyPriceImageView"
+                        app:layout_constraintTop_toTopOf="@id/buyPriceImageView" />
+
+                    <TextView
+                        android:id="@+id/buyPriceTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buy_price"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="@id/buyPriceImageView"
+                        app:layout_constraintEnd_toEndOf="@id/buyPriceTitleTextView"
+                        app:layout_constraintStart_toStartOf="@id/buyPriceTitleTextView"
+                        app:layout_constraintTop_toBottomOf="@id/buyPriceTitleTextView" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/buyCountLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/round_30_green"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/buyPriceLayout"
+                    app:layout_constraintTop_toBottomOf="@id/buyDateTextView">
+
+                    <ImageView
+                        android:id="@+id/buyCountImageView"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="18dp"
+                        android:background="@drawable/round_30"
+                        android:padding="8dp"
+                        android:src="@drawable/buy_count_icon"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/buyCountTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="18dp"
+                        android:text="구입 수량"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toTopOf="@id/buyCountTextView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/buyCountImageView"
+                        app:layout_constraintTop_toTopOf="@id/buyCountImageView" />
+
+                    <TextView
+                        android:id="@+id/buyCountTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/product_count"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="@id/buyCountImageView"
+                        app:layout_constraintEnd_toEndOf="@id/buyCountTitleTextView"
+                        app:layout_constraintStart_toStartOf="@id/buyCountTitleTextView"
+                        app:layout_constraintTop_toBottomOf="@id/buyCountTitleTextView" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/shareCountLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="10dp"
+                    android:background="@drawable/round_30_green"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@id/sharePriceLayout"
+                    app:layout_constraintTop_toBottomOf="@id/buyCountLayout">
+
+                    <ImageView
+                        android:id="@+id/shareCountImageView"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="18dp"
+                        android:background="@drawable/round_30"
+                        android:padding="8dp"
+                        android:src="@drawable/share_count_icon"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/shareCountTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="18dp"
+                        android:text="공유 수량"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toTopOf="@id/shareCountTextView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/shareCountImageView"
+                        app:layout_constraintTop_toTopOf="@id/shareCountImageView" />
+
+                    <TextView
+                        android:id="@+id/shareCountTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="4개"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="@id/shareCountImageView"
+                        app:layout_constraintEnd_toEndOf="@id/shareCountTitleTextView"
+                        app:layout_constraintStart_toStartOf="@id/shareCountTitleTextView"
+                        app:layout_constraintTop_toBottomOf="@id/shareCountTitleTextView" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/sharePriceLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_marginEnd="8dp"
+                    android:background="@drawable/round_30_green"
+                    app:layout_constraintEnd_toStartOf="@id/shareCountLayout"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@id/buyPriceLayout">
+
+                    <ImageView
+                        android:id="@+id/sharePriceImageView"
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_margin="18dp"
+                        android:background="@drawable/round_30"
+                        android:padding="8dp"
+                        android:src="@drawable/share_price_icon"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/sharePriceTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="18dp"
+                        android:text="공유 가격"
+                        android:textColor="@color/white"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toTopOf="@id/sharePriceTextView"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toEndOf="@id/sharePriceImageView"
+                        app:layout_constraintTop_toTopOf="@id/sharePriceImageView" />
+
+                    <TextView
+                        android:id="@+id/sharePriceTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/buy_price"
+                        android:textColor="@color/white"
+                        android:textSize="18sp"
+                        app:layout_constraintBottom_toBottomOf="@id/sharePriceImageView"
+                        app:layout_constraintEnd_toEndOf="@id/sharePriceTitleTextView"
+                        app:layout_constraintStart_toStartOf="@id/sharePriceTitleTextView"
+                        app:layout_constraintTop_toBottomOf="@id/sharePriceTitleTextView" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/descriptionLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:background="@drawable/add_product_image_round"
+                    app:layout_constraintEnd_toEndOf="@id/buyCountLayout"
+                    app:layout_constraintStart_toStartOf="@id/buyPriceLayout"
+                    app:layout_constraintTop_toBottomOf="@id/sharePriceLayout">
+
+                    <TextView
+                        android:id="@+id/descriptionTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/main_font"
+                        android:text="상세 설명"
+                        android:textColor="@color/app_main"
+                        android:textSize="18sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <TextView
+                        android:id="@+id/descriptionTextView"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="20dp"
+                        android:layout_marginBottom="18dp"
+                        android:text="상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. 상세설명 칸입니다. "
+                        android:textColor="@color/black"
+                        android:textSize="15sp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/descriptionTitleTextView" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/placeLayout"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="18dp"
+                    android:background="@drawable/add_product_image_round"
+                    android:elevation="5dp"
+                    app:layout_constraintEnd_toEndOf="@id/buyCountLayout"
+                    app:layout_constraintStart_toStartOf="@id/buyPriceLayout"
+                    app:layout_constraintTop_toBottomOf="@id/descriptionLayout">
+
+                    <TextView
+                        android:id="@+id/placeTitleTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="30dp"
+                        android:layout_marginTop="20dp"
+                        android:fontFamily="@font/main_font"
+                        android:text="희망 공유 장소"
+                        android:textColor="@color/app_main"
+                        android:textSize="18sp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+
+                    <fragment
+                        android:id="@+id/mapDetailed"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="0dp"
+                        android:layout_height="256dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_marginTop="10dp"
+                        android:layout_marginEnd="10dp"
+                        android:layout_marginBottom="30dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/placeTitleTextView"
+                        tools:context=".AddProductsActivity" />
+
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    app:layout_constraintTop_toBottomOf="@id/placeLayout" />
+
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <View
+        android:layout_width="29dp"
+        android:layout_height="29dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="@drawable/round_30_green"
+        android:fontFamily="@font/main_font"
+        android:text="연락하기"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

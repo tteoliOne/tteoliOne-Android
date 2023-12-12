@@ -10,6 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.data.SaveProductsData
 import com.demo.sharingapp.data.SaveProductsListData
+import com.demo.sharingapp.domain.home.part.data.DetailedProductData
+import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -28,10 +30,7 @@ import kotlinx.coroutines.*
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import retrofit2.Retrofit
+import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
 
 class RetrofitManager() : Application() {
@@ -533,6 +532,36 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("postProductLike", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 상세 화면 불러오기
+    fun getDetailedProduct(context: Context, productsId: Long, accessToken: String, onProductData:(DetailedProductData)->Unit ){
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.getDetailedProduct(Authorization = "Bearer $accessToken", productsId)
+
+        call.enqueue(object : retrofit2.Callback<DetailedProductResponseData>{
+            override fun onResponse(
+                call: Call<DetailedProductResponseData>,
+                response: Response<DetailedProductResponseData>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getDetailedProduct", "success ${response.body()?.success}")
+                    Log.e("getDetailedProduct", "data ${response.body()?.data}")
+                    Log.e("getDetailedProduct", "message ${response.body()?.message}")
+                    Log.e("getDetailedProduct", "code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onProductData(data)
+                } else {
+                    Log.e("getDetailedProduct", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<DetailedProductResponseData>, t: Throwable) {
+                Log.e("getDetailedProduct", "fail ${t} $call")
             }
         })
     }

@@ -21,4 +21,6 @@
     <string name="next">다음</string>
     <string name="buy_date_local">%d-%02d-%02dT15:53:16</string>
     <string name="walking_time">%dm 도보 %d분</string>
+    <string name="buy_price">%s원</string>
+    <string name="product_count">%d개</string>
 </resources>
