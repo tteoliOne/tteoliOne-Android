@@ -453,6 +453,7 @@
     </ScrollView>
 
     <View
+        android:id="@+id/backButton"
         android:layout_width="29dp"
         android:layout_height="29dp"
         android:layout_margin="20dp"

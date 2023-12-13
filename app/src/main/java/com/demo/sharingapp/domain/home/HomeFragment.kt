@@ -1,41 +1,34 @@
 package com.demo.sharingapp.domain.home
 
+import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.getIntent
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.PopupMenu
-import androidx.annotation.MenuRes
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.demo.sharingapp.AddProductsActivity
-import com.demo.sharingapp.MainActivity
-import com.demo.sharingapp.MyApplication
 import com.demo.sharingapp.R
-import com.demo.sharingapp.addproduct.ProductImageAdapter
 import com.demo.sharingapp.databinding.FragmentHomeBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.part.DetailedProductActivity
-import com.demo.sharingapp.login.data.DataGetProducts
 import com.demo.sharingapp.login.data.ProductsData
-import com.demo.sharingapp.retrofit.RestAPI
-import com.demo.sharingapp.retrofit.RetrofitClient
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
-import com.demo.sharingapp.utils.API
-import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.NICKNAME
+import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.USER_ID
+
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
 
@@ -182,6 +175,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             // 좋아요 클릭 시 함수 호출
             likeClick(it, accessToken)
         },
+        onViewClick = {
+            val intent = Intent(this@HomeFragment.requireActivity(),DetailedProductActivity::class.java).putExtra(PRODUCT_ID,it)
+            startActivityForResult(intent,200)
+        }
     )
 
     // 좋아요 클릭 시 함수
@@ -270,6 +267,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == 200 && resultCode == RESULT_OK) {
+            val intent = this@HomeFragment.requireActivity().intent
+            this@HomeFragment.requireActivity().finish()
+            startActivity(intent)
+        }
+    }
+
     // 초기 nickname 설정 함수
     private fun initNickname() {
         // 뷰 모델 프로바이더를 통해 뷰모델 가져오기
@@ -291,6 +297,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     interface MyFragmentListener {
         fun onButtonClicked()
     }
+
+
 
 
 

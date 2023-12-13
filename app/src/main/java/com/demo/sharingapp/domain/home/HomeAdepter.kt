@@ -1,6 +1,7 @@
 package com.demo.sharingapp.domain.home
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.util.Log
@@ -17,7 +18,11 @@ import com.demo.sharingapp.databinding.ItemHomeMoreBinding
 import com.demo.sharingapp.databinding.ItemHomeProductBinding
 import com.demo.sharingapp.login.data.ProductsData
 
-class HomeAdepter(val onMoreClick: (List<ProductsData>) -> Unit, val onLikeClick: (Long) -> Unit) :
+class HomeAdepter(
+    val onMoreClick: (List<ProductsData>) -> Unit,
+    val onLikeClick: (Long) -> Unit,
+    val onViewClick: (Long) -> Unit,
+) :
     ListAdapter<ProductsData, RecyclerView.ViewHolder>(object :
         DiffUtil.ItemCallback<ProductsData>() {
         override fun areItemsTheSame(oldItem: ProductsData, newItem: ProductsData): Boolean {
@@ -70,13 +75,13 @@ class HomeAdepter(val onMoreClick: (List<ProductsData>) -> Unit, val onLikeClick
 
             // 좋아요 눌렀을 때
             binding.pickImageView.setOnClickListener {
-                Log.e("liked",liked.toString())
-                if (liked){
+                Log.e("liked", liked.toString())
+                if (liked) {
                     binding.pickImageView.setImageResource(R.drawable.heart)
                     likePoint -= 1
                     binding.heartScoreTextView.text = likePoint.toString()
                     liked = !liked
-                }else{
+                } else {
                     binding.pickImageView.setImageResource(R.drawable.heart_fill)
                     likePoint += 1
                     binding.heartScoreTextView.text = likePoint.toString()
@@ -85,6 +90,9 @@ class HomeAdepter(val onMoreClick: (List<ProductsData>) -> Unit, val onLikeClick
                 onLikeClick(item.productId)
             }
 
+            binding.root.setOnClickListener {
+                onViewClick(item.productId)
+            }
             //binding.walkTimeTextView.text = item.walkingTime.toString()
         }
     }

@@ -1,16 +1,22 @@
 package com.demo.sharingapp.domain.home.part
 
+import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
+import com.demo.sharingapp.login.signup.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
+import com.demo.sharingapp.utils.Constants.DETAILED_LIKED
+import com.demo.sharingapp.utils.Constants.DETAILED_LIKED_POINT
+import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -24,10 +30,20 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityDetailedProductBinding
+
+    private var liked = false
+
+    private var likePoint = 0
+
+    private var uri = ""
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailedProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val productId = intent.getLongExtra(PRODUCT_ID,140)
+        val accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+
 
         // 맵 설정
         initMap()
@@ -35,6 +51,48 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         // 서버에서 상품 데이터 받아오기
         getDetailedData()
 
+        binding.likeImageView.setOnClickListener {
+            if (liked) {
+                binding.likeImageView.setImageResource(R.drawable.heart)
+                likePoint -= 1
+                binding.likeCountTextView.text = likePoint.toString()
+                liked = !liked
+
+            } else {
+                binding.likeImageView.setImageResource(R.drawable.heart_fill)
+                likePoint += 1
+                binding.likeCountTextView.text = likePoint.toString()
+                liked = !liked
+            }
+            likeClick(productId,accessToken)
+        }
+
+        binding.backButton.setOnClickListener {
+            val resultIntent = Intent()
+            setResult(RESULT_OK, resultIntent)
+            finish()
+        }
+
+        binding.receiptImageView.setOnClickListener {
+            showDialog(uri)
+        }
+
+
+
+    }
+    // 알림창 띄우기
+    private fun showDialog(uri: String) {
+        val dialog = DetailedProductDialog(uri)
+        Log.e("uri",uri.toString())
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this.supportFragmentManager,
+            "SignupDialog")
+    }
+
+    // 좋아요 클릭 시 함수
+    private fun likeClick(it: Long, accessToken: String) {
+        RetrofitManager.instance.postProductLike(this, it, accessToken)
     }
 
     // 맵 설정 함수
@@ -46,8 +104,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // 서버에서 상품 데이터 받아오기 함수
     private fun getDetailedData() {
-        val productId = intent.getLongExtra("productId", 140)
+        val productId = intent.getLongExtra(PRODUCT_ID,140)
         val accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+
         RetrofitManager.instance.getDetailedProduct(this, productId, accessToken) {
             // 상품 데이터 설정 함수
             settingData(it)
@@ -72,6 +131,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         val frameAdapter = FrameAdapter(images)
         binding.productImageViewPager.adapter = frameAdapter
 
+        //
+        uri = it.receipt
+
         // 프로필 사진
         Glide.with(binding.profileImageView)
             .load(it.sellerProfile)
@@ -91,14 +153,16 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         binding.buyDateTextView.text = formattedDate
 
         // 좋아요 유무
-        if (it.checkLiked) { // 좋아요가 true 일때
+        liked = it.checkLiked
+        if (liked) { // 좋아요가 true 일때
             binding.likeImageView.setImageResource(R.drawable.heart_fill)
         } else { // 좋아요가 false 일때
             binding.likeImageView.setImageResource(R.drawable.heart)
         }
 
         // 좋아요 개수
-        binding.likeCountTextView.text = it.likeCount.toString()
+        likePoint = it.likeCount
+        binding.likeCountTextView.text = likePoint.toString()
 
         // 구입가격
         binding.buyPriceTextView.text = getString(R.string.buy_price, buyPrice)
@@ -133,6 +197,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location))
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(17f))
     }
+
 
     //구글맵 초기 설정
     override fun onMapReady(map: GoogleMap) {

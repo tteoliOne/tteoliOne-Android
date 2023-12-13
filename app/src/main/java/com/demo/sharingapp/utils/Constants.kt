@@ -16,6 +16,9 @@ object Constants{
     const val SIGNUP_ID = "id"
     const val SIGNUP_NAME = "name"
     const val SIGNUP_PASSWORD = "password"
+    const val PRODUCT_ID = "productId"
+    const val DETAILED_LIKED = "detailedLiked"
+    const val DETAILED_LIKED_POINT = "detailedLikedPoint"
 
     const val ACCESS_FINE_LOCATION_CODE = 200
 
