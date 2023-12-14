@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.demo.sharingapp.databinding.ActivityMainBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.HomeFragment
+import com.demo.sharingapp.domain.home.part.DetailedProductActivity
 import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -24,7 +25,9 @@ import com.demo.sharingapp.utils.Constants
 
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.MOVE_DETAILED_CODE
 import com.demo.sharingapp.utils.Constants.NICKNAME
+import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.common.KakaoSdk
@@ -67,6 +70,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         // 바텀네비 초기 설정 함수 호출
         initNavigation()
 
+
         initRecyclerView()
 
 
@@ -90,7 +94,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     }
 
     private fun initRecyclerView() {
-        saveProductAdapter = LikeListAdapter()
+        saveProductAdapter = LikeListAdapter(){
+            val intent = Intent(this,DetailedProductActivity::class.java)
+                .putExtra(PRODUCT_ID,it)
+            startActivityForResult(intent, MOVE_DETAILED_CODE)
+        }
         binding.likeListRecyclerView.apply {
             adapter = saveProductAdapter
             layoutManager = LinearLayoutManager(this@MainActivity)
@@ -182,6 +190,15 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         Log.e("aa","MyFragmentListener")
         binding.drawerView.bringToFront()
         binding.drawerView.setScrimColor(Color.TRANSPARENT)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == MOVE_DETAILED_CODE && resultCode == RESULT_OK) {
+            val intent = this.intent
+            finish()
+            startActivity(intent)
+        }
     }
 
 

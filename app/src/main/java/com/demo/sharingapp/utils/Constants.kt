@@ -22,6 +22,8 @@ object Constants{
 
     const val ACCESS_FINE_LOCATION_CODE = 200
 
+    const val MOVE_DETAILED_CODE = 201
+
 
 
     //카메라를 호출하는 플래그

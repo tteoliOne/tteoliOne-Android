@@ -12,7 +12,7 @@ import com.demo.sharingapp.data.SaveProductsData
 import com.demo.sharingapp.databinding.ItemHomeProductBinding
 import com.demo.sharingapp.databinding.ItemProductSaveBinding
 
-class LikeListAdapter: ListAdapter<SaveProductsData, LikeListAdapter.LikeListViewHolder>(object :
+class LikeListAdapter(private val onClick:(Long)->Unit): ListAdapter<SaveProductsData, LikeListAdapter.LikeListViewHolder>(object :
     DiffUtil.ItemCallback<SaveProductsData>(){
     override fun areItemsTheSame(oldItem: SaveProductsData, newItem: SaveProductsData): Boolean {
         return oldItem.likedId == newItem.likedId
@@ -30,7 +30,7 @@ class LikeListAdapter: ListAdapter<SaveProductsData, LikeListAdapter.LikeListVie
                 .into(binding.saveImageView)
             binding.saveTextView.text = item.title
             binding.root.setOnClickListener {
-                Log.e("click","click")
+                onClick(item.productId)
             }
         }
     }

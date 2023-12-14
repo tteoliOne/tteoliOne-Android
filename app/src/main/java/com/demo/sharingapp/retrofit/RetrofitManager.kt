@@ -73,15 +73,18 @@ class RetrofitManager() : Application() {
                 response: Response<GetSaveProductData>,
             ) {
                 if (response.isSuccessful){
-                    Log.e("getSaveProduct", "success Login data ${response.body()?.data}")
-                    Log.e("getSaveProduct", "success Login success ${response.body()?.success}")
-                    Log.e("getSaveProduct", "success Login message ${response.body()?.message}")
-                    Log.e("getSaveProduct", "success Login code ${response.body()?.code}")
+                    Log.e("getSaveProduct", "success getSaveProduct data ${response.body()?.data}")
+                    Log.e("getSaveProduct", "success getSaveProduct success ${response.body()?.success}")
+                    Log.e("getSaveProduct", "success getSaveProduct message ${response.body()?.message}")
+                    Log.e("getSaveProduct", "success getSaveProduct code ${response.body()?.code}")
                     val data = response.body()?.data ?:return
                         onSuccessData(data)
 
                 }
-                Log.e("getSaveProduct", "succes, Login but ${response.errorBody()}")
+                else{
+                    Log.e("getSaveProduct", "succes, getSaveProduct but ${response.errorBody()}")
+                }
+
             }
 
             override fun onFailure(call: Call<GetSaveProductData>, t: Throwable) {

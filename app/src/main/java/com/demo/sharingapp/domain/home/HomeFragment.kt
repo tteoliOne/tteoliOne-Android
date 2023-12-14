@@ -25,6 +25,7 @@ import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.MOVE_DETAILED_CODE
 import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.USER_ID
@@ -177,7 +178,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         },
         onViewClick = {
             val intent = Intent(this@HomeFragment.requireActivity(),DetailedProductActivity::class.java).putExtra(PRODUCT_ID,it)
-            startActivityForResult(intent,200)
+            startActivityForResult(intent,MOVE_DETAILED_CODE)
         }
     )
 
@@ -269,7 +270,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 200 && resultCode == RESULT_OK) {
+        if (requestCode == MOVE_DETAILED_CODE && resultCode == RESULT_OK) {
             val intent = this@HomeFragment.requireActivity().intent
             this@HomeFragment.requireActivity().finish()
             startActivity(intent)
