@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var binding:ActivityMainBinding
 
+
     private lateinit var saveProductAdapter: LikeListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -198,8 +199,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
             val intent = this.intent
             finish()
             startActivity(intent)
+
         }
     }
-
 
 }

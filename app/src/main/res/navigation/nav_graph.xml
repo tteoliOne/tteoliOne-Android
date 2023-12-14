@@ -51,14 +51,17 @@
         android:label="HomePartProductFragment"
         tools:layout="@layout/fragment_home_part_product" >
         <argument
-            android:name="data"
-            app:argType="com.demo.sharingapp.login.data.ProductsData[]" />
-        <argument
             android:name="name"
             app:argType="string" />
         <action
             android:id="@+id/action_homePartProductFragment_to_selectProductFragment"
             app:destination="@id/selectProductFragment" />
+        <argument
+            android:name="longitude"
+            app:argType="string" />
+        <argument
+            android:name="latitude"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/selectProductFragment"

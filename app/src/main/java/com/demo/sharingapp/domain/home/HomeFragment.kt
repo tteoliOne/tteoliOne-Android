@@ -3,7 +3,6 @@ package com.demo.sharingapp.domain.home
 import android.app.Activity.RESULT_OK
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.getIntent
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -19,7 +18,6 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentHomeBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.part.DetailedProductActivity
-import com.demo.sharingapp.login.data.ProductsData
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
@@ -42,6 +40,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var homeSeafoodAdepter: HomeAdepter
     private lateinit var homeEtcAdepter: HomeAdepter
 
+    private var accessToken= ""
+    private var userId = 0L
 
     private var longitude = 0.0
     private var latitude = 0.0
@@ -75,8 +75,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             longitude = SharedPreferencesData.getData(this.requireContext(), LONGITUDE).toDouble()
             latitude = SharedPreferencesData.getData(this.requireContext(), LATITUDE).toDouble()
         }
-        val accessToken = SharedPreferencesData.getData(this.requireContext(),ACCESS_TOKEN)
-        val userId = SharedPreferencesData.getLongData(this.requireContext(),USER_ID)
+         accessToken = SharedPreferencesData.getData(this.requireContext(),ACCESS_TOKEN)
+         userId = SharedPreferencesData.getLongData(this.requireContext(),USER_ID)
 
         Log.e("aa", mainViewModel.longitude.value.toString())
 
@@ -170,7 +170,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun homeAdepter(accessToken: String, category: String) = HomeAdepter(
         onMoreClick = {
             // 더보기 화면으로 이동 함수 호출
-            movePartProductFragment(it, category)
+            movePartProductFragment(category,longitude,latitude)
         },
         onLikeClick = {
             // 좋아요 클릭 시 함수 호출
@@ -188,8 +188,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     // 더보기 화면으로 이동 함수
-    private fun movePartProductFragment(data : List<ProductsData>, category: String) {
-        val action = HomeFragmentDirections.actionHomeFragmentToHomePartProductFragment(data.toTypedArray(),category)
+    private fun movePartProductFragment( category: String, longitude: Double, latitude: Double) {
+        val action = HomeFragmentDirections.actionHomeFragmentToHomePartProductFragment(category,longitude.toString(),latitude.toString())
         findNavController().navigate(action)
     }
 
@@ -298,9 +298,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     interface MyFragmentListener {
         fun onButtonClicked()
     }
-
-
-
 
 
 }

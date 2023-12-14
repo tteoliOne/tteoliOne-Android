@@ -13,7 +13,7 @@ import com.demo.sharingapp.databinding.ItemHomePartProductBinding
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
 
-class HomePartProductAdepter(val onLikeClick: (Long) -> Unit) :
+class HomePartProductAdepter(private val onLikeClick: (Long) -> Unit, private val onViewClick:(Long)->Unit) :
     ListAdapter<ProductsData, HomePartProductAdepter.HomePartProductViewHolder>(object :
         DiffUtil.ItemCallback<ProductsData>() {
         override fun areItemsTheSame(oldItem: ProductsData, newItem: ProductsData): Boolean {
@@ -27,6 +27,10 @@ class HomePartProductAdepter(val onLikeClick: (Long) -> Unit) :
     inner class HomePartProductViewHolder(val binding: ItemHomePartProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: ProductsData) {
+
+            binding.root.setOnClickListener {
+                onViewClick(item.productId)
+            }
 
             var liked = item.liked
             var likePoint = item.totalLikes

@@ -4,6 +4,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.MenuItem
+import android.view.View
+import android.widget.PopupMenu
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
@@ -17,7 +21,6 @@ import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.tabs.TabLayoutMediator
 import java.text.NumberFormat
@@ -38,6 +41,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
     private var latitude = 0.0
     private var longitude =0.0
+    private var checkOwner = false
 
     lateinit var productData: DetailedProductData
 
@@ -63,6 +67,42 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
         // 영수증 클릭
         clickReceipt()
+
+        binding.settingMenu.setOnClickListener {
+            if (binding.menuDecoratingImageView.getVisibility() == View.VISIBLE){
+                binding.menuDecoratingImageView.isVisible= false
+                binding.menuRemoveButton.isVisible=false
+                binding.menuModifyButton.isVisible=false
+                binding.menuReportButton.isVisible = false
+            }
+            else if(checkOwner){
+                binding.menuDecoratingImageView.isVisible= true
+                binding.menuRemoveButton.isVisible=true
+                binding.menuModifyButton.isVisible=true
+            }else{
+                binding.menuDecoratingImageView.isVisible= true
+                binding.menuReportButton.isVisible = true
+            }
+        }
+
+        binding.menuRemoveButton.setOnClickListener {
+            binding.menuDecoratingImageView.isVisible= false
+            binding.menuRemoveButton.isVisible=false
+            binding.menuModifyButton.isVisible=false
+            binding.menuReportButton.isVisible = false
+        }
+        binding.menuModifyButton.setOnClickListener {
+            binding.menuDecoratingImageView.isVisible= false
+            binding.menuRemoveButton.isVisible=false
+            binding.menuModifyButton.isVisible=false
+            binding.menuReportButton.isVisible = false
+        }
+        binding.menuReportButton.setOnClickListener {
+            binding.menuDecoratingImageView.isVisible= false
+            binding.menuRemoveButton.isVisible=false
+            binding.menuModifyButton.isVisible=false
+            binding.menuReportButton.isVisible = false
+        }
 
     }
 
@@ -136,6 +176,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
         productData = it
 
+        checkOwner = it.checkOwner
         //가격 변환
         val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
         val buyPrice = currencyFormat.format(it.buyPrice)
