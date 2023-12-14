@@ -152,7 +152,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         val frameAdapter = FrameAdapter(images){
             Log.e("aa","쿨릭")
             val intent = Intent(this,DetailedProductImageActivity::class.java)
+                .putExtra("data",it.images)
             startActivity(intent)
+
         }
         binding.productImageViewPager.adapter = frameAdapter
 
