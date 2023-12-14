@@ -8,12 +8,15 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.databinding.ItemDetailedImageBinding
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 
-class FrameAdapter(private val list: List<DetailedImageData>):RecyclerView.Adapter<FrameAdapter.FrameViewHolder>()  {
+class FrameAdapter(private val list: List<DetailedImageData>,private val onClick:()->Unit):RecyclerView.Adapter<FrameAdapter.FrameViewHolder>()  {
     inner class FrameViewHolder(private val binding: ItemDetailedImageBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(item: DetailedImageData) {
             Glide.with(binding.frameImageView)
                 .load(item.uri)
                 .into(binding.frameImageView)
+            binding.root.setOnClickListener {
+                onClick()
+            }
 
         }
     }

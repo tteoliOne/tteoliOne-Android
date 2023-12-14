@@ -1,7 +1,6 @@
 package com.demo.sharingapp.domain.home.part
 
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,15 +9,15 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
-import com.demo.sharingapp.login.signup.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
-import com.demo.sharingapp.utils.Constants.DETAILED_LIKED
-import com.demo.sharingapp.utils.Constants.DETAILED_LIKED_POINT
+import com.demo.sharingapp.utils.Constants.LATITUDE
+import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.tabs.TabLayoutMediator
 import java.text.NumberFormat
@@ -26,7 +25,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
+class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMap.OnMapClickListener {
 
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityDetailedProductBinding
@@ -36,6 +35,11 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
     private var likePoint = 0
 
     private var uri = ""
+
+    private var latitude = 0.0
+    private var longitude =0.0
+
+    lateinit var productData: DetailedProductData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,6 +55,32 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         // 서버에서 상품 데이터 받아오기
         getDetailedData()
 
+        // 좋아요 클릭
+        clickLiked(productId, accessToken)
+
+        // 이전 버튼 클릭
+        clickBackButton()
+
+        // 영수증 클릭
+        clickReceipt()
+
+    }
+
+    private fun clickBackButton() {
+        binding.backButton.setOnClickListener {
+            val resultIntent = Intent()
+            setResult(RESULT_OK, resultIntent)
+            finish()
+        }
+    }
+
+   private fun clickReceipt() {
+        binding.receiptImageView.setOnClickListener {
+            showDialog(uri)
+        }
+    }
+
+    private fun clickLiked(productId: Long, accessToken: String) {
         binding.likeImageView.setOnClickListener {
             if (liked) {
                 binding.likeImageView.setImageResource(R.drawable.heart)
@@ -64,22 +94,10 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
                 binding.likeCountTextView.text = likePoint.toString()
                 liked = !liked
             }
-            likeClick(productId,accessToken)
+            likeClick(productId, accessToken)
         }
-
-        binding.backButton.setOnClickListener {
-            val resultIntent = Intent()
-            setResult(RESULT_OK, resultIntent)
-            finish()
-        }
-
-        binding.receiptImageView.setOnClickListener {
-            showDialog(uri)
-        }
-
-
-
     }
+
     // 알림창 띄우기
     private fun showDialog(uri: String) {
         val dialog = DetailedProductDialog(uri)
@@ -115,6 +133,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
 
     // 상품 데이터 설정 함수
     private fun settingData(it: DetailedProductData) {
+
+        productData = it
+
         //가격 변환
         val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
         val buyPrice = currencyFormat.format(it.buyPrice)
@@ -128,8 +149,13 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         // 상품 이미지
         val images = it.images
             .map { uriString -> DetailedImageData(uriString) }
-        val frameAdapter = FrameAdapter(images)
+        val frameAdapter = FrameAdapter(images){
+            Log.e("aa","쿨릭")
+            val intent = Intent(this,DetailedProductImageActivity::class.java)
+            startActivity(intent)
+        }
         binding.productImageViewPager.adapter = frameAdapter
+
 
         //
         uri = it.receipt
@@ -141,6 +167,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
             .into(binding.profileImageView)
 
         showLocationOnMap(it.latitude, it.longitude)
+        latitude = it.latitude
+        longitude = it.longitude
 
 
         // 유저 닉네임
@@ -193,9 +221,12 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         val markerOptions = MarkerOptions()
             .position(location)
             .title("공유 희망 장소")
+
         googleMap.addMarker(markerOptions)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location))
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(17f))
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(15f))
+
+
     }
 
 
@@ -208,5 +239,19 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback {
         val uiSettings: UiSettings = googleMap.uiSettings
         uiSettings.setScrollGesturesEnabled(false)
 
+
+        // 맵에 터치 리스너 설정
+        googleMap.setOnMapClickListener(this)
+
     }
+
+    // 맵 클릭시
+    override fun onMapClick(p0: LatLng) {
+        val intent= Intent(this, DetailedProductMapActivity::class.java)
+            .putExtra(LATITUDE,latitude)
+            .putExtra(LONGITUDE,longitude)
+        Log.e("demap","${latitude} ${longitude}")
+        startActivity(intent)
+    }
+
 }
