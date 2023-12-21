@@ -603,7 +603,9 @@ class RetrofitManager() : Application() {
                     Log.e("getRemoveProduct", "data ${response.body()?.data}")
                     Log.e("getRemoveProduct", "message ${response.body()?.message}")
                     Log.e("getRemoveProduct", "code ${response.body()?.code}")
-                    val data = response.body()?.data ?: return
+                    if (response.body()?.success == true){
+                        Toast.makeText(context, response.body()?.data, Toast.LENGTH_SHORT).show()
+                    }
                 } else {
                     Log.e("getRemoveProduct", "succes, but ${response.errorBody()}")
 

@@ -33,12 +33,15 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityDetailedProductBinding
 
+    private lateinit var accessToken: String
+
     private var liked = false
 
     private var likePoint = 0
 
     private var uri = ""
 
+    private var productId: Long =  0
     private var latitude = 0.0
     private var longitude =0.0
     private var checkOwner = false
@@ -47,8 +50,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         super.onCreate(savedInstanceState)
         binding = ActivityDetailedProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        val productId = intent.getLongExtra(PRODUCT_ID,140)
-        val accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+        productId = intent.getLongExtra(PRODUCT_ID,0)
+        accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
 
         // 맵 설정
@@ -105,7 +108,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 메뉴의 삭제하기 버튼 클릭 함수
     private fun clickMenuRemoveButton() {
         binding.menuRemoveButton.setOnClickListener {
+            RetrofitManager.instance.getRemoveProduct(this, accessToken, productId)
             disappearsMenu() // 메뉴버튼 전체 사라짐
+            moveBack() // 이전화면 이동
         }
     }
 
@@ -134,10 +139,16 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 이전 버튼 클릭 함수
     private fun clickBackButton() {
         binding.backButton.setOnClickListener {
-            val resultIntent = Intent()
-            setResult(RESULT_OK, resultIntent)
-            finish()
+            // 이전 화면 이동
+            moveBack()
         }
+    }
+
+    // 이전 화면 이동 함수
+    private fun moveBack() {
+        val resultIntent = Intent()
+        setResult(RESULT_OK, resultIntent)
+        finish()
     }
 
     // 영수증 클릭 함수

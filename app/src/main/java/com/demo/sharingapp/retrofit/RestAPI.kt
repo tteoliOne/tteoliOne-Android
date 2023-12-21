@@ -125,7 +125,7 @@ interface RestAPI {
     ): Call<DetailedProductResponseData>
 
     // 상품 삭제
-    @GET(API.DETAILED_PRODUCT)
+    @DELETE(API.DETAILED_PRODUCT)
     fun getRemoveProduct(
         @Header("Authorization") Authorization: String,
         @Path ("productId") productId: Long
