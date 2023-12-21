@@ -40,7 +40,7 @@ class FindPasswordResetFragment:Fragment(R.layout.fragment_find_password_reset) 
         binding.nextButton.setOnClickListener {
             val password = binding.passwordEditText.text.toString()
             val passwordResetData = FindPasswordResetData(name, email, id, password)
-            RetrofitManager.instance.postFindPasswordReset(passwordResetData) { checkBoolean, message ->
+            RetrofitManager.instance.patchFindPasswordReset(passwordResetData) { checkBoolean, message ->
                 if (checkBoolean) {
                     this@FindPasswordResetFragment.requireActivity().finish()
                     Toast.makeText(this.requireContext(), message, Toast.LENGTH_SHORT).show()

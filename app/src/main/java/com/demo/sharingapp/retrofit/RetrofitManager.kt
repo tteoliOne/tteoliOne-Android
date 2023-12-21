@@ -14,6 +14,7 @@ import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.data.PartProductListData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
+import com.demo.sharingapp.domain.user.data.NicknameResponse
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -411,9 +412,38 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 내정보 - 닉내임 변경
+    fun patchChangeNickname(context: Context, accessToken: String, nickname: String, onCheckNickname:(Boolean,String)->Unit){
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val nicknameData = NicknameData(nickname)
+        val call = api.patchChangeNickname(Authorization = "Bearer $accessToken", nicknameData)
+        call.enqueue(object : retrofit2.Callback<NicknameResponse>{
+            override fun onResponse(
+                call: Call<NicknameResponse>,
+                response: Response<NicknameResponse>,
+            ) {
+                if (response.isSuccessful){
+                    Log.e("patchChangeNickname", "success Nickname success ${response.body()?.success}")
+                    Log.e("patchChangeNickname", "success Nickname message ${response.body()?.message}")
+                    Log.e("patchChangeNickname", "success Nickname code ${response.body()?.code}")
+                    val success = response.body()?.success ?: return
+                    val message = response.body()?.message ?: return
+                    onCheckNickname(success,message)
+                }else{
+                    Log.e("patchChangeNickname", "succes, Nickname but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<NicknameResponse>, t: Throwable) {
+                Log.e("patchChangeNickname", "fail ${t} $call")
+            }
+        })
+    }
+
     // 비밀번호 찾기 - 재변경한 비밀번호 보내기
-    fun postFindPasswordReset(findPasswordRestData: FindPasswordResetData, onCheckPassword: (Boolean,String)->Unit){
-        val call = retrofitInterface?.postFindPasswordReset(findPasswordRestData)
+    fun patchFindPasswordReset(findPasswordRestData: FindPasswordResetData, onCheckPassword: (Boolean,String)->Unit){
+        val call = retrofitInterface?.patchFindPasswordReset(findPasswordRestData)
         call?.enqueue(object : retrofit2.Callback<EmailResponse>{
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful){

@@ -69,6 +69,8 @@ object API {
 
     const val DETAILED_PRODUCT : String="/api/products/{productId}"
 
+    const val CHANGE_NICKNAME : String="/api/users/nickname"
+
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
 }

@@ -3,6 +3,7 @@ package com.demo.sharingapp.retrofit
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
+import com.demo.sharingapp.domain.user.data.NicknameResponse
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -72,7 +73,7 @@ interface RestAPI {
 
     // 비밀번호 찾기 - 바꾼 비밀번호 보내기
     @PATCH(API.FIND_PASSWORD_RESET) // Replace with your API endpoint
-    fun postFindPasswordReset(@Body findPasswordEmailVerify: FindPasswordResetData): Call<EmailResponse>
+    fun patchFindPasswordReset(@Body findPasswordEmailVerify: FindPasswordResetData): Call<EmailResponse>
 
 
     // 카카오 토큰 보내기
@@ -130,6 +131,13 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
         @Path ("productId") productId: Long
     ): Call<EmailResponse>
+
+    // 닉네임 변경
+    @PATCH(API.CHANGE_NICKNAME)
+    fun patchChangeNickname(
+        @Header("Authorization") Authorization: String,
+        @Body nickname: NicknameData
+    ): Call<NicknameResponse>
 
 
     // 도로명 주소 정보 가져오기
