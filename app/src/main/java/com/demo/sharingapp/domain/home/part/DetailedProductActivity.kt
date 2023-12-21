@@ -43,8 +43,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     private var longitude =0.0
     private var checkOwner = false
 
-    lateinit var productData: DetailedProductData
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailedProductBinding.inflate(layoutInflater)
@@ -68,44 +66,72 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         // 영수증 클릭
         clickReceipt()
 
-        binding.settingMenu.setOnClickListener {
-            if (binding.menuDecoratingImageView.getVisibility() == View.VISIBLE){
-                binding.menuDecoratingImageView.isVisible= false
-                binding.menuRemoveButton.isVisible=false
-                binding.menuModifyButton.isVisible=false
-                binding.menuReportButton.isVisible = false
-            }
-            else if(checkOwner){
-                binding.menuDecoratingImageView.isVisible= true
-                binding.menuRemoveButton.isVisible=true
-                binding.menuModifyButton.isVisible=true
-            }else{
-                binding.menuDecoratingImageView.isVisible= true
-                binding.menuReportButton.isVisible = true
-            }
-        }
-
-        binding.menuRemoveButton.setOnClickListener {
-            binding.menuDecoratingImageView.isVisible= false
-            binding.menuRemoveButton.isVisible=false
-            binding.menuModifyButton.isVisible=false
-            binding.menuReportButton.isVisible = false
-        }
-        binding.menuModifyButton.setOnClickListener {
-            binding.menuDecoratingImageView.isVisible= false
-            binding.menuRemoveButton.isVisible=false
-            binding.menuModifyButton.isVisible=false
-            binding.menuReportButton.isVisible = false
-        }
-        binding.menuReportButton.setOnClickListener {
-            binding.menuDecoratingImageView.isVisible= false
-            binding.menuRemoveButton.isVisible=false
-            binding.menuModifyButton.isVisible=false
-            binding.menuReportButton.isVisible = false
-        }
+        // 메뉴 버튼
+        menuButton()
 
     }
 
+    // 메뉴 버튼 함수
+    private fun menuButton() {
+        // 메뉴 버튼 클릭
+        clickMenuButton()
+
+        // 메뉴의 삭제하기 버튼 클릭
+        clickMenuRemoveButton()
+
+        // 메뉴의 수정하기 버튼 클릭
+        clickMenuModifyButton()
+
+        // 메뉴의 신고하기 버튼 클릭
+        clickMenuReportButton()
+    }
+
+    // 메뉴 버튼 클릭 함수
+    private fun clickMenuButton() {
+        binding.settingMenu.setOnClickListener {
+            if (binding.menuDecoratingImageView.getVisibility() == View.VISIBLE) { // 메뉴가 켜져있을 때
+                disappearsMenu()// 메뉴버튼 전체 사라짐
+            } else if (checkOwner) { // 작성자 일 때
+                binding.menuDecoratingImageView.isVisible = true
+                binding.menuRemoveButton.isVisible = true
+                binding.menuModifyButton.isVisible = true
+            } else { // 작성자가 아닐 때
+                binding.menuDecoratingImageView.isVisible = true
+                binding.menuReportButton.isVisible = true
+            }
+        }
+    }
+
+    // 메뉴의 삭제하기 버튼 클릭 함수
+    private fun clickMenuRemoveButton() {
+        binding.menuRemoveButton.setOnClickListener {
+            disappearsMenu() // 메뉴버튼 전체 사라짐
+        }
+    }
+
+    // 메뉴의 수정하기 버튼 클릭 함수
+    private fun clickMenuModifyButton() {
+        binding.menuModifyButton.setOnClickListener {
+            disappearsMenu() // 메뉴버튼 전체 사라짐
+        }
+    }
+
+    // 메뉴의 신고하기 버튼 클릭 함수
+    private fun clickMenuReportButton() {
+        binding.menuReportButton.setOnClickListener {
+            disappearsMenu() // 메뉴버튼 전체 사라짐
+        }
+    }
+
+    // 메뉴버튼 전체 사라짐
+    private fun disappearsMenu() {
+        binding.menuDecoratingImageView.isVisible = false
+        binding.menuRemoveButton.isVisible = false
+        binding.menuModifyButton.isVisible = false
+        binding.menuReportButton.isVisible = false
+    }
+
+    // 이전 버튼 클릭 함수
     private fun clickBackButton() {
         binding.backButton.setOnClickListener {
             val resultIntent = Intent()
@@ -114,21 +140,23 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         }
     }
 
+    // 영수증 클릭 함수
    private fun clickReceipt() {
         binding.receiptImageView.setOnClickListener {
             showDialog(uri)
         }
     }
 
+    // 좋아요 클릭 함수
     private fun clickLiked(productId: Long, accessToken: String) {
         binding.likeImageView.setOnClickListener {
-            if (liked) {
+            if (liked) { // 좋아요 켜져있을 때
                 binding.likeImageView.setImageResource(R.drawable.heart)
                 likePoint -= 1
                 binding.likeCountTextView.text = likePoint.toString()
                 liked = !liked
 
-            } else {
+            } else { // 좋아요 꺼져있을 때
                 binding.likeImageView.setImageResource(R.drawable.heart_fill)
                 likePoint += 1
                 binding.likeCountTextView.text = likePoint.toString()
@@ -174,9 +202,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 상품 데이터 설정 함수
     private fun settingData(it: DetailedProductData) {
 
-        productData = it
+        checkOwner = it.checkOwner // 작성자 확인
 
-        checkOwner = it.checkOwner
         //가격 변환
         val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
         val buyPrice = currencyFormat.format(it.buyPrice)
@@ -190,12 +217,10 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         // 상품 이미지
         val images = it.images
             .map { uriString -> DetailedImageData(uriString) }
-        val frameAdapter = FrameAdapter(images){
-            Log.e("aa","쿨릭")
+        val frameAdapter = FrameAdapter(images){ // 상품 이미지 클릭 했을때
             val intent = Intent(this,DetailedProductImageActivity::class.java)
                 .putExtra("data",it.images)
             startActivity(intent)
-
         }
         binding.productImageViewPager.adapter = frameAdapter
 
@@ -250,6 +275,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         // 상세 설명
         binding.descriptionTextView.text = it.description
 
+
+        // 테이블 레이아웃 설정
         TabLayoutMediator(
             binding.tabLayout,
             binding.productImageViewPager,

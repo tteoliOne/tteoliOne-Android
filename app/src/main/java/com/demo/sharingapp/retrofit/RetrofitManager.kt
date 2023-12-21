@@ -10,6 +10,8 @@ import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.data.SaveProductsData
 import com.demo.sharingapp.data.SaveProductsListData
+import com.demo.sharingapp.domain.home.data.PartProductData
+import com.demo.sharingapp.domain.home.data.PartProductListData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.login.data.*
@@ -32,6 +34,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
+import java.time.LocalDate
 
 class RetrofitManager() : Application() {
 
@@ -92,15 +95,64 @@ class RetrofitManager() : Application() {
             }
         })
     }
+    // 카테고리별 상품 가져오기
+    fun getPartProduct(
+        context: Context,
+        longitude: Double,
+        latitude: Double,
+        oldAccessToken: String,
+        categoryId : Long,
+        sort: String,
+        page: Int,
+        searchStartDate: String?,
+        searchEndDate: String?,
+        onProducts: (PartProductListData) -> Unit
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getPartProducts(Authorization = authorization,
+            longitude = longitude,
+            latitude = latitude,
+            categoryId = categoryId,
+            page = page,
+            size = 30,
+            sort = sort,
+            searchStartDate = searchStartDate,
+            searchEndDate = searchEndDate
+        )
+        //userId.value?:0
+        getCall.enqueue(object : retrofit2.Callback<PartProductData> {
+            override fun onResponse(
+                call: Call<PartProductData>,
+                response: Response<PartProductData>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("Get", "success ${response.body()}")
+                    val data = response.body()?.data ?: return
+                    onProducts(data)
 
-    // 상품 가져오기
+                } else {
+                    Log.e("Get", "succes, but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PartProductData>, t: Throwable) {
+                Log.e("Get", "fail ${t} $call")
+            }
+
+
+        })
+    }
+
+
+    // 홈 상품 가져오기
     fun getProduct(
         context: Context,
         longitude: Double,
         latitude: Double,
         oldAccessToken: String,
-        userId: Long,
-        //
         onProducts: (List<DataGetProducts>) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
@@ -108,7 +160,6 @@ class RetrofitManager() : Application() {
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val getCall = api.getProducts(Authorization = authorization,
-            userId = userId,
             longitude = longitude,
             latitude = latitude)
         //userId.value?:0
@@ -535,6 +586,31 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("postProductLike", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 상품 삭제 하기
+    fun getRemoveProduct(context: Context, accessToken: String, productsId: Long){
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.getRemoveProduct(Authorization = "Bearer $accessToken", productsId)
+
+        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("getRemoveProduct", "success ${response.body()?.success}")
+                    Log.e("getRemoveProduct", "data ${response.body()?.data}")
+                    Log.e("getRemoveProduct", "message ${response.body()?.message}")
+                    Log.e("getRemoveProduct", "code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                } else {
+                    Log.e("getRemoveProduct", "succes, but ${response.errorBody()}")
+
+                }
+            }
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("getRemoveProduct", "fail ${t} $call")
             }
         })
     }

@@ -49,29 +49,23 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val latitude = intent.getDoubleExtra(Constants.LATITUDE,0.0)
+        val longitude = intent.getDoubleExtra(LONGITUDE,0.0)
 
-        binding.likeListCloseButton.setOnClickListener {
-            binding.drawerView.closeDrawer(Gravity.LEFT)
-            binding.navHostFragment.bringToFront()
-        }
-
+        // 찜 목록 닫기 버튼 클릭
+        clickLikeListCloseButton()
 
         // 로그인 상태 확인 함수 호출
         checkHasLogin()
 
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-        val latitude = intent.getDoubleExtra(Constants.LATITUDE,0.0)
-        val longitude = intent.getDoubleExtra(LONGITUDE,0.0)
         mainViewModel.updateMyPlace(longitude,latitude)
-
-
-
 
         // 바텀네비 초기 설정 함수 호출
         initNavigation()
 
-
+        // 리사이클러뷰 초기 설정
         initRecyclerView()
 
 
@@ -84,16 +78,21 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
             }
         }
 
-
         KakaoSdk.init(this, "b7724ccdfc3f8f5fef039b767bdd06d3")
         // 해쉬 키 확인 함수 호출
         //findKeyHash()
 
-
-
-
     }
 
+    // 찜 목록 닫기 버튼 클릭 함수
+    private fun clickLikeListCloseButton() {
+        binding.likeListCloseButton.setOnClickListener {
+            binding.drawerView.closeDrawer(Gravity.LEFT)
+            binding.navHostFragment.bringToFront()
+        }
+    }
+
+    // 리사이클러뷰 초기 설정 함수
     private fun initRecyclerView() {
         saveProductAdapter = LikeListAdapter(){
             val intent = Intent(this,DetailedProductActivity::class.java)
@@ -117,7 +116,6 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     // 해쉬 키 확인 함수
     private fun findKeyHash() {
-
         var keyHash = Utility.getKeyHash(this)
         Log.e("keyHash",keyHash)
 
@@ -128,37 +126,9 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         val checkIsRefreshToken = SharedPreferencesData.containsData(this, REFRESH_TOKEN)
 
-
         if (!checkIsRefreshToken){
             moveLogin()
         }
-
-        // 토큰을 가지고 있는지 확인
-//        if (AuthApiClient.instance.hasToken()) {
-//            UserApiClient.instance.accessTokenInfo { _, error ->
-//
-//                if (error != null) {
-//                    //로그인 필요
-//                    if (error is KakaoSdkError && error.isInvalidTokenError() == true) {
-//
-//                        // 로그인 화면으로 이동 함수 호출
-//                        moveLogin()
-//
-//                    }
-//                    else {
-//                        //기타 에러
-//                    }
-//                }
-//                else {
-//                    //토큰 유효성 체크 성공(필요 시 토큰 갱신됨)
-//                }
-//            }
-//        }
-//        else { //로그인 필요
-//
-//            // 로그인 화면으로 이동 함수 호출
-//            moveLogin()
-//        }
 
     }
 

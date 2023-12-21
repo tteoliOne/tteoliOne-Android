@@ -29,13 +29,16 @@ class DetailedProductMapActivity : AppCompatActivity(), OnMapReadyCallback {
         binding = ActivityDetailedProductMapBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 내위치
+        latitude = intent.getDoubleExtra(LATITUDE,latitude)
+        longitude = intent.getDoubleExtra(LONGITUDE,longitude)
+
+        // 이전 버튼 클릭
         binding.completeButton.setOnClickListener {
             finish()
         }
 
-        latitude = intent.getDoubleExtra(LATITUDE,latitude)
-        longitude = intent.getDoubleExtra(LONGITUDE,longitude)
-
+        // 맵 설정
         val mapFragment =
             supportFragmentManager.findFragmentById(R.id.allMapDetailed) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -45,13 +48,14 @@ class DetailedProductMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(map: GoogleMap) {
         googleMap = map
         val initialLocation = LatLng(latitude, longitude)
-        Log.e("demap","$latitude $longitude")
         val markerOptions = MarkerOptions()
             .position(initialLocation)
             .title("공유 희망 장소")
+
         // 기본 위치 설정 (예시로 서울의 위도, 경도를 설정)
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 15f))
         googleMap.addMarker(markerOptions)
+
         // 현재 위치 레이어 활성화
         if (ContextCompat.checkSelfPermission(
                 this,

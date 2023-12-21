@@ -58,8 +58,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
-
-
     private lateinit var binding: FragmentHomeBinding
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -68,9 +66,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // 초기 nickname 설정 함수 호출
         initNickname()
 
-//        val longitude = mainViewModel.longitude.value
-//       val latitude = mainViewModel.latitude.value
-
+        // 내부저장소에 데이터가 있는지 확인
         if (checkSharedPreferencesData(LONGITUDE) && checkSharedPreferencesData(LATITUDE)){
             longitude = SharedPreferencesData.getData(this.requireContext(), LONGITUDE).toDouble()
             latitude = SharedPreferencesData.getData(this.requireContext(), LATITUDE).toDouble()
@@ -78,16 +74,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
          accessToken = SharedPreferencesData.getData(this.requireContext(),ACCESS_TOKEN)
          userId = SharedPreferencesData.getLongData(this.requireContext(),USER_ID)
 
-        Log.e("aa", mainViewModel.longitude.value.toString())
-
         // 초기 전체 리사이클러 뷰 설정 함수 호출
         initAllRecyclerView(accessToken)
 
+        // 상품 데이터 받아오기
         initProduct(accessToken, longitude, latitude, userId)
 
         // 상품 등록 버튼 클릭 시
         addProductButton()
 
+        // 닉네임 버튼 클릭
         clickNicknameButton()
 
         binding.homeScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
@@ -98,14 +94,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
         }
 
-        //
-        binding.vegetableTextView.setOnClickListener {
-            val intent = Intent(this.requireActivity(),DetailedProductActivity::class.java)
-            startActivity(intent)
-        }
-
     }
 
+    // 닉네임 버튼 클릭 함수
     private fun clickNicknameButton() {
         binding.topBar.nicknameSettingButton.setOnClickListener {
 
@@ -131,6 +122,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    // 상품 데이터 받아오기 함수
     private fun initProduct(
         accessToken: String,
         longitude: Double?,
@@ -215,7 +207,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 longitude,
                 latitude,
                 accessToken,
-                userId) {
+              ) {
 
                 val productData = it.groupBy {
                     it.categoryId
@@ -271,9 +263,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == MOVE_DETAILED_CODE && resultCode == RESULT_OK) {
-            val intent = this@HomeFragment.requireActivity().intent
-            this@HomeFragment.requireActivity().finish()
-            startActivity(intent)
+
+            initProduct(accessToken,longitude,latitude,userId)
+//            val intent = this@HomeFragment.requireActivity().intent
+//            this@HomeFragment.requireActivity().finish()
+//            startActivity(intent)
         }
     }
 
@@ -291,6 +285,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     }
 
+    // 내부저장소에 데이터가 있는지 확인 함수
     private fun checkSharedPreferencesData(dataName: String): Boolean{
         return SharedPreferencesData.containsData(this.requireContext(),dataName)
     }

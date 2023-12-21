@@ -62,14 +62,8 @@ class UserPlace : AppCompatActivity() {
         setContentView(binding.root)
 
 
-        addressAdepter = UserPlaceAdepter(){
-            geoCoding(it)
-        }
-
-        binding.addressListRecyclerView.apply {
-            adapter = addressAdepter
-            layoutManager =LinearLayoutManager(this@UserPlace)
-        }
+        // 리사이클러뷰 초기 설정
+        initRecyclerView()
 
         // 검색버튼 클릭 함수 호출
         deleteButtonClick()
@@ -87,11 +81,28 @@ class UserPlace : AppCompatActivity() {
             )
         }
 
+        // 현 위치 찾기 버튼 클릭
+        clickMyPlaceButton()
 
+    }
+
+    // 현 위치 찾기 버튼 클릭 함수
+    private fun clickMyPlaceButton() {
         binding.myPlaceButton.setOnClickListener {
             checkPermissionLocation()
         }
+    }
 
+    // 리사이클러뷰 초기 설정 함수
+    private fun initRecyclerView() {
+        addressAdepter = UserPlaceAdepter() {
+            geoCoding(it)
+        }
+
+        binding.addressListRecyclerView.apply {
+            adapter = addressAdepter
+            layoutManager = LinearLayoutManager(this@UserPlace)
+        }
     }
 
     // 검색버튼 클릭 함수
@@ -104,6 +115,7 @@ class UserPlace : AppCompatActivity() {
         }
     }
 
+    // 주소 검색 api
     private fun searchAddress() {
         val searchValue = binding.addressEditText.text
 

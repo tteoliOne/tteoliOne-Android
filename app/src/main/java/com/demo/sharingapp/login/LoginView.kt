@@ -37,23 +37,12 @@ import java.util.regex.Pattern
 
 class LoginView : AppCompatActivity() {
 
-    private lateinit var nickname: String
-    private lateinit var accessToken: String
-    private lateinit var refreshToken: String
-    private lateinit var userId: String
-
-
     private lateinit var binding: ActivityLoginViewBinding
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
         binding = ActivityLoginViewBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
-        val data = SharedPreferencesData.getData(this, REFRESH_TOKEN)
-        Log.e("re",data)
-
-        Log.e("aa", binding.idEditText.text.toString().isEmpty().toString())
 
         // id 와 password 가 빈값인지 확인
         checkIdAndPassword()
@@ -72,12 +61,6 @@ class LoginView : AppCompatActivity() {
 
         // 아이디 찾기 버튼 클릭 함수 호출
         clickFindIdButton()
-
-        //
-        binding.googleLoginButton.setOnClickListener {
-            startActivity(Intent(this, UserPlace::class.java))
-        }
-
 
     }
 

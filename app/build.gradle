@@ -79,6 +79,8 @@ dependencies {
     //구글맵
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
 
+    // 포토뷰
+    implementation 'com.github.chrisbanes:PhotoView:2.3.0'
 
 
     // 구글 플레이 서비스

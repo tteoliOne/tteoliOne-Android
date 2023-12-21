@@ -1,6 +1,7 @@
 package com.demo.sharingapp.retrofit
 
 import com.demo.sharingapp.data.GetSaveProductData
+import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
@@ -14,6 +15,7 @@ import com.demo.sharingapp.utils.API
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.*
+import java.time.LocalDate
 
 interface RestAPI {
 
@@ -87,11 +89,24 @@ interface RestAPI {
         @Part ("request") request : Products,
     ): Call<ProductsResponse>
 
-    // 상품 정보 가져오기
+    // 카테고리별 상품 정보 가져오기
     @GET(API.PRODUCTS)
+    fun getPartProducts(
+        @Header("Authorization") Authorization: String,
+        @Query("longitude") longitude: Double,
+        @Query("latitude") latitude: Double,
+        @Query("categoryId") categoryId: Long,
+        @Query("searchStartDate") searchStartDate: String?,
+        @Query("searchEndDate") searchEndDate: String?,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String,
+        ): Call<PartProductData>
+
+    // 상품 정보 가져오기
+    @GET(API.PRODUCTS_SIMPLE)
     fun getProducts(
         @Header("Authorization") Authorization: String,
-        @Query("userId") userId: Long,
         @Query("longitude") longitude: Double,
         @Query("latitude") latitude: Double
     ): Call<GetProductsResponse>
@@ -108,6 +123,13 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
         @Path ("productId") productId: Long
     ): Call<DetailedProductResponseData>
+
+    // 상품 삭제
+    @GET(API.DETAILED_PRODUCT)
+    fun getRemoveProduct(
+        @Header("Authorization") Authorization: String,
+        @Path ("productId") productId: Long
+    ): Call<EmailResponse>
 
 
     // 도로명 주소 정보 가져오기

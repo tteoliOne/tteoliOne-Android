@@ -14,13 +14,17 @@ class DetailedProductImageActivity : AppCompatActivity() {
         binding = ActivityDetailedProductImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val a = intent.getStringArrayExtra("data") ?: return
+
+        val imageArray = intent.getStringArrayExtra("data") ?: return
         // 상품 이미지
-        val images = a
+        val images = imageArray
             .map { uriString -> DetailedImageData(uriString) }
-        val frameAdapter = FrameAdapter(images){}
+
+        // 프레임어뎁터 설정
+       val frameAdapter = DetailedFrameAdapter(images)
         binding.productImageViewPager.adapter = frameAdapter
 
+        // 테이블 레이아웃 설정
         TabLayoutMediator(
             binding.tabLayout,
             binding.productImageViewPager,
@@ -28,6 +32,7 @@ class DetailedProductImageActivity : AppCompatActivity() {
             binding.productImageViewPager.currentItem = tab.position
         }.attach()
 
+        // 이전 버튼 클릭
         binding.backButton.setOnClickListener {
             finish()
         }

@@ -10,23 +10,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemHomePartProductBinding
+import com.demo.sharingapp.domain.home.data.PartProductContent
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
 
 class HomePartProductAdepter(private val onLikeClick: (Long) -> Unit, private val onViewClick:(Long)->Unit) :
-    ListAdapter<ProductsData, HomePartProductAdepter.HomePartProductViewHolder>(object :
-        DiffUtil.ItemCallback<ProductsData>() {
-        override fun areItemsTheSame(oldItem: ProductsData, newItem: ProductsData): Boolean {
+    ListAdapter<PartProductContent, HomePartProductAdepter.HomePartProductViewHolder>(object :
+        DiffUtil.ItemCallback<PartProductContent>() {
+        override fun areItemsTheSame(oldItem: PartProductContent, newItem: PartProductContent): Boolean {
             return oldItem.productId == newItem.productId
         }
 
-        override fun areContentsTheSame(oldItem: ProductsData, newItem: ProductsData): Boolean {
+        override fun areContentsTheSame(oldItem: PartProductContent, newItem: PartProductContent): Boolean {
             return oldItem == newItem
         }
     }) {
     inner class HomePartProductViewHolder(val binding: ItemHomePartProductBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: ProductsData) {
+        fun bind(item: PartProductContent, position: Int) {
 
             binding.root.setOnClickListener {
                 onViewClick(item.productId)
@@ -71,9 +72,18 @@ class HomePartProductAdepter(private val onLikeClick: (Long) -> Unit, private va
                     liked = !liked
                 }
                 onLikeClick(item.productId)
+                updateItem(position = position, liked, likePoint)
             }
 
         }
+    }
+
+    // 아이템을 수정하는 함수
+    fun updateItem(position: Int, liked: Boolean, totalLikes: Int) {
+        val currentList = currentList.toMutableList()
+        currentList[position].liked = liked
+        currentList[position].totalLikes = totalLikes
+        submitList(currentList)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomePartProductViewHolder {
@@ -84,6 +94,6 @@ class HomePartProductAdepter(private val onLikeClick: (Long) -> Unit, private va
     }
 
     override fun onBindViewHolder(holder: HomePartProductViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        holder.bind(currentList[position], position)
     }
 }

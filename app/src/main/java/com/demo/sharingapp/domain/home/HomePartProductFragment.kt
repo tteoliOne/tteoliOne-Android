@@ -10,16 +10,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentHomePartProductBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.part.DetailedProductActivity
 import com.demo.sharingapp.login.data.ProductsData
+import com.demo.sharingapp.login.signup.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.MOVE_DETAILED_CODE
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
+import java.time.LocalDate
 
 class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
 
@@ -34,30 +37,57 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
     private var category = ""
     private var longitude = 0.0
     private var latitude = 0.0
+    private var page = 0
+    private var last = false
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.e("page", "시작")
+
         category = args.name
         longitude = args.longitude.toDouble()
         latitude = args.latitude.toDouble()
-
         binding = FragmentHomePartProductBinding.bind(view)
 
-        val accessToken = SharedPreferencesData.getData(this.requireContext(), Constants.ACCESS_TOKEN)
+        val linearLayoutManager = LinearLayoutManager(this@HomePartProductFragment.requireContext())
+
+        val accessToken =
+            SharedPreferencesData.getData(this.requireContext(), Constants.ACCESS_TOKEN)
 
 
         // 이전 버튼 클릭 시 함수 호출
         clickBackButton()
 
         // 초기 리사이클러뷰 설정 함수 호출
-        initRecyclerView(accessToken)
+        initRecyclerView(accessToken, linearLayoutManager)
 
         binding.categoryTextView.text = category
 
 
         // 카테고리에 맞는 상품 데이터 받는 함수 호출
-        getProducts(category,longitude,latitude)
+        getProducts(category, page, longitude, latitude)
+
+        binding.partProductRecyclerView.addOnScrollListener(object :
+            RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+
+                val totalCount = linearLayoutManager.itemCount
+                val lastVisiblePosition =
+                    linearLayoutManager.findLastCompletelyVisibleItemPosition()
+
+                if (lastVisiblePosition >= (totalCount - 1) && !last && lastVisiblePosition >28 ) {
+                    Log.e("page", "aa $lastVisiblePosition , ${totalCount - 1}, $last")
+                    page += 1
+                    getProducts(category, page, longitude, latitude)
+                }
+            }
+        })
+
+        binding.filterButton.setOnClickListener {
+            showDialog()
+        }
 
         // 전 화면에 있는 데이터 넣기
         //homePartProductsAdepter.submitList(productsData)
@@ -65,19 +95,20 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
     }
 
     // 초기 리사이클러뷰 설정 함수
-    private fun initRecyclerView(accessToken: String) {
+    private fun initRecyclerView(accessToken: String, linearLayoutManager: LinearLayoutManager) {
         homePartProductsAdepter = HomePartProductAdepter(onLikeClick = {
             RetrofitManager.instance.postProductLike(this.requireContext(), it, accessToken)
         },
-        onViewClick = {
-            val intent = Intent(this@HomePartProductFragment.requireContext(),DetailedProductActivity::class.java)
-                .putExtra(PRODUCT_ID,it)
-            startActivityForResult(intent, MOVE_DETAILED_CODE)
-        }
-            )
+            onViewClick = {
+                val intent = Intent(this@HomePartProductFragment.requireContext(),
+                    DetailedProductActivity::class.java)
+                    .putExtra(PRODUCT_ID, it)
+                startActivityForResult(intent, MOVE_DETAILED_CODE)
+            }
+        )
         binding.partProductRecyclerView.apply {
             adapter = homePartProductsAdepter
-            layoutManager = LinearLayoutManager(this@HomePartProductFragment.requireContext())
+            layoutManager = linearLayoutManager
         }
     }
 
@@ -89,9 +120,17 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
     }
 
     // 카테고리에 맞는 상품 데이터 받는 함수
-    private fun getProducts(category: String, longitude: Double, latitude: Double) {
+    private fun getProducts(
+        category: String,
+        page: Int,
+        longitude: Double,
+        latitude: Double,
+        searchStartDate: String? = null,
+        searchEndDate: String? = null,
+        sort: String = "asc",
+    ) {
 
-        val id = when(category){
+        val id = when (category) {
             "채소" -> 1
             "과일" -> 2
             "간편식" -> 3
@@ -104,29 +143,58 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
         mainViewModel = ViewModelProvider(this.requireActivity())[MainViewModel::class.java]
         val accessToken = SharedPreferencesData.getData(this.requireContext(),
             Constants.ACCESS_TOKEN)
-        val userId = SharedPreferencesData.getLongData(this.requireContext(), Constants.USER_ID)
         if (longitude != null && latitude != null) {
-            RetrofitManager.instance.getProduct(this.requireContext(),
+            RetrofitManager.instance.getPartProduct(this.requireContext(),
                 longitude,
                 latitude,
                 accessToken,
-                userId) {
-                val productData = it.groupBy {
-                    it.categoryId
-                }
+                categoryId = id.toLong(),
+                page = page,
+                sort = sort,
+                searchStartDate = searchStartDate,
+                searchEndDate = searchEndDate
+            ) {
+                if (page > 0) {
+                    this.last = it.last
+                    homePartProductsAdepter.submitList(homePartProductsAdepter.currentList + it.content.orEmpty())
+                } else {
+                    homePartProductsAdepter.submitList(it.content){
+                        binding.partProductRecyclerView.scrollToPosition(0)
+                    }
 
-                productData[id]?.forEach {
-                    homePartProductsAdepter.submitList(it.products)
                 }
-
             }
         }
+
+    }
+
+    // 알림창 띄우기
+    private fun showDialog() {
+        val dialog = HomePartProductDialog() { searchStartDate, searchEndDate, sort ->
+            getProducts(category = category,
+                page = 0,
+                longitude = longitude,
+                latitude = latitude,
+                searchStartDate = searchStartDate,
+                searchEndDate = searchEndDate,
+                sort = sort
+            )
+        }
+
+
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this@HomePartProductFragment.requireActivity().supportFragmentManager,
+            "SignupDialog")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Constants.MOVE_DETAILED_CODE && resultCode == Activity.RESULT_OK) {
-            getProducts(category = category,longitude,latitude )
+            getProducts(category = category,
+                page = 0,
+                longitude = longitude,
+                latitude = latitude)
         }
     }
 }

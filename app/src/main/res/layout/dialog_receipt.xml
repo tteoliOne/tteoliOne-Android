@@ -15,7 +15,7 @@
         android:background="@drawable/round_30"
         android:clipToOutline="true"
         android:layout_width="300dp"
-        android:scaleType="fitXY"
+        android:scaleType="centerCrop"
         android:layout_height="235dp"/>
 
     <ImageView
