@@ -101,7 +101,7 @@ interface RestAPI {
         @Query("searchEndDate") searchEndDate: String?,
         @Query("page") page: Int,
         @Query("size") size: Int,
-        @Query("sort") sort: String,
+        @Query("sort") sort: String?,
         ): Call<PartProductData>
 
     // 상품 정보 가져오기

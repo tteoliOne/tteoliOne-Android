@@ -40,6 +40,11 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
     private var page = 0
     private var last = false
 
+    private var sort = "createAt-asc"
+    private var searchStartDate: LocalDate? = null
+    private var searchEndDate: LocalDate? = null
+    private var dateType = 0
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -66,7 +71,7 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
 
 
         // 카테고리에 맞는 상품 데이터 받는 함수 호출
-        getProducts(category, page, longitude, latitude)
+        getProducts(category, page, longitude, latitude, searchStartDate, searchEndDate, sort)
 
         binding.partProductRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
@@ -77,10 +82,16 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
                 val lastVisiblePosition =
                     linearLayoutManager.findLastCompletelyVisibleItemPosition()
 
-                if (lastVisiblePosition >= (totalCount - 1) && !last && lastVisiblePosition >28 ) {
+                if (lastVisiblePosition >= (totalCount - 1) && !last && lastVisiblePosition > 28) {
                     Log.e("page", "aa $lastVisiblePosition , ${totalCount - 1}, $last")
                     page += 1
-                    getProducts(category, page, longitude, latitude)
+                    getProducts(category,
+                        page,
+                        longitude,
+                        latitude,
+                        searchStartDate,
+                        searchEndDate,
+                        sort)
                 }
             }
         })
@@ -125,11 +136,10 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
         page: Int,
         longitude: Double,
         latitude: Double,
-        searchStartDate: String? = null,
-        searchEndDate: String? = null,
-        sort: String = "asc",
+        searchStartDate: LocalDate?,
+        searchEndDate: LocalDate?,
+        sort: String? = "asc",
     ) {
-
         val id = when (category) {
             "채소" -> 1
             "과일" -> 2
@@ -139,6 +149,22 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
             "기타" -> 6
             else -> 0
         }
+
+        var startDate: String? = null
+        var endDate: String? = null
+        if (searchStartDate != null && searchEndDate != null) {
+             startDate = String.format("%d%02d%02d",
+                searchStartDate.year,
+                searchStartDate.monthValue,
+                searchStartDate.dayOfMonth)
+
+             endDate = String.format("%d%02d%02d",
+                searchEndDate.year,
+                searchEndDate.monthValue,
+                searchEndDate.dayOfMonth)
+        }
+
+
 
         mainViewModel = ViewModelProvider(this.requireActivity())[MainViewModel::class.java]
         val accessToken = SharedPreferencesData.getData(this.requireContext(),
@@ -151,14 +177,14 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
                 categoryId = id.toLong(),
                 page = page,
                 sort = sort,
-                searchStartDate = searchStartDate,
-                searchEndDate = searchEndDate
+                searchStartDate = startDate,
+                searchEndDate = endDate
             ) {
                 if (page > 0) {
                     this.last = it.last
                     homePartProductsAdepter.submitList(homePartProductsAdepter.currentList + it.content.orEmpty())
                 } else {
-                    homePartProductsAdepter.submitList(it.content){
+                    homePartProductsAdepter.submitList(it.content) {
                         binding.partProductRecyclerView.scrollToPosition(0)
                     }
 
@@ -170,7 +196,14 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
 
     // 알림창 띄우기
     private fun showDialog() {
-        val dialog = HomePartProductDialog() { searchStartDate, searchEndDate, sort ->
+        val dialog = HomePartProductDialog(sort,
+            searchStartDate,
+            searchEndDate,
+            dateType) { searchStartDate, searchEndDate, sort, dateType ->
+            this.searchStartDate = searchStartDate
+            this.searchEndDate = searchEndDate
+            this.sort = sort
+            this.dateType = dateType
             getProducts(category = category,
                 page = 0,
                 longitude = longitude,
@@ -194,7 +227,7 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
             getProducts(category = category,
                 page = 0,
                 longitude = longitude,
-                latitude = latitude)
+                latitude = latitude, searchStartDate, searchEndDate, sort)
         }
     }
 }

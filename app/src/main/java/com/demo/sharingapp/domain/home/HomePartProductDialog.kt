@@ -17,8 +17,11 @@ import com.demo.sharingapp.databinding.DialogSignupBinding
 import java.time.LocalDate
 import java.util.*
 
-class HomePartProductDialog(
-     val onClick:(String?, String?, String)->Unit
+class HomePartProductDialog( sort: String,
+                             searchStartDate: LocalDate?,
+                             searchEndDate: LocalDate?,
+                             dateType: Int,
+     val onClick:(LocalDate?, LocalDate?, String, Int)->Unit
 ) : DialogFragment(),DatePickerDialog.OnDateSetListener {
     // 뷰 바인딩 정의
     private var _binding: DialogPartProductBinding? = null
@@ -27,13 +30,13 @@ class HomePartProductDialog(
     private var text: String? = null
 
     private var isStart = false
-    private var dateType = 0
-    private var sort = "createAt-asc"
-    private var startDate : LocalDate? = null
-    private var endDate : LocalDate? = null
+    private var dateType = dateType
 
-    private var searchStartDate : String? = null
-    private var searchEndDate: String? = null
+    private var sort = sort
+    private var searchStartDate : LocalDate? = searchStartDate
+    private var searchEndDate: LocalDate? = searchEndDate
+
+    private val currentDate = LocalDate.now()
 
 
     init {
@@ -53,6 +56,32 @@ class HomePartProductDialog(
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
 
+
+        //
+        cleanChipButton()
+        when(dateType){
+            0 -> binding.dateAllButton.isChecked = true
+            1 -> binding.dateTodayButton.isChecked = true
+            2 -> binding.dateWeekButton.isChecked = true
+            3 -> binding.dateMonthButton.isChecked = true
+            4 -> binding.dateTreeMonthButton.isChecked = true
+            5 -> binding.dateSixMonthButton.isChecked = true
+            6 -> {
+                binding.dateDirectInputButton.isChecked = true
+
+                appearDateInput(true)
+
+            }
+        }
+        if (sort == "createAt-desc"){
+            binding.pastView.isVisible=false
+            binding.latestView.isVisible = true
+        }else{
+            binding.latestView.isVisible=false
+            binding.pastView.isVisible = true
+        }
+
+
         // 조회 버튼 클릭
         clickSearchButton()
 
@@ -63,49 +92,42 @@ class HomePartProductDialog(
         binding.pastTextView.setOnClickListener {
             binding.latestView.isVisible=false
             binding.pastView.isVisible = true
-            sort = "createAt-desc"
+            sort = "createAt-asc"
         }
 
         // 정렬순서 - 최신순 클릭
         binding.latestTextView.setOnClickListener {
             binding.pastView.isVisible=false
             binding.latestView.isVisible = true
-            sort = "createAt-asc"
+            sort = "createAt-desc"
         }
 
-        binding.dateStartTextView.text = "${endDate?.year}.${endDate?.monthValue}.${endDate?.dayOfMonth}"
-        binding.dateEndTextView.text = "${endDate?.year}.${endDate?.monthValue}.${endDate?.dayOfMonth}"
+
 
         binding.dateStartTextView.setOnClickListener {
             isStart = true
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
+            val date = searchStartDate ?: currentDate
             context?.let {
                 DatePickerDialog(
                     it,
                     this,
-                    year,
-                    month,
-                    day
+                    date.year,
+                    date.monthValue - 1,
+                    date.dayOfMonth
                 ).show()
             }
         }
 
         binding.dateEndTextView.setOnClickListener {
             isStart = false
-            val calendar = Calendar.getInstance()
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH)
-            val day = calendar.get(Calendar.DAY_OF_MONTH)
+            val date = searchEndDate ?: currentDate
             context?.let {
                 DatePickerDialog(
                     it,
                     this,
-                    year,
-                    month,
-                    day
+                    date.year,
+                    date.monthValue - 1,
+                    date.dayOfMonth
                 ).show()
             }
         }
@@ -123,8 +145,9 @@ class HomePartProductDialog(
             cleanChipButton()
             binding.dateAllButton.isChecked = true
             appearDateInput(false)
-            startDate = null
-            endDate = null
+            searchStartDate = null
+            searchEndDate = null
+            dateType = 0
         }
 
         // 기간선택 - 1일 칩 클릭
@@ -132,9 +155,10 @@ class HomePartProductDialog(
             cleanChipButton()
             binding.dateTodayButton.isChecked = true
             appearDateInput(false)
-            startDate = endDate?.minusDays(1)
+            searchEndDate = currentDate
+            searchStartDate = searchEndDate?.minusDays(1)
 
-            Log.e("currentDate",startDate.toString())
+            dateType = 1
         }
 
         // 기간선택 - 일주일 칩 클릭
@@ -142,7 +166,10 @@ class HomePartProductDialog(
             cleanChipButton()
             binding.dateWeekButton.isChecked = true
             appearDateInput(false)
-            startDate = endDate?.minusDays(7)
+            searchEndDate = currentDate
+            searchStartDate = searchEndDate?.minusDays(7)
+
+            dateType = 2
         }
 
         // 기간선택 - 1개월 칩 클릭
@@ -150,7 +177,10 @@ class HomePartProductDialog(
             cleanChipButton()
             binding.dateMonthButton.isChecked = true
             appearDateInput(false)
-            startDate = endDate?.minusMonths(1)
+            searchEndDate = currentDate
+            searchStartDate = searchEndDate?.minusMonths(1)
+
+            dateType = 3
         }
 
         // 기간선택 - 3개월 칩 클릭
@@ -158,7 +188,10 @@ class HomePartProductDialog(
             cleanChipButton()
             binding.dateTreeMonthButton.isChecked = true
             appearDateInput(false)
-            startDate = endDate?.minusMonths(3)
+            searchEndDate = currentDate
+            searchStartDate = searchEndDate?.minusMonths(3)
+
+            dateType = 4
         }
 
         // 기간선택 - 6개월 칩 클릭
@@ -166,7 +199,10 @@ class HomePartProductDialog(
             cleanChipButton()
             binding.dateSixMonthButton.isChecked = true
             appearDateInput(false)
-            startDate = endDate?.minusMonths(6)
+            searchEndDate = currentDate
+            searchStartDate = searchEndDate?.minusMonths(6)
+
+            dateType = 5
         }
 
         // 기간선택 - 직접 입력 칩 클릭
@@ -177,11 +213,21 @@ class HomePartProductDialog(
 
             appearDateInput(true)
 
+            dateType = 6
+
         }
     }
 
     // 직접입력칸 온오프 함수
     private fun appearDateInput(isInput: Boolean) {
+        if (searchStartDate != null){
+            binding.dateStartTextView.text = "${searchStartDate?.year}.${searchStartDate?.monthValue}.${searchStartDate?.dayOfMonth}"
+            binding.dateEndTextView.text = "${searchEndDate?.year}.${searchEndDate?.monthValue}.${searchEndDate?.dayOfMonth}"
+        }else{
+            binding.dateStartTextView.text = "${currentDate?.year}.${currentDate?.monthValue}.${currentDate?.dayOfMonth}"
+            binding.dateEndTextView.text = "${currentDate?.year}.${currentDate?.monthValue}.${currentDate?.dayOfMonth}"
+        }
+
         binding.dateStartTextView.isVisible = isInput
         binding.dateEndTextView.isVisible = isInput
         binding.fromTextView.isVisible = isInput
@@ -196,18 +242,19 @@ class HomePartProductDialog(
         binding.dateTreeMonthButton.isChecked = false
         binding.dateSixMonthButton.isChecked = false
         binding.dateDirectInputButton.isChecked = false
-        endDate = LocalDate.now()
+
+
     }
 
     // 조회 버튼 클릭 함수
     private fun clickSearchButton() {
         binding.searchButton.setOnClickListener {
 
-            if (startDate !=null && endDate != null){
-                searchStartDate = String.format("%d%02d%02d",startDate?.year,startDate?.monthValue,startDate?.dayOfMonth)
-                searchEndDate = String.format("%d%02d%02d",endDate?.year,endDate?.monthValue,endDate?.dayOfMonth)
+            if (searchStartDate !=null && searchEndDate != null){
+                searchStartDate = searchStartDate
+                searchEndDate = searchEndDate
             }
-            onClick(searchStartDate, searchEndDate, sort)
+            onClick(searchStartDate, searchEndDate, sort, dateType)
             dismiss()
         }
     }
@@ -220,11 +267,11 @@ class HomePartProductDialog(
     override fun onDateSet(view: DatePicker?, year: Int, month: Int, dayOfMonth: Int) {
         if (isStart){
             binding.dateStartTextView.text = "$year.${month + 1}.$dayOfMonth"
-            startDate = LocalDate.of(year, month + 1, dayOfMonth)
+            searchStartDate = LocalDate.of(year, month + 1, dayOfMonth)
         }
         else{
             binding.dateEndTextView.text = "$year.${month + 1}.$dayOfMonth"
-            endDate = LocalDate.of(year, month + 1, dayOfMonth)
+            searchEndDate = LocalDate.of(year, month + 1, dayOfMonth)
         }
 
     }

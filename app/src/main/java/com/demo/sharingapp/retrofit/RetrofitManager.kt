@@ -103,7 +103,7 @@ class RetrofitManager() : Application() {
         latitude: Double,
         oldAccessToken: String,
         categoryId : Long,
-        sort: String,
+        sort: String?,
         page: Int,
         searchStartDate: String?,
         searchEndDate: String?,
