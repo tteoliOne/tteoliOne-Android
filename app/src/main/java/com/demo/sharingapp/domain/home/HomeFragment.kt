@@ -49,14 +49,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     //
     private var listener: MyFragmentListener? = null
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        if (context is MyFragmentListener) {
-            listener = context
-        } else {
-            throw ClassCastException("$context must implement MyFragmentListener")
-        }
-    }
 
     private lateinit var binding: FragmentHomeBinding
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -288,6 +280,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     // 내부저장소에 데이터가 있는지 확인 함수
     private fun checkSharedPreferencesData(dataName: String): Boolean{
         return SharedPreferencesData.containsData(this.requireContext(),dataName)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if (context is MyFragmentListener) {
+            listener = context
+        } else {
+            throw ClassCastException("$context must implement MyFragmentListener")
+        }
     }
 
     interface MyFragmentListener {

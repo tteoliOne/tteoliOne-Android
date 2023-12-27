@@ -170,7 +170,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         imageList.forEach {
             val file = File(cacheDir, "image.jpeg")
             val fileOutputStream = FileOutputStream(file)
-            convertUriToJpeg(it).compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            convertUriToJpeg(it).compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
 
