@@ -17,13 +17,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
-        <ImageView
+        <com.makeramen.roundedimageview.RoundedImageView
             android:id="@+id/imageView"
             android:layout_width="0dp"
             android:layout_height="106dp"
-            android:background="@drawable/round_left_30"
-            android:clipToOutline="true"
+            app:riv_corner_radius_top_left="20dp"
+            app:riv_corner_radius_bottom_left="20dp"
             android:scaleType="centerCrop"
             android:src="@drawable/image_100"
             app:layout_constraintEnd_toStartOf="@id/textLayout"

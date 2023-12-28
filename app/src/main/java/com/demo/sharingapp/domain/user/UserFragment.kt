@@ -41,6 +41,9 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         initNickname()
         initId()
 
+        binding.shareProductListLayout.setOnClickListener {
+
+        }
     }
 
     // 초기 닉네임 입력 함수
