@@ -6,9 +6,13 @@ import android.app.DatePickerDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import android.media.ExifInterface
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
@@ -52,10 +56,7 @@ import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
-import java.io.OutputStream
+import java.io.*
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -93,6 +94,8 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private var shareCount = ""
     private var categoryId = 0
     private var description = ""
+
+    private var realUri: Uri? = null
 
     private lateinit var binding: ActivityAddProductsBinding
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,9 +171,14 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val imageFileList: ArrayList<MultipartBody.Part> = ArrayList()
         imageList.forEach {
+
+            val exifInterface = getExifInterface(this, it)
+            val orientation = exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+            val rotatedBitmap = rotateBitmap(convertUriToJpeg(it), getRotationAngle(orientation ?: ExifInterface.ORIENTATION_NORMAL))
+
             val file = File(cacheDir, "image.jpeg")
             val fileOutputStream = FileOutputStream(file)
-            convertUriToJpeg(it).compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
 
@@ -195,6 +203,67 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
             buyDate = getString(R.string.buy_date_local, year, month, day)
         )
 
+    }
+    // 휴대폰 설정에 따라 이미지 각도를 돌려줌
+    private fun getRotationAngle(orientation: Int): Float {
+        return when (orientation) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+    }
+
+    // 비트맵을 주어진 각도로 회전하여 반환하는 함수
+    private fun rotateBitmap(source: Bitmap, angle: Float): Bitmap {
+        val matrix = Matrix()
+        matrix.postRotate(angle)
+        return Bitmap.createBitmap(source, 0, 0, source.width, source.height, matrix, true)
+    }
+
+    // uri 에서 절대경로 가져오기
+    fun getRealPathFromUri(context: Context, uri: Uri): String? {
+        var realPath: String? = null
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            // Android 10 이상에서는 ContentResolver를 통해 파일 경로 가져오기
+            context.contentResolver.query(uri, projection, null, null, null)?.use { cursor ->
+                cursor.moveToFirst()
+                val columnIndex = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                realPath = cursor.getString(columnIndex)
+            }
+        } else {
+            // Android 9 이하에서는 MediaStore를 통해 파일 경로 가져오기
+            val cursor: Cursor? = context.contentResolver.query(uri, projection, null, null, null)
+            cursor?.use {
+                if (it.moveToFirst()) {
+                    val columnIndex = it.getColumnIndexOrThrow(MediaStore.Images.Media.DATA)
+                    realPath = it.getString(columnIndex)
+                }
+            }
+            cursor?.close()
+        }
+
+        return realPath
+    }
+
+    // 이미지 uri에서 ExifInterface 가져오기
+    fun getExifInterface(context: Context, uri: Uri): ExifInterface? {
+        val inputStream = context.contentResolver.openInputStream(uri)
+        return if (inputStream != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                ExifInterface(inputStream)
+            } else {
+                // Android N 이하에서는 파일 경로를 얻어서 ExifInterface 생성
+                val realPath = getRealPathFromUri(context, uri)
+                realPath?.let {
+                    ExifInterface(it)
+                }
+            }
+        } else {
+            null
+        }
     }
 
     // uri를 비트맵으로 바꾸는 함수
@@ -379,12 +448,28 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun openCamera() {
         val cameraPermission = arrayOf(Manifest.permission.CAMERA)
         if (PermissionUtil.checkPermission(this, cameraPermission)) {
+
             val intent: Intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+            createImageUri(generateFileName(), "image/jpg")?.let { uri ->
+                realUri = uri
+                // MediaStore.EXTRA_OUTPUT을 Key로 하여 Uri를 넘겨주면
+                // 일반적인 Camera App은 이를 받아 내가 지정한 경로에 사진을 찍어서 저장시킨다.
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, realUri)
+            }
             startActivityForResult(intent, Constants.FLAG_REQ_CAMERA)
         } else {
             PermissionUtil.requestPermission(this, cameraPermission)
         }
+
     }
+
+    private fun createImageUri(filename: String, mimeType: String): Uri? {
+        var values = ContentValues()
+        values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
+        values.put(MediaStore.Images.Media.MIME_TYPE, mimeType)
+        return this.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+    }
+
 
     // 사진 찍고 이미지 비트맵으로 저장 함수
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -392,16 +477,9 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         if (resultCode == Activity.RESULT_OK) {
             when (requestCode) {
                 Constants.FLAG_REQ_CAMERA -> {
-                    if (data?.extras?.get("data") != null) {
-                        //카메라로 방금 촬영한 이미지를 미리 만들어 놓은 이미지뷰로 전달 합니다.
-                        val bitmap = data?.extras?.get("data") as Bitmap
-
-                        val imageUri = saveBitmapToGallery(this, bitmap)
-                        if (imageUri != null) {
-                            imageList.add(imageUri)
-                            updateImageList()
-                        }
-
+                    realUri?.let { uri ->
+                        imageList.add(uri)
+                        updateImageList()
                     }
                 }
                 300 -> {
@@ -411,8 +489,11 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                     saveSharedString(FIND_LONGITUDE, longitude.toString())
                     saveSharedString(FIND_LATITUDE, latitude.toString())
 
-                    Log.e("SendingActivity","현제 ${SharedPreferencesData.getData(this, LATITUDE)} 바꾼 ${SharedPreferencesData.getData(this,
-                        FIND_LATITUDE)}")
+                    Log.e("SendingActivity",
+                        "현제 ${SharedPreferencesData.getData(this, LATITUDE)} 바꾼 ${
+                            SharedPreferencesData.getData(this,
+                                FIND_LATITUDE)
+                        }")
                     // 결과 데이터 사용
                     Log.d("SendingActivity", "Received result: $latitude, $longitude")
                     if (latitude != null && longitude != null)
@@ -440,8 +521,9 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         if (imageUri != null) {
             try {
                 val outputStream: OutputStream? = context.contentResolver.openOutputStream(imageUri)
+
                 if (outputStream != null) {
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
                     outputStream.close()
                     return imageUri
                 }
@@ -571,7 +653,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         latitude = SharedPreferencesData.getData(this@AddProductsActivity, LATITUDE).toDouble()
         longitude = SharedPreferencesData.getData(this@AddProductsActivity, LONGITUDE).toDouble()
 
-        Log.e("SendingActivity","시작 위치 $latitude, $longitude")
+        Log.e("SendingActivity", "시작 위치 $latitude, $longitude")
 //        title = intent.getStringExtra("title") ?: ""
 //        buyPrice = intent.getStringExtra("buyPrice") ?: ""
 //        buyCount = intent.getStringExtra("buyCount") ?: ""
