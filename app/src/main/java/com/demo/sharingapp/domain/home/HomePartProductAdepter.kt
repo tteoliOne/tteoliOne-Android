@@ -6,12 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewOutlineProvider
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemHomePartProductBinding
+import com.demo.sharingapp.databinding.ItemShareProductListBinding
 import com.demo.sharingapp.domain.home.data.PartProductContent
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
@@ -34,6 +36,7 @@ class HomePartProductAdepter(private val onLikeClick: (Long) -> Unit, private va
             binding.root.setOnClickListener {
                 onViewClick(item.productId)
             }
+
 
             var liked = item.liked
             var likePoint = item.totalLikes

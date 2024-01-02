@@ -96,6 +96,54 @@ class RetrofitManager() : Application() {
             }
         })
     }
+
+    // 내정보 - 내 공유글 목록 정보 가져오기
+    fun getShareProductList(
+        context: Context,
+        longitude: Double,
+        latitude: Double,
+        sort: String?,
+        page: Int,
+        status: String?,
+        onProducts: (PartProductListData) -> Unit
+
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getShareProductList(
+            Authorization = authorization,
+            longitude = longitude,
+            latitude = latitude,
+            page = page,
+            size = 30,
+            sort = sort,
+            status = status,
+        )
+        getCall.enqueue(object : retrofit2.Callback<PartProductData> {
+            override fun onResponse(
+                call: Call<PartProductData>,
+                response: Response<PartProductData>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getShareProductList", "success ${response.body()}")
+                    Log.e("getShareProductList", "success ${response.body()?.data?.last}")
+                    val data = response.body()?.data ?: return
+                    onProducts(data)
+
+                } else {
+                    Log.e("getShareProductList", "succes, but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PartProductData>, t: Throwable) {
+                Log.e("getShareProductList", "fail ${t} $call")
+            }
+
+        })
+    }
+
     // 카테고리별 상품 가져오기
     fun getPartProduct(
         context: Context,
@@ -621,7 +669,8 @@ class RetrofitManager() : Application() {
     }
 
     // 상품 삭제 하기
-    fun getRemoveProduct(context: Context, accessToken: String, productsId: Long){
+    fun getRemoveProduct(context: Context, productsId: Long){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val call = api.getRemoveProduct(Authorization = "Bearer $accessToken", productsId)

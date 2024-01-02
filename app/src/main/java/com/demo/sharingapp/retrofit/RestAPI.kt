@@ -104,6 +104,19 @@ interface RestAPI {
         @Query("sort") sort: String?,
         ): Call<PartProductData>
 
+    // 내정보 - 내공유글 목록 정보 가져오기
+    @GET(API.PRODUCTS_ME)
+    fun getShareProductList(
+        @Header("Authorization") Authorization: String,
+        @Query("longitude") longitude: Double,
+        @Query("latitude") latitude: Double,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String?,
+        @Query("status") status: String?,
+    ): Call<PartProductData>
+
+
     // 상품 정보 가져오기
     @GET(API.PRODUCTS_SIMPLE)
     fun getProducts(
@@ -147,6 +160,8 @@ interface RestAPI {
         @Query("keyword") keyword: String,
         @Query("resultType") resultType: String
     ): Call<AddressRequest>
+
+
 
 
 

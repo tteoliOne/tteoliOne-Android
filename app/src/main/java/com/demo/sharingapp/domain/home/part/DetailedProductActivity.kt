@@ -108,7 +108,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 메뉴의 삭제하기 버튼 클릭 함수
     private fun clickMenuRemoveButton() {
         binding.menuRemoveButton.setOnClickListener {
-            RetrofitManager.instance.getRemoveProduct(this, accessToken, productId)
+            RetrofitManager.instance.getRemoveProduct(this, productId)
             disappearsMenu() // 메뉴버튼 전체 사라짐
             moveBack() // 이전화면 이동
         }

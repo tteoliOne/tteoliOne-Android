@@ -12,6 +12,7 @@ import com.demo.sharingapp.MyApplication.Companion.mainViewModel
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentUserBinding
 import com.demo.sharingapp.domain.MainViewModel
+import com.demo.sharingapp.domain.user.shareProductList.ShareProductListActivity
 import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
@@ -24,6 +25,12 @@ class UserFragment: Fragment(R.layout.fragment_user) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentUserBinding.bind(view)
+
+        binding.myShareListButton.setOnClickListener {
+            Log.e("button","버튼 클릭 내공유글")
+            val intent = Intent(context, ShareProductListActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.userSettingButton.setOnClickListener {
             val action = UserFragmentDirections.actionUserFragmentToUserSettingFragment()
@@ -41,9 +48,7 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         initNickname()
         initId()
 
-        binding.shareProductListLayout.setOnClickListener {
 
-        }
     }
 
     // 초기 닉네임 입력 함수

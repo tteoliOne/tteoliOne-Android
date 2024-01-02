@@ -41,6 +41,8 @@ object API {
 
     const val PRODUCTS : String="/api/products"
 
+    const val PRODUCTS_ME : String="/api/products/me"
+
     const val PRODUCTS_SIMPLE : String="/api/products/simple"
 
     const val SIGNUP : String="/api/users/signup"

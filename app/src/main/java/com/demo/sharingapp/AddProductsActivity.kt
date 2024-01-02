@@ -463,6 +463,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     }
 
+
     private fun createImageUri(filename: String, mimeType: String): Uri? {
         var values = ContentValues()
         values.put(MediaStore.Images.Media.DISPLAY_NAME, filename)
@@ -506,32 +507,9 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         }
     }
 
+    // 내부저장소에 데이터 저장 함수
     private fun saveSharedString(title: String, data: String) {
         SharedPreferencesData.saveData(this, title, data)
-    }
-
-    // 비트맵 이미지를 갤러리에 저장하는 함수
-    fun saveBitmapToGallery(context: Context, bitmap: Bitmap): Uri? {
-        val contentValues = ContentValues()
-        contentValues.put(MediaStore.Images.Media.DISPLAY_NAME, generateFileName())
-        contentValues.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
-
-        val imageUri = context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-            contentValues)
-        if (imageUri != null) {
-            try {
-                val outputStream: OutputStream? = context.contentResolver.openOutputStream(imageUri)
-
-                if (outputStream != null) {
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-                    outputStream.close()
-                    return imageUri
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return imageUri
     }
 
     // 갤러리에 저장할때 이미지 이름 정하는 함수
@@ -620,7 +598,6 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     // 이전버튼 눌렀을 때 함수
     private fun movePrevious() {
         binding.movePreviousButton.setOnClickListener {
-//            startActivity(Intent(this, MainActivity::class.java))
             removeFindPlace()
             finish()
         }
@@ -652,43 +629,12 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun initPlaceData() {
         latitude = SharedPreferencesData.getData(this@AddProductsActivity, LATITUDE).toDouble()
         longitude = SharedPreferencesData.getData(this@AddProductsActivity, LONGITUDE).toDouble()
-
-        Log.e("SendingActivity", "시작 위치 $latitude, $longitude")
-//        title = intent.getStringExtra("title") ?: ""
-//        buyPrice = intent.getStringExtra("buyPrice") ?: ""
-//        buyCount = intent.getStringExtra("buyCount") ?: ""
-//        sharePrice = intent.getStringExtra("sharePrice") ?: ""
-//        shareCount = intent.getStringExtra("shareCount") ?: ""
-
-//        categoryId = intent.getIntExtra("categoryId", 0)
-//        description = intent.getStringExtra("description") ?: ""
-//        year = intent.getIntExtra("year", year)
-//        month = intent.getIntExtra("month", month)
-//        day = intent.getIntExtra("day", day)
-//        imageList = intent.getSerializableExtra("imageList")
     }
 
     // 작서한 데이터 저장하고 화면 이동 함수
     private fun saveDataAndMove() {
 
         startActivityForResult(Intent(this, BigSizeMapActivity::class.java), 300)
-        // 입력한 데이터 넣기 함수호출
-//        inputDate()
-//        startActivity(Intent(this, BigSizeMapActivity::class.java).apply {
-//            putExtra("title", title)
-//            putExtra("buyPrice", buyPrice)
-//            putExtra("buyCount", buyCount)
-//            putExtra("sharePrice", sharePrice)
-//            putExtra("shareCount", shareCount)
-//            putExtra("latitude", latitude)
-//            putExtra("longitude", longitude)
-//            putExtra("imageList", imageList)
-//            putExtra("categoryId", categoryId)
-//            putExtra("description", description)
-//            putExtra("year", year)
-//            putExtra("month", month)
-//            putExtra("day", day)
-//        })
 
     }
 
@@ -788,6 +734,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         return super.dispatchTouchEvent(ev)
     }
 
+    // 내부저장소에 데이터 삭제하기
     private fun removeFindPlace() {
         SharedPreferencesData.removeData(this, FIND_LATITUDE)
         SharedPreferencesData.removeData(this, FIND_LONGITUDE)

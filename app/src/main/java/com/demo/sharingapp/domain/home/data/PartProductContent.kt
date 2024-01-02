@@ -9,5 +9,7 @@ data class PartProductContent(
     val walkingTime: Int,
     var totalLikes: Int,
     val likeId: Long,
-    var liked: Boolean
+    var liked: Boolean,
+    var isClamped: Boolean = false,
+    var isCheckVisible: Boolean = false
 )

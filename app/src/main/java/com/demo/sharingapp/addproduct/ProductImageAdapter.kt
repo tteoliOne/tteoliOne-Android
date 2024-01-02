@@ -30,6 +30,7 @@ class ProductImageAdapter(val onItemClicked: (Int) -> Unit) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(position: Int) {
+            binding.productImageView.clipToOutline = true
             binding.productImageView.setImageURI(currentList[position].image)
 
             binding.root.setOnClickListener {
