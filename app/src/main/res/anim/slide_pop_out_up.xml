@@ -6,7 +6,7 @@
         android:fromXDelta="0%"
         android:fromYDelta="0%"
         android:toXDelta="0%"
-        android:toYDelta="-440dp"
+        android:toYDelta="-60%"
         />
 
 </set>

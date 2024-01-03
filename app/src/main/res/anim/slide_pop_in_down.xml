@@ -4,7 +4,7 @@
     <translate
         android:duration="1000"
         android:fromXDelta="0%"
-        android:fromYDelta="440dp"
+        android:fromYDelta="60%"
         android:toXDelta="0%"
         android:toYDelta="0%"
         />
