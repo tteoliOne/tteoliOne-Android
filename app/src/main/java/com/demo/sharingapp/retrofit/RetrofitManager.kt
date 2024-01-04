@@ -587,7 +587,7 @@ class RetrofitManager() : Application() {
     }
 
     // 토큰 보내기
-    fun postToken(context: Context, token: AccessTokenRequest) {
+    fun postKaKaoToken(context: Context, token: AccessTokenRequest, onExistsUser: (Boolean)->Unit) {
 
         val call = retrofitInterface?.postAccessToken(accessTokenRequest = token)
         call?.enqueue(object : retrofit2.Callback<TokenResponse> {
@@ -599,6 +599,8 @@ class RetrofitManager() : Application() {
                     Log.e("Post", "success nickname ${response.body()?.data?.nickname}")
                     Log.e("Post", "success userId ${response.body()?.data?.userId}")
                     Log.e("Post", "success accessToken ${response.body()?.data?.accessToken}")
+                    val existsUser = response.body()?.data?.existsUser ?: return
+                    onExistsUser(existsUser)
 //                    _nickname.value = response.body()?.data?.nickname
 //                    _refreshToken.value = response.body()?.data?.refreshToken
 //                    _accessToken.value = response.body()?.data?.accessToken
@@ -722,6 +724,45 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<DetailedProductResponseData>, t: Throwable) {
                 Log.e("getDetailedProduct", "fail ${t} $call")
+            }
+        })
+    }
+
+    //
+    fun postKaKaoProfile(
+        context: Context,
+        token: String,
+        profile: MultipartBody.Part,
+        onSuccess: (Int) -> Unit
+    ){
+        val call = retrofitInterface?.postKaKaoProfile(profile = profile, oAuth2KakaoRequest = AccessTokenRequest(token))
+        call?.enqueue(object : retrofit2.Callback<TokenResponse> {
+            override fun onResponse(
+                call: Call<TokenResponse>,
+                response: Response<TokenResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("Post", "success nickname ${response.body()?.data?.nickname}")
+                    Log.e("Post", "success userId ${response.body()?.data?.userId}")
+                    Log.e("Post", "success accessToken ${response.body()?.data?.accessToken}")
+                    val code = response.body()?.code ?: return
+                    onSuccess(code)
+
+//                    _nickname.value = response.body()?.data?.nickname
+//                    _refreshToken.value = response.body()?.data?.refreshToken
+//                    _accessToken.value = response.body()?.data?.accessToken
+//                    _userId.value = response.body()?.data?.userId
+
+                    // 사용자 정보 저장 함수 호출
+                    saveDate(context, response)
+
+                } else {
+                    Log.e("Post", "succes, but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+                Log.e("Post", "fail ${t} $call")
             }
         })
     }

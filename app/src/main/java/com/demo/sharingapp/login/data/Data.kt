@@ -5,4 +5,5 @@ data class Data(
     val accessToken: String,
     val refreshToken: String,
     val nickname: String,
+    val existsUser: Boolean
 )

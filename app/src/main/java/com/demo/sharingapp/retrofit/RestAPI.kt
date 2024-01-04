@@ -80,6 +80,14 @@ interface RestAPI {
     @POST(API.KAKAO_TOKEN) // Replace with your API endpoint
     fun postAccessToken(@Body accessTokenRequest: AccessTokenRequest): Call<TokenResponse>
 
+    // 카카오 프로필 보내기
+    @Multipart
+    @POST(API.KAKAO_TOKEN_PROFILE) // Replace with your API endpoint
+    fun postKaKaoProfile(
+        @Part profile: MultipartBody.Part,
+        @Part ("oAuth2KakaoRequest") oAuth2KakaoRequest : AccessTokenRequest,
+    ): Call<TokenResponse>
+
     // 등록 상품 정보 보내기
     @Multipart
     @POST(API.PRODUCTS) // Replace with your API endpoint

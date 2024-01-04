@@ -19,6 +19,7 @@ object Constants{
     const val PRODUCT_ID = "productId"
     const val DETAILED_LIKED = "detailedLiked"
     const val DETAILED_LIKED_POINT = "detailedLikedPoint"
+    const val KAKAO_TOKEN = "kaKaoToken"
 
     const val ACCESS_FINE_LOCATION_CODE = 200
 
@@ -34,6 +35,9 @@ object API {
     const val BASE_URL : String = "https://tteolione.store"
 
     const val KAKAO_TOKEN : String = "/api/users/kakao"
+
+    const val KAKAO_TOKEN_PROFILE : String = "/api/users/kakao/profile"
+
 
     const val EMAIL_URL : String = "/api/email/send/signup"
 

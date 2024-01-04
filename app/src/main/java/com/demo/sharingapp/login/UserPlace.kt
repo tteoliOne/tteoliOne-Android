@@ -72,6 +72,11 @@ class UserPlace : AppCompatActivity() {
             searchAddress()
         }
 
+        binding.cancelButton.setOnClickListener {
+            val intent = Intent(this, LoginView::class.java)
+            startActivity(intent)
+        }
+
         binding.addressEditText.addTextChangedListener {
             searchFor = it.toString()
             handler.removeCallbacks(runnable)

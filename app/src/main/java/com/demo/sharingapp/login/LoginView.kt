@@ -12,6 +12,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.isVisible
 import com.demo.sharingapp.databinding.ActivityLoginViewBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.login.data.AccessTokenRequest
@@ -19,15 +20,18 @@ import com.demo.sharingapp.login.data.LoginData
 import com.demo.sharingapp.login.find_id.FindIdActivity
 import com.demo.sharingapp.login.find_password.FindPasswordActivity
 import com.demo.sharingapp.login.signup.SignUpActivity
+import com.demo.sharingapp.login.signup.SignupProfileActivity
 
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
+import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
 import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.demo.sharingapp.utils.Constants.USER_ID
 import com.demo.sharingapp.utils.readData
 import com.kakao.sdk.auth.model.OAuthToken
+import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
@@ -161,8 +165,13 @@ class LoginView : AppCompatActivity() {
     // 카카오 버튼 클릭 함수
     private fun clickKakaoButton() {
         binding.kakaoLoginButton.setOnClickListener {
+            binding.loadingView.isVisible=true
+            binding.loginButton.isVisible=false
+
+            KakaoSdk.init(this, "b7724ccdfc3f8f5fef039b767bdd06d3")
             //카카오로그인 함수 호출
             kakaoLogin()
+
         }
     }
 
@@ -177,11 +186,8 @@ class LoginView : AppCompatActivity() {
                 Log.i("kakaoLogin", "카카오계정으로 로그인 성공 ${token.accessToken}")
 
                 // 레트로핏에 토큰 보내는 함수 호출
-                postAccessToken(token.accessToken)
+                postKaKaoAccessToken(token.accessToken)
 
-
-                // 위치 설정 화면 이동 함수 호출
-                moveUserPlaceActivity()
             }
         }
 
@@ -203,11 +209,8 @@ class LoginView : AppCompatActivity() {
                     Log.i("kakaoLogin", "카카오톡으로 로그인 성공 ${token.accessToken}")
 
                     // post 에서 데이터 받아서 쉐어드프리퍼런스에 저장 함수 호출
-                    postAccessToken(token.accessToken)
+                    postKaKaoAccessToken(token.accessToken)
 
-
-                    // 메인화면 이동 함수 호출
-                    moveUserPlaceActivity()
                 }
             }
         } else {
@@ -217,10 +220,22 @@ class LoginView : AppCompatActivity() {
 
 
     // 레트로핏에 토큰 보내는 함수
-    private fun postAccessToken(token: String) {
+    private fun postKaKaoAccessToken(token: String) {
         val accessTokenRequest = AccessTokenRequest("$token")
 
-        RetrofitManager.instance.postToken(this, token = accessTokenRequest)
+        RetrofitManager.instance.postKaKaoToken(this, token = accessTokenRequest){
+            if(it){
+                // 위치 설정 화면 이동 함수 호출
+                moveUserPlaceActivity()
+
+            }else{
+                val intent = Intent(this, SignupProfileActivity::class.java)
+                    .putExtra(KAKAO_TOKEN,token)
+                startActivity(intent)
+                finish()
+
+            }
+        }
     }
 
     // 위치 설정 화면 이동 함수
