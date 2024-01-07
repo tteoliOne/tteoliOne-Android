@@ -514,8 +514,8 @@ class RetrofitManager() : Application() {
     }
 
     // 회원가입 정보 보내기
-    fun postSignup(signupData: SignupData, signupSuccess: (Boolean) -> Unit) {
-        val call = retrofitInterface?.postSignupData(signupData)
+    fun postSignup(signupData: SignupData, profile: MultipartBody.Part, signupSuccess: (Boolean) -> Unit) {
+        val call = retrofitInterface?.postSignupData(signUpRequest = signupData, profile = profile)
         call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful && response.body() != null) {
@@ -728,7 +728,8 @@ class RetrofitManager() : Application() {
         })
     }
 
-    //
+
+    // 회원가입- 카카오
     fun postKaKaoProfile(
         context: Context,
         token: String,

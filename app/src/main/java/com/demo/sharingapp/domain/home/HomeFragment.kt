@@ -235,7 +235,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                     homeEtcAdepter.submitList(it.products)
                 }
 
-
+                (activity as? MyFragmentListener)?.onLoading()
                 Log.e("mao", productData[1].toString())
                 Log.e("mao", productData[2].toString())
                 Log.e("mao", productData[3].toString())
@@ -293,6 +293,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     interface MyFragmentListener {
         fun onButtonClicked()
+        fun onLoading()
     }
 
 

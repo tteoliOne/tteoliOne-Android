@@ -72,7 +72,7 @@ class SwipeHelper: ItemTouchHelper.Callback() {
 
             val isClamped = getClamped(viewHolder as ShareProductListAdepter.ShareProductListViewHolder)
 
-            val x = clampViewPositionHorizontal(itemView, dX, isClamped, isCurrentlyActive)
+            val x = clampViewPositionHorizontal(view, dX, isClamped, isCurrentlyActive)
             //Log.d("AppTest", "dX : ${dX}, dY : ${dY}")
 
             currentDx = x

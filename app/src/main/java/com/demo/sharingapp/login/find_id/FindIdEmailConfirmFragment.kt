@@ -10,11 +10,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentFindIdEmailConfirmBinding
-import com.demo.sharingapp.domain.home.HomePartProductFragmentArgs
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
-import com.demo.sharingapp.login.signup.ConfirmDialogInterface
-import com.demo.sharingapp.login.signup.SignupDialog
-import com.demo.sharingapp.login.signup.data.SignupData
+import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import okhttp3.internal.format
 import java.util.*

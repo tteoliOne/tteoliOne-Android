@@ -1,4 +1,4 @@
-package com.demo.sharingapp.login.signup
+package com.demo.sharingapp.login.signup.basic
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

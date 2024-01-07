@@ -1,5 +1,6 @@
-package com.demo.sharingapp.login.signup
+package com.demo.sharingapp.login.signup.basic
 
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -12,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentSignupNicknameBinding
+import com.demo.sharingapp.login.signup.SignupProfileActivity
 import com.demo.sharingapp.login.signup.data.NicknameData
 import com.demo.sharingapp.login.signup.data.SignupData
 import com.demo.sharingapp.retrofit.RetrofitManager
@@ -19,9 +21,11 @@ import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.SIGNUP_EMAIL
 import com.demo.sharingapp.utils.Constants.SIGNUP_ID
 import com.demo.sharingapp.utils.Constants.SIGNUP_NAME
+import com.demo.sharingapp.utils.Constants.SIGNUP_NICKNAME
 import com.demo.sharingapp.utils.Constants.SIGNUP_PASSWORD
+import com.demo.sharingapp.utils.Constants.SIGNUP_TYPE
 
-class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),ConfirmDialogInterface {
+class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname), ConfirmDialogInterface {
 
     private lateinit var binding: FragmentSignupNicknameBinding
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,7 +38,7 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),Confir
             SharedPreferencesData.removeData(this.requireContext(),SIGNUP_PASSWORD)
         }
 
-        binding.finishButton.setOnClickListener {
+        binding.confirmButton.setOnClickListener {
 
             val loginId = SharedPreferencesData.getData(this.requireContext(), SIGNUP_ID)
             val email = SharedPreferencesData.getData(this.requireContext(), SIGNUP_EMAIL)
@@ -47,7 +51,7 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),Confir
             RetrofitManager.instance.postCheckNickname(NicknameData(nickname)){ NicknameBoolean, message ->
                 if(NicknameBoolean){
                     // 서버에 회원가입 정보 보내기 함수 호출
-                    binding.finishButton.isVisible = false
+                    binding.confirmButton.isVisible = false
                     binding.completeButton.isVisible = true
 
                     showUseDialog(signupData)
@@ -61,18 +65,25 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),Confir
 
         }
 
+        binding.completeButton.setOnClickListener {
+            val nickname = binding.nicknameEditText.text.toString()
+            SharedPreferencesData.saveData(this.requireContext(), SIGNUP_NICKNAME, nickname)
+            val action = SignupNicknameFragmentDirections.actionSignupNicknameFragmentToSignupProfileFragment()
+            findNavController().navigate(action)
+        }
+
         binding.nicknameEditText.addTextChangedListener(object : TextWatcher{
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) { }
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 if (s.toString().trim().isNotEmpty()){
-                    binding.finishButton.isVisible = true
+                    binding.confirmButton.isVisible = true
                     binding.completeButton.isVisible = false
-                    binding.finishButton.setBackgroundColor(Color.parseColor("#588F11"))
-                    binding.finishButton.isClickable = true
+                    binding.confirmButton.setBackgroundColor(Color.parseColor("#588F11"))
+                    binding.confirmButton.isClickable = true
                 }else{
-                    binding.finishButton.setBackgroundColor(Color.parseColor("#CDCFCECE"))
-                    binding.finishButton.isClickable = false
+                    binding.confirmButton.setBackgroundColor(Color.parseColor("#CDCFCECE"))
+                    binding.confirmButton.isClickable = false
                 }
             }
 
@@ -81,15 +92,7 @@ class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname),Confir
 
     }
 
-    // 서버에 회원가입 정보 보내기 함수
-    private fun sendSignupData(signupData: SignupData) {
-        RetrofitManager.instance.postSignup(signupData) {
-            if (it) {
-                Toast.makeText(this.requireContext(), "회원가입을 성공합니다", Toast.LENGTH_SHORT).show()
-                requireActivity().finish()
-            }
-        }
-    }
+
 
     // 실패 알림창 띄우기
     private fun showDialog(message: String) {

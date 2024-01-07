@@ -70,7 +70,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
 
         navHostFragment.navController.addOnDestinationChangedListener{ a,b,c ->
-            //Log.e("bb", " a = $a , b = ${b.id} , ${R.id.userFragment} , c = $c")
+            Log.e("bb", " a = $a , b = ${b.id} , ${R.id.userFragment} , c = $c")
             if (b.id == R.id.userSettingFragment || b.id == R.id.homePartProductFragment){
                 binding.bottomNavigationView.isVisible = false
             }else if (b.id == R.id.userFragment || b.id == R.id.homeFragment) {
@@ -78,9 +78,33 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
             }
         }
 
-        KakaoSdk.init(this, "b7724ccdfc3f8f5fef039b767bdd06d3")
-        // 해쉬 키 확인 함수 호출
-        //findKeyHash()
+        binding.bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
+
+            when (menuItem.itemId) {
+                R.id.homeFragment -> {
+                    binding.loadingView.isVisible = true
+
+                    // 첫 번째 아이템이 클릭되었을 때의 처리
+                    // 예: 네비게이션 뷰에서 특정 프래그먼트로 이동
+                    navHostFragment.navController.navigate(R.id.homeFragment)
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.chatFragment -> {
+                    // 두 번째 아이템이 클릭되었을 때의 처리
+                    // 예: 네비게이션 뷰에서 다른 프래그먼트로 이동
+                    navHostFragment.navController.navigate(R.id.chatFragment)
+                    return@setOnNavigationItemSelectedListener true
+                }
+                R.id.userFragment -> {
+                    // 두 번째 아이템이 클릭되었을 때의 처리
+                    // 예: 네비게이션 뷰에서 다른 프래그먼트로 이동
+                    navHostFragment.navController.navigate(R.id.userFragment)
+                    return@setOnNavigationItemSelectedListener true
+                }
+
+                else -> return@setOnNavigationItemSelectedListener false
+            }
+        }
 
     }
 
@@ -161,6 +185,10 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         Log.e("aa","MyFragmentListener")
         binding.drawerView.bringToFront()
         binding.drawerView.setScrimColor(Color.TRANSPARENT)
+    }
+
+    override fun onLoading() {
+        binding.loadingView.isVisible=false
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

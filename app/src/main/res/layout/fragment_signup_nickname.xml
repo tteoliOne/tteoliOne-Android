@@ -95,13 +95,13 @@
 
 
     <Button
-        android:id="@+id/finishButton"
+        android:id="@+id/confirmButton"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="18dp"
         android:backgroundTint="#CDCFCECE"
         android:clickable="false"
-        android:text="완료"
+        android:text="중복체크"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@id/nicknameEditText"

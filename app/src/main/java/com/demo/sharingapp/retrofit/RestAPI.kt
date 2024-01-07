@@ -25,8 +25,12 @@ interface RestAPI {
     fun postEmailData(@Body email: EmailData): Call<EmailResponse>
 
     // 회원가입 정보 보내기
+    @Multipart
     @POST(API.SIGNUP) // Replace with your API endpoint
-    fun postSignupData(@Body signup: SignupData): Call<EmailResponse>
+    fun postSignupData(
+        @Part profile: MultipartBody.Part,
+        @Part("signUpRequest") signUpRequest: SignupData,
+    ): Call<EmailResponse>
 
     // 아이디 중복 확인 보내기
     @POST(API.CHECK_ID) // Replace with your API endpoint
@@ -36,7 +40,7 @@ interface RestAPI {
     @POST(API.PRODUCT_LIKE) // Replace with your API endpoint
     fun postProductLike(
         @Header("Authorization") Authorization: String,
-        @Path ("productId") productId: Long
+        @Path("productId") productId: Long,
     ): Call<EmailResponse>
 
     // 닉네임 중복 확인 보내기
@@ -85,7 +89,7 @@ interface RestAPI {
     @POST(API.KAKAO_TOKEN_PROFILE) // Replace with your API endpoint
     fun postKaKaoProfile(
         @Part profile: MultipartBody.Part,
-        @Part ("oAuth2KakaoRequest") oAuth2KakaoRequest : AccessTokenRequest,
+        @Part("oAuth2KakaoRequest") oAuth2KakaoRequest: AccessTokenRequest,
     ): Call<TokenResponse>
 
     // 등록 상품 정보 보내기
@@ -95,7 +99,7 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
         @Part photos: List<MultipartBody.Part>,
         @Part receipt: MultipartBody.Part,
-        @Part ("request") request : Products,
+        @Part("request") request: Products,
     ): Call<ProductsResponse>
 
     // 카테고리별 상품 정보 가져오기
@@ -110,7 +114,7 @@ interface RestAPI {
         @Query("page") page: Int,
         @Query("size") size: Int,
         @Query("sort") sort: String?,
-        ): Call<PartProductData>
+    ): Call<PartProductData>
 
     // 내정보 - 내공유글 목록 정보 가져오기
     @GET(API.PRODUCTS_ME)
@@ -130,7 +134,7 @@ interface RestAPI {
     fun getProducts(
         @Header("Authorization") Authorization: String,
         @Query("longitude") longitude: Double,
-        @Query("latitude") latitude: Double
+        @Query("latitude") latitude: Double,
     ): Call<GetProductsResponse>
 
     // 찜목록 가져오기
@@ -143,21 +147,21 @@ interface RestAPI {
     @GET(API.DETAILED_PRODUCT)
     fun getDetailedProduct(
         @Header("Authorization") Authorization: String,
-        @Path ("productId") productId: Long
+        @Path("productId") productId: Long,
     ): Call<DetailedProductResponseData>
 
     // 상품 삭제
     @DELETE(API.DETAILED_PRODUCT)
     fun getRemoveProduct(
         @Header("Authorization") Authorization: String,
-        @Path ("productId") productId: Long
+        @Path("productId") productId: Long,
     ): Call<EmailResponse>
 
     // 닉네임 변경
     @PATCH(API.CHANGE_NICKNAME)
     fun patchChangeNickname(
         @Header("Authorization") Authorization: String,
-        @Body nickname: NicknameData
+        @Body nickname: NicknameData,
     ): Call<NicknameResponse>
 
 
@@ -166,11 +170,8 @@ interface RestAPI {
     fun getAddress(
         @Query("confmKey") confmKey: String,
         @Query("keyword") keyword: String,
-        @Query("resultType") resultType: String
+        @Query("resultType") resultType: String,
     ): Call<AddressRequest>
-
-
-
 
 
 }

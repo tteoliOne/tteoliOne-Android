@@ -1,10 +1,7 @@
 package com.demo.sharingapp.login
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
-import android.location.Geocoder
-import android.location.Location
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
@@ -14,30 +11,20 @@ import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import androidx.core.view.isVisible
 import com.demo.sharingapp.databinding.ActivityLoginViewBinding
-import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.login.data.AccessTokenRequest
 import com.demo.sharingapp.login.data.LoginData
 import com.demo.sharingapp.login.find_id.FindIdActivity
 import com.demo.sharingapp.login.find_password.FindPasswordActivity
-import com.demo.sharingapp.login.signup.SignUpActivity
+import com.demo.sharingapp.login.signup.basic.SignUpActivity
 import com.demo.sharingapp.login.signup.SignupProfileActivity
 
 import com.demo.sharingapp.retrofit.RetrofitManager
-import com.demo.sharingapp.shared.SharedPreferencesData
-import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
-import com.demo.sharingapp.utils.Constants.NICKNAME
-import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
-import com.demo.sharingapp.utils.Constants.USER_ID
-import com.demo.sharingapp.utils.readData
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
-import retrofit2.awaitResponse
-import java.util.*
-import java.util.regex.Pattern
 
 class LoginView : AppCompatActivity() {
 

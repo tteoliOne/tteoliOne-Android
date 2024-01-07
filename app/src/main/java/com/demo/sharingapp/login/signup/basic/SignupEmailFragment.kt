@@ -1,4 +1,4 @@
-package com.demo.sharingapp.login.signup
+package com.demo.sharingapp.login.signup.basic
 
 import android.graphics.Color
 import android.os.Bundle
@@ -12,18 +12,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentSignupEmailBinding
-import com.demo.sharingapp.login.data.TokenResponse
 import com.demo.sharingapp.login.signup.data.EmailData
-import com.demo.sharingapp.login.signup.data.EmailResponse
-import com.demo.sharingapp.retrofit.RestAPI
-import com.demo.sharingapp.retrofit.RetrofitClient
 import com.demo.sharingapp.retrofit.RetrofitManager
-import com.demo.sharingapp.shared.SharedPreferencesData
-import com.demo.sharingapp.utils.API
-import com.demo.sharingapp.utils.Constants
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.regex.Pattern
 
 class SignupEmailFragment:Fragment(R.layout.fragment_signup_email) {

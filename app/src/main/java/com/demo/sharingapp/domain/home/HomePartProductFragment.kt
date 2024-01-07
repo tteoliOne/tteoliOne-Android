@@ -16,7 +16,7 @@ import com.demo.sharingapp.databinding.FragmentHomePartProductBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.part.DetailedProductActivity
 import com.demo.sharingapp.login.data.ProductsData
-import com.demo.sharingapp.login.signup.SignupDialog
+import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants

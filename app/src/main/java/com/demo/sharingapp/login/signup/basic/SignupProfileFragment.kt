@@ -1,4 +1,4 @@
-package com.demo.sharingapp.login.signup
+package com.demo.sharingapp.login.signup.basic
 
 import android.content.Context
 import android.content.Intent
@@ -9,18 +9,25 @@ import android.graphics.Matrix
 import android.media.ExifInterface
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivitySignupProfileBinding
-import com.demo.sharingapp.login.LoginView
+import com.demo.sharingapp.login.signup.SignupFinishActivity
+import com.demo.sharingapp.login.signup.data.SignupData
 import com.demo.sharingapp.retrofit.RetrofitManager
-import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
+import com.demo.sharingapp.shared.SharedPreferencesData
+import com.demo.sharingapp.utils.Constants
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -28,23 +35,21 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
-class SignupProfileActivity : AppCompatActivity() {
+class SignupProfileFragment : Fragment(R.layout.activity_signup_profile) {
+
     private lateinit var binding: ActivitySignupProfileBinding
-
-
     private lateinit var imageUri: Uri
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivitySignupProfileBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
-        val kaKaoToken = intent.getStringExtra(KAKAO_TOKEN) ?: ""
-        val packageName = this.packageName
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = ActivitySignupProfileBinding.bind(view)
+
+        val packageName = this.requireContext().packageName
         val resourceId = R.drawable.profile_image_basics
         imageUri = Uri.parse("android.resource://$packageName/$resourceId")
 
         Glide.with(binding.profileImageView)
-            .load(R.drawable.profile_image_basics)
+            .load(imageUri)
             .circleCrop()
             .into(binding.profileImageView)
 
@@ -56,23 +61,27 @@ class SignupProfileActivity : AppCompatActivity() {
         }
 
         binding.backButton.setOnClickListener {
-            val intent = Intent(this, LoginView::class.java)
-            startActivity(intent)
-            finish()
+            findNavController().popBackStack()
         }
 
         binding.finishButton.setOnClickListener {
             val imageFile = imageToFile(imageUri)
-            RetrofitManager.instance.postKaKaoProfile(this, token = kaKaoToken,imageFile){
-                if (it == 0){
-                    val intent = Intent(this, SignupFinishActivity::class.java)
+            val loginId = SharedPreferencesData.getData(this.requireContext(), Constants.SIGNUP_ID)
+            val email = SharedPreferencesData.getData(this.requireContext(), Constants.SIGNUP_EMAIL)
+            val username = SharedPreferencesData.getData(this.requireContext(),
+                Constants.SIGNUP_NAME)
+            val password = SharedPreferencesData.getData(this.requireContext(),
+                Constants.SIGNUP_PASSWORD)
+            val nickname = SharedPreferencesData.getData(this.requireContext(),
+                Constants.SIGNUP_NICKNAME)
+
+            val signupData = SignupData(loginId,email,username,nickname,password)
+            RetrofitManager.instance.postSignup(signupData = signupData, profile = imageFile) {
+                if (it) {
+                    val intent = Intent(this.requireContext(),SignupFinishActivity::class.java)
                     startActivity(intent)
-                    finish()
-                }else if (it == 1001){
-                    Toast.makeText(this, "error code is 1001",Toast.LENGTH_SHORT).show()
-                }
-                else{
-                    Toast.makeText(this, "error",Toast.LENGTH_SHORT).show()
+                    requireActivity().finish()
+                    SharedPreferencesData.removeAllData(this.requireContext())
                 }
             }
         }
@@ -80,18 +89,18 @@ class SignupProfileActivity : AppCompatActivity() {
     }
 
     private fun imageToFile(uri: Uri): MultipartBody.Part{
-            val exifInterface = getExifInterface(this, uri)
-            val orientation = exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
-            val rotatedBitmap = rotateBitmap(convertUriToJpeg(uri), getRotationAngle(orientation ?: ExifInterface.ORIENTATION_NORMAL))
+        val exifInterface = getExifInterface(this.requireContext(), uri)
+        val orientation = exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
+        val rotatedBitmap = rotateBitmap(convertUriToJpeg(uri), getRotationAngle(orientation ?: ExifInterface.ORIENTATION_NORMAL))
 
-            val file = File(this.cacheDir, "profile.jpeg")
-            val fileOutputStream = FileOutputStream(file)
-            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
-            fileOutputStream.flush()
-            fileOutputStream.close()
+        val file = File(this.requireContext().cacheDir, "profile.jpeg")
+        val fileOutputStream = FileOutputStream(file)
+        rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
+        fileOutputStream.flush()
+        fileOutputStream.close()
 
-            val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
-            val imagePart = MultipartBody.Part.createFormData("profile", file.name, requestFile)
+        val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+        val imagePart = MultipartBody.Part.createFormData("profile", file.name, requestFile)
         return imagePart
     }
 
@@ -107,7 +116,7 @@ class SignupProfileActivity : AppCompatActivity() {
 
     // uri를 비트맵으로 바꾸는 함수
     private fun convertUriToJpeg(uri: Uri): Bitmap {
-        val input = this.contentResolver.openInputStream(uri)
+        val input = this.requireContext().contentResolver.openInputStream(uri)
         val bitmap = BitmapFactory.decodeStream(input)
         val outputStream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
@@ -138,7 +147,6 @@ class SignupProfileActivity : AppCompatActivity() {
             null
         }
     }
-
     // uri 에서 절대경로 가져오기
     fun getRealPathFromUri(context: Context, uri: Uri): String? {
         var realPath: String? = null
@@ -170,15 +178,14 @@ class SignupProfileActivity : AppCompatActivity() {
     private val activityResult: ActivityResultLauncher<Intent> = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()) {
 
-        if (it.resultCode == RESULT_OK) {
+        if (it.resultCode == AppCompatActivity.RESULT_OK) {
 
-             // 이미지 한장 골랐을 때
-                 imageUri = it.data!!.data ?: imageUri
+            // 이미지 한장 골랐을 때
+            imageUri = it.data!!.data ?: imageUri
             Glide.with(binding.profileImageView)
                 .load(imageUri)
                 .circleCrop()
                 .into(binding.profileImageView)
         }
     }
-
 }

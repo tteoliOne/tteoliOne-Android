@@ -19,6 +19,27 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".login.signup.SignupFinishActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".login.signup.SignupProfileActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
+            android:name=".domain.user.saveProductList.SaveProductListActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".domain.user.shareProductList.ShareProductListActivity"
             android:exported="false">
             <meta-data
@@ -63,7 +84,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".login.signup.SignUpActivity"
+            android:name=".login.signup.basic.SignUpActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize">
             <meta-data

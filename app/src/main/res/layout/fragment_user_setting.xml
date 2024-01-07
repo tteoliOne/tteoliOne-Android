@@ -144,14 +144,21 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!-- 수평 가이드라인 -->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guidelineHorizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.85" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/userMenuLayout"
         android:layout_width="353dp"
         android:layout_height="313dp"
         android:background="@drawable/user_menu_round"
         android:elevation="10dp"
-        android:layout_marginBottom="-200dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         >

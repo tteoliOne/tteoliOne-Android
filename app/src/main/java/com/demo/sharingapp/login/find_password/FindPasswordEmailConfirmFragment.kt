@@ -12,7 +12,7 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentFindPasswordEmailConfirmBinding
 import com.demo.sharingapp.login.find_id.FindIdEmailConfirmFragmentArgs
 import com.demo.sharingapp.login.find_password.data.FindPasswordEmailVerifyData
-import com.demo.sharingapp.login.signup.SignupDialog
+import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 
 class FindPasswordEmailConfirmFragment : Fragment(R.layout.fragment_find_password_email_confirm) {

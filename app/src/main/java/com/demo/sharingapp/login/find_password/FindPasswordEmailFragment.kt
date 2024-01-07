@@ -12,7 +12,7 @@ import androidx.navigation.fragment.findNavController
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentFindPasswordEmailBinding
 import com.demo.sharingapp.login.find_password.data.FindPasswordEmailData
-import com.demo.sharingapp.login.signup.SignupDialog
+import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import java.util.regex.Pattern
 

@@ -9,7 +9,6 @@
     tools:context=".MainActivity"
     >
 
-
     <androidx.drawerlayout.widget.DrawerLayout
         android:id="@+id/drawerView"
         app:layout_constraintTop_toTopOf="parent"
@@ -75,6 +74,27 @@
 
 
     </androidx.drawerlayout.widget.DrawerLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:visibility="gone"
+        android:id="@+id/loadingView"
+        android:layout_width="match_parent"
+        android:background="#66000000"
+        android:layout_height="match_parent">
+        <ProgressBar
+            android:layout_gravity="center"
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:indeterminateTint="@color/white"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -170,22 +170,25 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         productViewModel = ViewModelProvider(this)[ProductViewModel::class.java]
 
         val imageFileList: ArrayList<MultipartBody.Part> = ArrayList()
+        var imageCount = 1
         imageList.forEach {
 
             val exifInterface = getExifInterface(this, it)
             val orientation = exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             val rotatedBitmap = rotateBitmap(convertUriToJpeg(it), getRotationAngle(orientation ?: ExifInterface.ORIENTATION_NORMAL))
 
-            val file = File(cacheDir, "image.jpeg")
+            val file = File(cacheDir, "photos${imageCount++}.jpeg")
             val fileOutputStream = FileOutputStream(file)
-            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fileOutputStream)
+            rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 50, fileOutputStream)
             fileOutputStream.flush()
             fileOutputStream.close()
 
             val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
             val imagePart = MultipartBody.Part.createFormData("photos", file.name, requestFile)
             Log.e("aa", imagePart.body.contentType().toString())
+            Log.e("aa", file.length().toString())
             imageFileList.add(imagePart)
+
         }
         productViewModel.updateProductImage(imageFileList)
 

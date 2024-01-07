@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/signupEmailFragment"
-        android:name="com.demo.sharingapp.login.signup.SignupEmailFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupEmailFragment"
         android:label="SignupEmailFragment"
         tools:layout="@layout/fragment_signup_email">
         <action
@@ -16,7 +16,7 @@
     </fragment>
     <fragment
         android:id="@+id/signupEmailConfirmFragment"
-        android:name="com.demo.sharingapp.login.signup.SignupEmailConfirmFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupEmailConfirmFragment"
         android:label="SignupEmailConfirmFragment"
         tools:layout="@layout/fragment_signup_email_confirm">
         <action
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/signupIdFragment"
-        android:name="com.demo.sharingapp.login.signup.SignupIdFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupIdFragment"
         android:label="SignupIdFragment"
         tools:layout="@layout/fragment_signup_id">
         <action
@@ -34,7 +34,7 @@
     </fragment>
     <fragment
         android:id="@+id/signupPasswordFragment"
-        android:name="com.demo.sharingapp.login.signup.SignupPasswordFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupPasswordFragment"
         android:label="SignupPasswordFragment"
         tools:layout="@layout/fragment_signup_password">
         <action
@@ -43,16 +43,25 @@
     </fragment>
     <fragment
         android:id="@+id/signupNicknameFragment"
-        android:name="com.demo.sharingapp.login.signup.SignupNicknameFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupNicknameFragment"
         android:label="SignupNicknameFragment"
-        tools:layout="@layout/fragment_signup_nickname"/>
+        tools:layout="@layout/fragment_signup_nickname">
+        <action
+            android:id="@+id/action_signupNicknameFragment_to_signupProfileFragment"
+            app:destination="@id/signupProfileFragment" />
+    </fragment>
     <fragment
         android:id="@+id/signupNameFragment"
-        android:name="com.demo.sharingapp.login.signup.SignupNameFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupNameFragment"
         android:label="SignupNameFragment"
         tools:layout="@layout/fragment_signup_nickname">
         <action
             android:id="@+id/action_signupNameFragment_to_signupIdFragment"
             app:destination="@id/signupIdFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/signupProfileFragment"
+        android:name="com.demo.sharingapp.login.signup.basic.SignupProfileFragment"
+        android:label="SignupProfileFragment"
+        tools:layout="@layout/activity_signup_profile"/>
 </navigation>

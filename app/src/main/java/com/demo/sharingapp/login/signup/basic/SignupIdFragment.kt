@@ -1,4 +1,4 @@
-package com.demo.sharingapp.login.signup
+package com.demo.sharingapp.login.signup.basic
 
 import android.graphics.Color
 import android.os.Bundle
@@ -14,10 +14,8 @@ import com.demo.sharingapp.login.signup.data.IdData
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 
-import com.demo.sharingapp.utils.Constants.SIGNUP_EMAIL
 import com.demo.sharingapp.utils.Constants.SIGNUP_ID
 import com.demo.sharingapp.utils.Constants.SIGNUP_NAME
-import com.demo.sharingapp.utils.Constants.USER_ID
 import java.util.regex.Pattern
 
 class SignupIdFragment: Fragment(R.layout.fragment_signup_id) {

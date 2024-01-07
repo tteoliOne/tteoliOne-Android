@@ -144,14 +144,14 @@ class ProductBottomSheet : BottomSheetDialogFragment() {
                         val orientation = exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
                         val rotatedBitmap = rotateBitmap(convertUriToJpeg(uri), getRotationAngle(orientation ?: ExifInterface.ORIENTATION_NORMAL))
 
-                        val file = File(requireContext().cacheDir, "image")
+                        val file = File(requireContext().cacheDir, "receipt.jpeg")
                         val fileOutputStream = FileOutputStream(file)
                         rotatedBitmap.compress(Bitmap.CompressFormat.JPEG, 80, fileOutputStream)
                         fileOutputStream.flush()
                         fileOutputStream.close()
 
                         val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
-                        val imagePart = MultipartBody.Part.createFormData("receipt", "receipt", requestFile)
+                        val imagePart = MultipartBody.Part.createFormData("receipt", file.name, requestFile)
                         productViewModel.updateReceipt(imagePart)
                     }
                 }

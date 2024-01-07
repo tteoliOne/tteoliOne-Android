@@ -1,4 +1,4 @@
-package com.demo.sharingapp.login.signup
+package com.demo.sharingapp.login.signup.basic
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
