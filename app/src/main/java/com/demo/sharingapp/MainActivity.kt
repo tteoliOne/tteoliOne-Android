@@ -34,6 +34,7 @@ import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.KakaoSdkError
 import com.kakao.sdk.common.util.Utility
 import com.kakao.sdk.user.UserApiClient
+import kotlinx.coroutines.runBlocking
 
 class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
@@ -149,8 +150,15 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     private fun checkHasLogin() {
 
         val checkIsRefreshToken = SharedPreferencesData.containsData(this, REFRESH_TOKEN)
-
-        if (!checkIsRefreshToken){
+        Log.e("Log","1")
+        if (checkIsRefreshToken){
+            val reissueData = runBlocking {RetrofitManager.instance.postReissueMain(this@MainActivity)}
+            if (!reissueData){
+                Log.e("Log","2 $reissueData")
+                moveLogin()
+            }
+        }else{
+            Log.e("Log","3")
             moveLogin()
         }
 

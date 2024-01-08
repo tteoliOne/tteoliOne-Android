@@ -27,8 +27,10 @@ import com.demo.sharingapp.login.signup.data.*
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.API
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
+import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.demo.sharingapp.utils.Constants.SIGNUP_EMAIL
+import com.demo.sharingapp.utils.Constants.USER_ID
 import kotlinx.coroutines.*
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -241,6 +243,40 @@ class RetrofitManager() : Application() {
 
 
         })
+    }
+
+    // 메이화면 토큰 재발행
+    suspend fun postReissueMain(context: Context): Boolean{
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val refreshToken = SharedPreferencesData.getData(context, REFRESH_TOKEN)
+        val data = TokenData(accessToken, refreshToken)
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.postReissueData(data)
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = call.execute()
+                if (response.isSuccessful) {
+                    val newAccessToken = response.body()?.data?.accessToken
+                    val newRefreshToken = response.body()?.data?.refreshToken
+                    if (newAccessToken != null && newRefreshToken != null) {
+                        SharedPreferencesData.saveData(context, ACCESS_TOKEN, newAccessToken)
+                        SharedPreferencesData.saveData(context, REFRESH_TOKEN, newRefreshToken)
+                    }
+                    Log.e("Post gn 토큰 ", "$newAccessToken")
+                    val success = response.body()?.success ?: false
+                    Log.e("Post gn 토큰 ", "$success")
+                    success
+                }else{
+                    false
+                }
+            }catch (e: Exception) {
+                Log.e("aa", "오류 발생")
+                false
+            }
+        }
+
+
     }
 
 
@@ -632,16 +668,16 @@ class RetrofitManager() : Application() {
         Log.e("kakaoAcRf", "${accessToken.value}, ${refreshToken.value}")
         // request 로 온 데이터 내부에 저장하기
         SharedPreferencesData.saveData(context,
-            "accessToken",
+            ACCESS_TOKEN,
             response.body()?.data?.accessToken ?: return)
         SharedPreferencesData.saveData(context,
-            "refreshToken",
+            REFRESH_TOKEN,
             response.body()?.data?.refreshToken ?: return)
         SharedPreferencesData.saveData(context,
-            "nickname",
+            NICKNAME,
             response.body()?.data?.nickname ?: return)
         SharedPreferencesData.saveLongData(context,
-            "userId",
+            USER_ID,
             response.body()?.data?.userId ?: return)
     }
 
