@@ -19,6 +19,7 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivitySignupProfileBinding
 import com.demo.sharingapp.login.LoginView
+import com.demo.sharingapp.login.UserPlace
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -65,7 +66,7 @@ class SignupProfileActivity : AppCompatActivity() {
             val imageFile = imageToFile(imageUri)
             RetrofitManager.instance.postKaKaoProfile(this, token = kaKaoToken,imageFile){
                 if (it == 0){
-                    val intent = Intent(this, SignupFinishActivity::class.java)
+                    val intent = Intent(this, UserPlace::class.java)
                     startActivity(intent)
                     finish()
                 }else if (it == 1001){
