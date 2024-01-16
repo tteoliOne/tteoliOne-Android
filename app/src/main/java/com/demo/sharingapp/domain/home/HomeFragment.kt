@@ -163,6 +163,8 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         onViewClick = {
             val intent = Intent(this@HomeFragment.requireActivity(),DetailedProductActivity::class.java).putExtra(PRODUCT_ID,it)
             startActivityForResult(intent,MOVE_DETAILED_CODE)
+
+
         }
     )
 

@@ -844,6 +844,47 @@ class RetrofitManager() : Application() {
 
     }
 
+    // 상품 수정하기
+    fun putProductModify(
+        context: Context,
+        accessToken: String,
+        productsId: Long,
+        request: Products,
+        receipt: MultipartBody.Part,
+        photos: List<MultipartBody.Part>,
+    ) {
+        val token = accessToken
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.putProductsModify(Authorization = "Bearer $token",
+            productId= productsId,
+            request = request,
+            photos = photos,
+            receipt = receipt,
+            )
+
+        call.enqueue(object : retrofit2.Callback<ProductsResponse> {
+            override fun onResponse(
+                call: Call<ProductsResponse>,
+                response: Response<ProductsResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "상품이 등록 되었습니다.", Toast.LENGTH_SHORT).show()
+                    Log.e("Post", "success ${response.body()?.userId}")
+                    Log.e("Post", "success ${response.body()?.productId}")
+                } else {
+                    Log.e("Post", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<ProductsResponse>, t: Throwable) {
+                Log.e("Post", "fail ${t} $call")
+            }
+        })
+
+    }
+
     private fun initRetrofit(context: Context): Retrofit {
         val client = OkHttpClient.Builder()
         val loggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {

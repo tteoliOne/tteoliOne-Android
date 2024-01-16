@@ -9,16 +9,32 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
+import com.demo.sharingapp.AddProductsActivity
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
+import com.demo.sharingapp.domain.home.part.modify.DetailedProductModifyActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_COUNT
+import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_DAY
+import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_MONTH
+import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_PRICE
+import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_YEAR
+import com.demo.sharingapp.utils.Constants.PRODUCT_DESCRIPTION
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
+import com.demo.sharingapp.utils.Constants.PRODUCT_IMAGE
+import com.demo.sharingapp.utils.Constants.PRODUCT_LATITUDE
+import com.demo.sharingapp.utils.Constants.PRODUCT_LONGITUDE
+import com.demo.sharingapp.utils.Constants.PRODUCT_RECEIPT_IMAGE
+import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_COUNT
+import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
+import com.demo.sharingapp.utils.Constants.PRODUCT_TITLE
+import com.demo.sharingapp.utils.Constants.PRODUCT_TYPE
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -39,12 +55,26 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
     private var likePoint = 0
 
-    private var uri = ""
+    private var receiptUri = ""
 
     private var productId: Long =  0
     private var latitude = 0.0
     private var longitude =0.0
     private var checkOwner = false
+
+    private var productTitle = ""
+    private var productBuyPrice = ""
+    private var productBuyCount = ""
+    private var productSharePrice = ""
+    private var productShareCount = ""
+    private var productBuyYear= 0
+    private var productBuyMonth= 0
+    private var productBuyDay= 0
+    private var productDescription = ""
+
+    private lateinit var productImageArray : Array<String>
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +82,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         setContentView(binding.root)
         productId = intent.getLongExtra(PRODUCT_ID,0)
         accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
-
 
         // 맵 설정
         initMap()
@@ -117,6 +146,29 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 메뉴의 수정하기 버튼 클릭 함수
     private fun clickMenuModifyButton() {
         binding.menuModifyButton.setOnClickListener {
+            val intent = Intent(this, AddProductsActivity::class.java).apply {
+                putExtra(PRODUCT_TITLE,productTitle)
+                putExtra(PRODUCT_BUY_PRICE,productBuyPrice)
+                putExtra(PRODUCT_BUY_COUNT,productBuyCount)
+                putExtra(PRODUCT_SHARE_PRICE,productSharePrice)
+                putExtra(PRODUCT_SHARE_COUNT,productShareCount)
+                putExtra(PRODUCT_BUY_YEAR,productBuyYear)
+                putExtra(PRODUCT_BUY_MONTH,productBuyMonth)
+                putExtra(PRODUCT_BUY_DAY,productBuyDay)
+                putExtra(PRODUCT_DESCRIPTION,productDescription)
+                putExtra(PRODUCT_LATITUDE, latitude)
+                putExtra(PRODUCT_LONGITUDE, longitude)
+                putExtra(PRODUCT_IMAGE, productImageArray)
+                putExtra(PRODUCT_RECEIPT_IMAGE,receiptUri)
+                putExtra(PRODUCT_TYPE, 1)
+                putExtra(PRODUCT_ID, productId)
+
+
+
+
+
+            }
+            startActivity(intent)
             disappearsMenu() // 메뉴버튼 전체 사라짐
         }
     }
@@ -154,7 +206,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 영수증 클릭 함수
    private fun clickReceipt() {
         binding.receiptImageView.setOnClickListener {
-            showDialog(uri)
+            showDialog(receiptUri)
         }
     }
 
@@ -234,10 +286,14 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
             startActivity(intent)
         }
         binding.productImageViewPager.adapter = frameAdapter
+        productImageArray = it.images
 
 
-        //
-        uri = it.receipt
+        // 상품 id
+        it.productId
+
+        // 영수증 이미지
+        receiptUri = it.receipt
 
         // 프로필 사진
         Glide.with(binding.profileImageView)
@@ -255,9 +311,16 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
         // 상품 제목
         binding.productTitleTextView.text = it.title
+        productTitle = it.title
 
         // 구매 일자
         binding.buyDateTextView.text = formattedDate
+        productBuyYear = inputDateTime.year
+        productBuyMonth = inputDateTime.monthValue
+        productBuyDay = inputDateTime.dayOfMonth
+
+
+
 
         // 좋아요 유무
         liked = it.checkLiked
@@ -273,18 +336,23 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
         // 구입가격
         binding.buyPriceTextView.text = getString(R.string.buy_price, buyPrice)
+        productBuyPrice = it.buyPrice.toString()
 
         // 구입 수량
         binding.buyCountTextView.text = getString(R.string.product_count, it.buyCount)
+        productBuyCount = it.buyCount.toString()
 
         // 공유 가격
         binding.sharePriceTextView.text = getString(R.string.buy_price, sharePrice)
+        productSharePrice = it.sharePrice.toString()
 
         // 공유 수량
         binding.shareCountTextView.text = getString(R.string.product_count, it.shareCount)
+        productShareCount = it.shareCount.toString()
 
         // 상세 설명
         binding.descriptionTextView.text = it.description
+        productDescription = it.description
 
 
         // 테이블 레이아웃 설정
@@ -306,8 +374,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         googleMap.addMarker(markerOptions)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location))
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(15f))
-
-
     }
 
 

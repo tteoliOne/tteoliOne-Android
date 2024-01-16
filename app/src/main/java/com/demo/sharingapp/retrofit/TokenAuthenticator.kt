@@ -1,8 +1,11 @@
 package com.demo.sharingapp.retrofit
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.login.data.TokenData
 import kotlinx.coroutines.runBlocking
 import okhttp3.Authenticator
@@ -11,13 +14,26 @@ import okhttp3.Response
 import okhttp3.Route
 
 class TokenAuthenticator(val context: Context) : Authenticator {
+
+    private var tokenCheck = true
     override fun authenticate(route: Route?, response: Response): Request? {
-        if (isTokenExpired(response)) {
+        if (isTokenExpired(response) && tokenCheck) {
             Log.e("Authenticator", response.toString())
             Log.e("Authenticator", "토큰 재발급 시도")
             val reissueData = runBlocking {RetrofitManager.instance.postReissue(context)}
             val newAccessToken = reissueData?.data?.accessToken
             Log.e("Authorization Token", newAccessToken.toString())
+
+            if (reissueData?.code != 0){
+                tokenCheck = false
+                if (context is Activity) {
+                    val intent = Intent(context, LoginView::class.java)
+                    context.startActivity(intent)
+                    context.finish()
+
+                }
+            }
+
             return response.request.newBuilder()
                 .header("Authorization", "Bearer $newAccessToken")
                 .build()

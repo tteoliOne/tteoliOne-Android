@@ -25,6 +25,7 @@ import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.demo.sharingapp.PermissionUtil
 import com.demo.sharingapp.R
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -43,7 +44,7 @@ import java.io.OutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ProductBottomSheet : BottomSheetDialogFragment() {
+class ProductBottomSheet( private val productType: Int) : BottomSheetDialogFragment() {
     private lateinit var productViewModel: ProductViewModel
 
     // 카메라 권한
@@ -71,6 +72,7 @@ class ProductBottomSheet : BottomSheetDialogFragment() {
         productViewModel = ViewModelProvider(this.requireActivity())[ProductViewModel::class.java]
 
         val commitBtn = view?.findViewById<Button>(R.id.applyButton)
+        val iv_pre = view?.findViewById<ImageView>(R.id.receiptImageView) ?: return
 
         // 영수증 이미지 추가 버튼 클릭 시
         view?.findViewById<ConstraintLayout>(R.id.receiptImageButton)?.setOnClickListener {
@@ -80,16 +82,26 @@ class ProductBottomSheet : BottomSheetDialogFragment() {
 
         // 완료 버튼 클릭 시
         commitBtn?.setOnClickListener {
-
-            if(isChangeImage) {
-                // 뷰 모델로 데이터 전달 함수 호출
-                productViewModel.postProduct()
+            if (productType == 1){ // 상품 수정하기
+                productViewModel.putProductModify()
                 this@ProductBottomSheet.requireActivity().finish()
                 removeFindPlace()
                 dismiss()
-            }else{
-                view?.findViewById<TextView>(R.id.errorMessageTextView)?.isVisible=true
+            }else{ // 상품 추가하기
+                if(isChangeImage) {
+                    // 뷰 모델로 데이터 전달 함수 호출
+                    productViewModel.postProduct()
+                    this@ProductBottomSheet.requireActivity().finish()
+                    removeFindPlace()
+                    dismiss()
+                }else{
+                    view?.findViewById<TextView>(R.id.errorMessageTextView)?.isVisible=true
+                }
             }
+
+
+
+
         }
 
     }

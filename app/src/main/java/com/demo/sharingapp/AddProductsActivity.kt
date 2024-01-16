@@ -47,6 +47,9 @@ import com.demo.sharingapp.utils.Constants.FIND_LATITUDE
 import com.demo.sharingapp.utils.Constants.FIND_LONGITUDE
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.PRODUCT_ID
+import com.demo.sharingapp.utils.Constants.PRODUCT_RECEIPT_IMAGE
+import com.demo.sharingapp.utils.Constants.PRODUCT_TYPE
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
@@ -57,6 +60,8 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import java.io.*
+import java.net.HttpURLConnection
+import java.net.URL
 import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -77,6 +82,8 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     // 이미지
     private lateinit var imageAdepter: ProductImageAdapter
     private var imageList: ArrayList<Uri> = ArrayList()
+    private var intentImageList: ArrayList<Uri> = ArrayList()
+    private var allImageList: ArrayList<Uri> = ArrayList()
 
     // 달력
     private var calendar = Calendar.getInstance()
@@ -94,6 +101,9 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private var shareCount = ""
     private var categoryId = 0
     private var description = ""
+    private var receiptImage = ""
+    private var productType = 0
+    private var productId = 0L
 
     private var realUri: Uri? = null
 
@@ -102,6 +112,9 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         super.onCreate(savedInstanceState)
         binding = ActivityAddProductsBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        // 초기 리사이클러뷰 설정
+        initRecyclerView()
 
         // 카테고리 선택 함수 호출
         categoryCheck()
@@ -120,9 +133,6 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         // 크게보기 클릭 함수 호출
         bigSizeMapButtonClick()
-
-        // 초기 리사이클러뷰 설정
-        initRecyclerView()
 
         // 상품이미지 추가 버튼 함수 호출
         clickAddProductButton()
@@ -154,7 +164,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                 sendViewModel()
 
                 // 바텀시트 설정
-                val bottomSheetFragment = ProductBottomSheet()
+                val bottomSheetFragment = ProductBottomSheet(productType)
                 bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
 
             } else {
@@ -171,8 +181,8 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         val imageFileList: ArrayList<MultipartBody.Part> = ArrayList()
         var imageCount = 1
-        imageList.forEach {
 
+        imageList.forEach {
             val exifInterface = getExifInterface(this, it)
             val orientation = exifInterface?.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)
             val rotatedBitmap = rotateBitmap(convertUriToJpeg(it), getRotationAngle(orientation ?: ExifInterface.ORIENTATION_NORMAL))
@@ -205,8 +215,41 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
             categoryId = categoryId,
             buyDate = getString(R.string.buy_date_local, year, month, day)
         )
+        if (productType ==1){
+            productViewModel.updateId(productId)
+        }
+
 
     }
+
+    //
+    // Uri를 File로 변환하는 함수
+    private fun uriToFile(uri: Uri): File {
+        val file = File(cacheDir, "downloaded_image.jpeg")
+
+        try {
+            val url = URL(uri.toString())
+            val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
+            connection.doInput = true
+            connection.connect()
+
+            val input: InputStream = connection.inputStream
+            val output = FileOutputStream(file)
+
+            input.use { input ->
+                output.use { output ->
+                    input.copyTo(output)
+                }
+            }
+
+            Log.d("Download", "Image downloaded successfully")
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return file
+    }
+
     // 휴대폰 설정에 따라 이미지 각도를 돌려줌
     private fun getRotationAngle(orientation: Int): Float {
         return when (orientation) {
@@ -441,9 +484,12 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     // 상품이미지 추가 버튼 함수
     private fun clickAddProductButton() {
         binding.addProductImageButton.setOnClickListener {
-
-            // 상품이미지 추가 클릭시 나오는 메뉴 함수 호출
-            addProductButtonMenu(it, R.menu.menu_add_product)
+            if(imageList.count()<5){
+                // 상품이미지 추가 클릭시 나오는 메뉴 함수 호출
+                addProductButtonMenu(it, R.menu.menu_add_product)
+            }else{
+                Toast.makeText(this,"이미지 수가 초과입니다",Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -483,6 +529,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                 Constants.FLAG_REQ_CAMERA -> {
                     realUri?.let { uri ->
                         imageList.add(uri)
+                        allImageList.add(uri)
                         updateImageList()
                     }
                 }
@@ -569,11 +616,23 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         // 리사이클러뷰 안에 뷰 클릭 시 뷰 삭제
         imageAdepter = ProductImageAdapter { postion ->
-            imageList.removeAt(postion)
+            allImageList.removeAt(postion)
+            Log.e("image",intentImageList.count().toString())
+            Log.e("image",(postion+1).toString())
+
+
+            if (intentImageList.count() >= postion+1){
+                intentImageList.removeAt(postion)
+            }else{
+                imageList.removeAt(postion-intentImageList.count())
+            }
+            Log.e("image",intentImageList.count().toString())
+            Log.e("image",(imageList.count()).toString())
             //이미지 어댑터에서 업데이트 함수 호출
             updateImageList()
-            imageCount(imageList.count())
+            imageCount(allImageList.count())
         }
+
         // 리사이클러뷰 어댑터와 레이아웃메니져 설정
         binding.productImageRecyclerView.apply {
             adapter = imageAdepter
@@ -608,6 +667,19 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     // 불러온 데이터 넣기 함수
     private fun puttingData() {
+        title = intent.getStringExtra(Constants.PRODUCT_TITLE) ?: title
+        buyPrice = intent.getStringExtra(Constants.PRODUCT_BUY_PRICE) ?: buyPrice
+        buyCount = intent.getStringExtra(Constants.PRODUCT_BUY_COUNT) ?: buyCount
+        sharePrice = intent.getStringExtra(Constants.PRODUCT_SHARE_PRICE) ?: sharePrice
+        shareCount = intent.getStringExtra(Constants.PRODUCT_SHARE_COUNT) ?: shareCount
+        year = intent.getIntExtra(Constants.PRODUCT_BUY_YEAR,year)
+        month = intent.getIntExtra(Constants.PRODUCT_BUY_MONTH,month)
+        day = intent.getIntExtra(Constants.PRODUCT_BUY_DAY,day)
+        description = intent.getStringExtra(Constants.PRODUCT_DESCRIPTION) ?: description
+
+        productType = intent.getIntExtra(PRODUCT_TYPE, productType)
+        productId = intent.getLongExtra(PRODUCT_ID, productId)
+
         binding.titleEditText.setText(title)
         binding.purchasePriceEditText.setText(buyPrice)
         binding.purchasingVolumeEditText.setText(buyCount)
@@ -615,6 +687,20 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         binding.shareVolumeEditText.setText(shareCount)
         binding.descriptionEditText.setText(description)
         binding.buyDateTextView.text = getString(R.string.buy_date, year, month, day)
+
+        // 등록한 상품 이미지 불러오기
+//        val productImage = intent.getStringArrayExtra(Constants.PRODUCT_IMAGE) ?: return
+//        productImage.forEach {
+//            val uri = Uri.parse(it)
+//            intentImageList.add(uri)
+//            allImageList.add(uri)
+//        }
+        // 등록한 상품 영수증 이미지 불러오기
+        // receiptImage = intent.getStringExtra(PRODUCT_RECEIPT_IMAGE) ?: receiptImage
+
+
+        updateImageList()
+
         if (categoryId != 0) {
             when (categoryId) {
                 1 -> binding.chip1.isChecked = true
@@ -692,7 +778,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                 val count = it.data!!.clipData!!.itemCount
 
                 // 고른 이미지 수
-                val totalCount = allCount - imageList.count() - count
+                val totalCount = allCount - allImageList.count() - count
 
                 //최대 이미지 수 넘었을 때 제한
                 if (totalCount < 0) {
@@ -706,11 +792,13 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                 for (index in 0 until count) {
                     val imageUrl = it.data!!.clipData!!.getItemAt(index).uri
                     imageList.add(imageUrl)
+                    allImageList.add(imageUrl)
                 }
 
             } else { // 이미지 한장 골랐을 때
                 val imageUri = it.data!!.data
                 imageList.add(imageUri!!)
+                allImageList.add(imageUri!!)
             }
 
             //이미지 어댑터에서 업데이트 함수 호출
@@ -722,11 +810,11 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
     //이미지 어댑터에서 업데이트 함수
     private fun updateImageList() {
-        val images = imageList.map { AddProductImageData(it) }
+        val images = allImageList.map { AddProductImageData(it) }
         imageAdepter.submitList(images)
 
         // 선택한 이미지 개수 업데이트
-        imageCount(imageList.count())
+        imageCount(allImageList.count())
     }
 
     // 화면 터치 시 키보드 내리기

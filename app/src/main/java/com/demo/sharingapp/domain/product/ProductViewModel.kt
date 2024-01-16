@@ -28,6 +28,10 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     private var accessToken = SharedPreferencesData.getData(getApplication(), Constants.ACCESS_TOKEN)
     private var refreshToken = SharedPreferencesData.getData(getApplication(), Constants.REFRESH_TOKEN)
 
+    // 경도
+    private val _currentId = MutableLiveData<Long>()
+    val currentId: LiveData<Long>
+        get() = _currentId
 
     // 상품이미지
     private val _currentImageList = MutableLiveData<List<MultipartBody.Part>>()
@@ -124,6 +128,11 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         this._currentReceipt.value = receipt
     }
 
+    // 상품 id 데이터  받기
+    fun updateId(productId:Long) {
+        this._currentId.value = productId
+    }
+
 
     // 상품 등록하는 데이터 받기
     fun postProduct() {
@@ -143,6 +152,31 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
 
         if (currentReceipt.value != null && currentImageList.value != null) {
             RetrofitManager.instance.postProduct(context = getApplication(),accessToken = accessToken, request = products,
+                receipt = currentReceipt.value!!,
+                photos = currentImageList.value!!)
+
+        }
+
+
+    }
+    // 상품 등록하는 데이터 받기
+    fun putProductModify() {
+
+        val products = Products(userId = userId,
+            categoryId = currentCategoryId.value ?: return,
+            title = currentImageTitle.value ?: return,
+            buyPrice = currentBuyPrice.value ?: return,
+            buyCount = currentBuyCount.value ?: return,
+            sharePrice = currentSharePrice.value ?: return,
+            shareCount = currentShareCount.value ?: return,
+            buyDate = currentBuyDate.value ?: return,
+            description = currentDescription.value ?: return,
+            longitude = currentLongitude.value ?: return,
+            latitude = currentLatitude.value ?: return)
+
+
+        if (currentReceipt.value != null && currentImageList.value != null) {
+            RetrofitManager.instance.putProductModify(context = getApplication(),accessToken = accessToken, productsId = currentId.value!! ,request = products,
                 receipt = currentReceipt.value!!,
                 photos = currentImageList.value!!)
 

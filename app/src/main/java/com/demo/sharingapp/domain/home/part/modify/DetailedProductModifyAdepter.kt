@@ -1,27 +1,29 @@
-package com.demo.sharingapp.addproduct
+package com.demo.sharingapp.domain.home.part.modify
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.demo.sharingapp.addproduct.AddProductImageData
 import com.demo.sharingapp.databinding.ItemProductImageBinding
+import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 
-class ProductImageAdapter(val onItemClicked: (Int) -> Unit) :
-    ListAdapter<AddProductImageData, ProductImageAdapter.ProductImageViewHolder>(
-        object : DiffUtil.ItemCallback<AddProductImageData>() {
+
+class DetailedProductModifyAdepter(val onItemClicked: (Int) -> Unit) :
+    ListAdapter<DetailedImageData, DetailedProductModifyAdepter.ProductImageViewHolder>(
+        object : DiffUtil.ItemCallback<DetailedImageData>() {
             override fun areItemsTheSame(
-                oldItem: AddProductImageData,
-                newItem: AddProductImageData,
+                oldItem: DetailedImageData,
+                newItem: DetailedImageData,
             ): Boolean {
                 return oldItem === newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: AddProductImageData,
-                newItem: AddProductImageData,
+                oldItem: DetailedImageData,
+                newItem: DetailedImageData,
             ): Boolean {
                 return oldItem == newItem
             }
@@ -33,9 +35,8 @@ class ProductImageAdapter(val onItemClicked: (Int) -> Unit) :
         fun bind(position: Int) {
             binding.productImageView.clipToOutline = true
             Glide.with(binding.productImageView)
-                .load(currentList[position].image)
+                .load(currentList[position].uri)
                 .into(binding.productImageView)
-//            binding.productImageView.setImageURI(currentList[position].image)
 
             binding.root.setOnClickListener {
                 onItemClicked(position)

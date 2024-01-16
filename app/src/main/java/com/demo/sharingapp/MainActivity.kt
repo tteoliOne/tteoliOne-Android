@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         clickLikeListCloseButton()
 
         // 로그인 상태 확인 함수 호출
-        checkHasLogin()
+        //checkHasLogin()
 
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 

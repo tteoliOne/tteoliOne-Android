@@ -102,6 +102,17 @@ interface RestAPI {
         @Part("request") request: Products,
     ): Call<ProductsResponse>
 
+    // 등록 상품 정보 보내기
+    @Multipart
+    @PUT(API.PRODUCTS_MODIFY) // Replace with your API endpoint
+    fun putProductsModify(
+        @Header("Authorization") Authorization: String,
+        @Path("productId") productId: Long,
+        @Part photos: List<MultipartBody.Part>,
+        @Part receipt: MultipartBody.Part,
+        @Part("request") request: Products,
+    ): Call<ProductsResponse>
+
     // 카테고리별 상품 정보 가져오기
     @GET(API.PRODUCTS)
     fun getPartProducts(

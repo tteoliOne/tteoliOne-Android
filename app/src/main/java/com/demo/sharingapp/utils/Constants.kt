@@ -23,6 +23,22 @@ object Constants{
     const val KAKAO_TOKEN = "kaKaoToken"
     const val SIGNUP_TYPE = "signupType"
 
+    const val PRODUCT_TITLE = "productTitle"
+    const val PRODUCT_BUY_PRICE = "productBuyPrice"
+    const val PRODUCT_BUY_COUNT = "productBuyCount"
+    const val PRODUCT_SHARE_PRICE = "productSharePrice"
+    const val PRODUCT_SHARE_COUNT = "productShareCount"
+    const val PRODUCT_BUY_YEAR = "productBuyYear"
+    const val PRODUCT_BUY_MONTH = "productBuyMonth"
+    const val PRODUCT_BUY_DAY = "productBuyDay"
+    const val PRODUCT_DESCRIPTION = "productDescription"
+    const val PRODUCT_LATITUDE = "productLatitude"
+    const val PRODUCT_LONGITUDE = "productLongitude"
+    const val PRODUCT_IMAGE = "productImage"
+    const val PRODUCT_RECEIPT_IMAGE = "productReceiptImage"
+    const val PRODUCT_TYPE = "productType"
+
+
     const val ACCESS_FINE_LOCATION_CODE = 200
 
     const val MOVE_DETAILED_CODE = 201
@@ -46,6 +62,8 @@ object API {
     const val EMAIL_VERIFY : String = "/api/email/verify/signup"
 
     const val PRODUCTS : String="/api/products"
+
+    const val PRODUCTS_MODIFY : String="/api/products/{productId}"
 
     const val PRODUCTS_ME : String="/api/products/me"
 
