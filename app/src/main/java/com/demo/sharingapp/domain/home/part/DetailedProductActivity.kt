@@ -28,6 +28,7 @@ import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_DAY
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_MONTH
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_PRICE
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_YEAR
+import com.demo.sharingapp.utils.Constants.PRODUCT_CATEGORY_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_DESCRIPTION
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_IMAGE
@@ -61,6 +62,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     private var receiptUri = ""
 
     private var productId: Long =  0
+    private var categoryId: Int =  0
+
     private var latitude = 0.0
     private var longitude =0.0
     private var checkOwner = false
@@ -165,6 +168,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
                 putExtra(PRODUCT_RECEIPT_IMAGE,receiptUri)
                 putExtra(PRODUCT_TYPE, 1)
                 putExtra(PRODUCT_ID, productId)
+                putExtra(PRODUCT_CATEGORY_ID, categoryId)
+
 
             }
             startActivityForResult(intent,MOVE_MODIFY_CODE)
@@ -290,6 +295,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
         // 상품 id
         it.productId
+
+        categoryId = it.categoryId
 
         // 영수증 이미지
         receiptUri = it.receipt

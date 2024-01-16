@@ -2,6 +2,7 @@ package com.demo.sharingapp.domain.home.part.data
 
 data class DetailedProductData(
     val productId: Long,
+    val categoryId: Int,
     val images: Array<String>,
     val sellerProfile: String,
     val receipt: String,

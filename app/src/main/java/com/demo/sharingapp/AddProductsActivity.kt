@@ -47,6 +47,7 @@ import com.demo.sharingapp.utils.Constants.FIND_LATITUDE
 import com.demo.sharingapp.utils.Constants.FIND_LONGITUDE
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.PRODUCT_CATEGORY_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_RECEIPT_IMAGE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TYPE
@@ -104,6 +105,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private var receiptImage = ""
     private var productType = 0
     private var productId = 0L
+
 
     private var realUri: Uri? = null
 
@@ -679,6 +681,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
 
         productType = intent.getIntExtra(PRODUCT_TYPE, productType)
         productId = intent.getLongExtra(PRODUCT_ID, productId)
+        categoryId = intent.getIntExtra(PRODUCT_CATEGORY_ID, categoryId)
 
         binding.titleEditText.setText(title)
         binding.purchasePriceEditText.setText(buyPrice)

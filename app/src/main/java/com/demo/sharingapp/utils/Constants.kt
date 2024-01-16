@@ -18,6 +18,7 @@ object Constants{
     const val SIGNUP_NICKNAME = "nickname"
     const val SIGNUP_PASSWORD = "password"
     const val PRODUCT_ID = "productId"
+    const val PRODUCT_CATEGORY_ID = "productId"
     const val DETAILED_LIKED = "detailedLiked"
     const val DETAILED_LIKED_POINT = "detailedLikedPoint"
     const val KAKAO_TOKEN = "kaKaoToken"
