@@ -44,6 +44,12 @@ object Constants{
     const val MOVE_DETAILED_CODE = 201
 
 
+    const val MOVE_MODIFY_CODE = 202
+
+
+
+
+
 
     //카메라를 호출하는 플래그
     const val FLAG_REQ_CAMERA = 101

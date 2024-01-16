@@ -1,5 +1,6 @@
 package com.demo.sharingapp.domain.home.part
 
+import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -17,9 +18,11 @@ import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.modify.DetailedProductModifyActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
+import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.MOVE_MODIFY_CODE
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_COUNT
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_DAY
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_MONTH
@@ -163,12 +166,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
                 putExtra(PRODUCT_TYPE, 1)
                 putExtra(PRODUCT_ID, productId)
 
-
-
-
-
             }
-            startActivity(intent)
+            startActivityForResult(intent,MOVE_MODIFY_CODE)
             disappearsMenu() // 메뉴버튼 전체 사라짐
         }
     }
@@ -399,6 +398,15 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
             .putExtra(LONGITUDE,longitude)
         Log.e("demap","${latitude} ${longitude}")
         startActivity(intent)
+    }
+
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.MOVE_MODIFY_CODE && resultCode == Activity.RESULT_OK) {
+            Log.e("시작", "시작")
+            getDetailedData()
+        }
     }
 
 }

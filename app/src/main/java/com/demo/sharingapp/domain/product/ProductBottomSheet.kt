@@ -22,6 +22,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
@@ -84,6 +85,8 @@ class ProductBottomSheet( private val productType: Int) : BottomSheetDialogFragm
         commitBtn?.setOnClickListener {
             if (productType == 1){ // 상품 수정하기
                 productViewModel.putProductModify()
+                val resultIntent = Intent()
+                this@ProductBottomSheet.requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
                 this@ProductBottomSheet.requireActivity().finish()
                 removeFindPlace()
                 dismiss()
