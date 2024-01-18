@@ -1,7 +1,8 @@
 package com.demo.sharingapp.domain.user.data
 
-data class NicknameResponse(
+data class ChangeMyInfoResponse(
     val success : Boolean,
     val code : Int,
-    val message : String
+    val message : String,
+    val data: String
 )

@@ -17,6 +17,7 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <ImageView
+            android:id="@+id/imageView2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -25,26 +26,40 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/userImageView"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_marginStart="20dp"
+        <LinearLayout
+            android:id="@+id/userImageLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginTop="50dp"
-            android:src="@drawable/menu_user"
+            android:background="@drawable/user_image_background"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toStartOf="@id/usernameLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent" >
+
+            <ImageView
+                android:id="@+id/userImageView"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/menu_user"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </LinearLayout>
+
+
+
 
         <LinearLayout
             android:id="@+id/usernameLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:background="@drawable/user_round"
             android:elevation="50dp"
             android:orientation="vertical"
-            app:layout_constraintStart_toEndOf="@id/userImageView"
-            app:layout_constraintTop_toTopOf="@id/userImageView">
+            app:layout_constraintEnd_toStartOf="@id/goodCountLayout"
+            app:layout_constraintStart_toEndOf="@id/userImageLayout"
+            app:layout_constraintTop_toTopOf="@id/userImageLayout">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,12 +93,12 @@
             android:id="@+id/goodCountLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
             android:background="@drawable/user_round"
             android:elevation="50dp"
             android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/usernameLayout"
-            app:layout_constraintTop_toTopOf="@id/userImageView">
+            app:layout_constraintTop_toTopOf="@id/userImageLayout">
 
             <TextView
                 android:layout_width="wrap_content"
@@ -107,24 +122,24 @@
                 android:paddingStart="20dp"
                 android:paddingEnd="20dp"
                 android:paddingBottom="10dp"
+                android:text="0"
                 android:textColor="@color/black"
-                android:textSize="20sp"
-                android:text="0" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/descriptionTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="30dp"
+            android:layout_marginBottom="10dp"
             android:text="@string/no_introduction"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/goodCountLayout"
-            app:layout_constraintStart_toStartOf="@+id/userImageView"
-            app:layout_constraintTop_toBottomOf="@+id/userImageView" />
+            app:layout_constraintStart_toStartOf="@+id/userImageLayout"
+            app:layout_constraintTop_toBottomOf="@id/usernameLayout" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -142,10 +157,9 @@
         android:layout_height="313dp"
         android:background="@drawable/user_menu_round"
         android:elevation="10dp"
-        app:layout_constraintTop_toTopOf="@id/guidelineHorizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        >
+        app:layout_constraintTop_toTopOf="@id/guidelineHorizontal">
 
         <LinearLayout
             android:layout_width="match_parent"

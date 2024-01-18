@@ -43,7 +43,17 @@
         android:id="@+id/userSettingFragment"
         android:name="com.demo.sharingapp.domain.user.UserSettingFragment"
         android:label="UserSettingFragment"
-        tools:layout="@layout/fragment_user_setting"/>
+        tools:layout="@layout/fragment_user_setting">
+        <argument
+            android:name="nickname"
+            app:argType="string" />
+        <argument
+            android:name="description"
+            app:argType="string" />
+        <argument
+            android:name="profileImage"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/homePartProductFragment"

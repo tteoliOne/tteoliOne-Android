@@ -100,9 +100,14 @@ object API {
 
     const val SAVE_PRODUCTS : String="/api/products/saved"
 
+    const val MY_INFO : String="/api/users"
+
     const val DETAILED_PRODUCT : String="/api/products/{productId}"
 
     const val CHANGE_NICKNAME : String="/api/users/nickname"
+
+    const val CHANGE_MY_INFO : String="/api/users"
+
 
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 

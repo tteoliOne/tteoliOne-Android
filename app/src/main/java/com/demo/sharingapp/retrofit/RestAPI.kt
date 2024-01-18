@@ -3,7 +3,9 @@ package com.demo.sharingapp.retrofit
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
-import com.demo.sharingapp.domain.user.data.NicknameResponse
+import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
+import com.demo.sharingapp.domain.user.data.MyInfoResponse
+import com.demo.sharingapp.domain.user.data.ChangeMyInfoResponse
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -16,7 +18,6 @@ import com.demo.sharingapp.utils.API
 import okhttp3.MultipartBody
 import retrofit2.Call
 import retrofit2.http.*
-import java.time.LocalDate
 
 interface RestAPI {
 
@@ -154,6 +155,14 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
     ): Call<GetSaveProductData>
 
+    // 내 정보 조회
+    @GET(API.MY_INFO)
+    fun getMyInfo(
+        @Header("Authorization") Authorization: String
+    ): Call<MyInfoResponse>
+
+
+
     // 상세 상품 데이터 가져오기
     @GET(API.DETAILED_PRODUCT)
     fun getDetailedProduct(
@@ -168,12 +177,14 @@ interface RestAPI {
         @Path("productId") productId: Long,
     ): Call<EmailResponse>
 
-    // 닉네임 변경
-    @PATCH(API.CHANGE_NICKNAME)
+    // 내정보 변경
+    @PATCH(API.CHANGE_MY_INFO)
     fun patchChangeNickname(
         @Header("Authorization") Authorization: String,
-        @Body nickname: NicknameData,
-    ): Call<NicknameResponse>
+        @Body changeMyInfoData: ChangeMyInfoData,
+    ): Call<ChangeMyInfoResponse>
+
+
 
 
     // 도로명 주소 정보 가져오기

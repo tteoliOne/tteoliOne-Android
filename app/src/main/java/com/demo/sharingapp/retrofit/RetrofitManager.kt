@@ -8,13 +8,15 @@ import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.data.GetSaveProductData
-import com.demo.sharingapp.data.SaveProductsData
 import com.demo.sharingapp.data.SaveProductsListData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.data.PartProductListData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
-import com.demo.sharingapp.domain.user.data.NicknameResponse
+import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
+import com.demo.sharingapp.domain.user.data.MyInfoData
+import com.demo.sharingapp.domain.user.data.MyInfoResponse
+import com.demo.sharingapp.domain.user.data.ChangeMyInfoResponse
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -37,7 +39,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.*
 import retrofit2.converter.gson.GsonConverterFactory
-import java.time.LocalDate
 
 class RetrofitManager() : Application() {
 
@@ -497,15 +498,16 @@ class RetrofitManager() : Application() {
     }
 
     // 내정보 - 닉내임 변경
-    fun patchChangeNickname(context: Context, accessToken: String, nickname: String, onCheckNickname:(Boolean,String)->Unit){
+    fun patchChangeNickname(context: Context, accessToken: String, nickname: String, description: String, onCheckNickname:(Boolean,String)->Unit){
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val nicknameData = NicknameData(nickname)
-        val call = api.patchChangeNickname(Authorization = "Bearer $accessToken", nicknameData)
-        call.enqueue(object : retrofit2.Callback<NicknameResponse>{
+        val changeMyInfoData = ChangeMyInfoData(nickname,description)
+        Log.e("a",description.toString())
+        val call = api.patchChangeNickname(Authorization = "Bearer $accessToken", changeMyInfoData)
+        call.enqueue(object : retrofit2.Callback<ChangeMyInfoResponse>{
             override fun onResponse(
-                call: Call<NicknameResponse>,
-                response: Response<NicknameResponse>,
+                call: Call<ChangeMyInfoResponse>,
+                response: Response<ChangeMyInfoResponse>,
             ) {
                 if (response.isSuccessful){
                     Log.e("patchChangeNickname", "success Nickname success ${response.body()?.success}")
@@ -519,7 +521,7 @@ class RetrofitManager() : Application() {
                 }
             }
 
-            override fun onFailure(call: Call<NicknameResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ChangeMyInfoResponse>, t: Throwable) {
                 Log.e("patchChangeNickname", "fail ${t} $call")
             }
         })
@@ -730,6 +732,37 @@ class RetrofitManager() : Application() {
             }
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("getRemoveProduct", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 내 정보 조회하기
+    fun getMyInfo(context: Context, onSuccess: (MyInfoData) -> Unit){
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val call = api.getMyInfo(Authorization = "Bearer $accessToken")
+        call.enqueue(object : retrofit2.Callback<MyInfoResponse>{
+            override fun onResponse(
+                call: Call<MyInfoResponse>,
+                response: Response<MyInfoResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getMyInfo", "success ${response.body()?.success}")
+                    Log.e("getMyInfo", "data ${response.body()?.data}")
+                    Log.e("getMyInfo", "message ${response.body()?.message}")
+                    Log.e("getMyInfo", "code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onSuccess(data)
+
+                } else {
+                    Log.e("getMyInfo", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<MyInfoResponse>, t: Throwable) {
+                Log.e("getMyInfo", "fail ${t} $call")
             }
         })
     }
