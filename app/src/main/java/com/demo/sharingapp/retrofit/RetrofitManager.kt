@@ -84,7 +84,7 @@ class RetrofitManager() : Application() {
                     Log.e("getSaveProduct", "success getSaveProduct success ${response.body()?.success}")
                     Log.e("getSaveProduct", "success getSaveProduct message ${response.body()?.message}")
                     Log.e("getSaveProduct", "success getSaveProduct code ${response.body()?.code}")
-                    val data = response.body()?.data ?:return
+                    val data = response.body()?.data ?: return
                         onSuccessData(data)
 
                 }

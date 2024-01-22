@@ -48,6 +48,7 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <com.google.android.material.navigation.NavigationView
+            android:id="@+id/navigationView"
             android:layout_gravity="start"
             android:layout_width="150dp"
             android:background="@drawable/round_right_30"
@@ -64,7 +65,7 @@
                 android:id="@+id/likeListRecyclerView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_marginTop="30dp"
+                android:layout_marginTop="40dp"
                 android:scrollbars="vertical"
                 android:layout_marginBottom="30dp"/>
 

@@ -13,6 +13,7 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.AddProductsActivity
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
+import com.demo.sharingapp.domain.home.HomeFragment
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.modify.DetailedProductModifyActivity
@@ -104,92 +105,58 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         // 영수증 클릭
         clickReceipt()
 
-        // 메뉴 버튼
-        menuButton()
-
-    }
-
-    // 메뉴 버튼 함수
-    private fun menuButton() {
-        // 메뉴 버튼 클릭
-        clickMenuButton()
-
-        // 메뉴의 삭제하기 버튼 클릭
-        clickMenuRemoveButton()
-
-        // 메뉴의 수정하기 버튼 클릭
-        clickMenuModifyButton()
-
-        // 메뉴의 신고하기 버튼 클릭
-        clickMenuReportButton()
-    }
-
-    // 메뉴 버튼 클릭 함수
-    private fun clickMenuButton() {
         binding.settingMenu.setOnClickListener {
-            if (binding.menuDecoratingImageView.getVisibility() == View.VISIBLE) { // 메뉴가 켜져있을 때
-                disappearsMenu()// 메뉴버튼 전체 사라짐
-            } else if (checkOwner) { // 작성자 일 때
-                binding.menuDecoratingImageView.isVisible = true
-                binding.menuRemoveButton.isVisible = true
-                binding.menuModifyButton.isVisible = true
-            } else { // 작성자가 아닐 때
-                binding.menuDecoratingImageView.isVisible = true
-                binding.menuReportButton.isVisible = true
+            val popup = PopupMenu(this@DetailedProductActivity, it)
+            if(checkOwner){ // 작성자 일때
+                popup.menuInflater.inflate(R.menu.menu_detailed_my_product, popup.menu)
+            }else{
+                popup.menuInflater.inflate(R.menu.menu_detalied_other_product, popup.menu)
             }
-        }
-    }
-
-    // 메뉴의 삭제하기 버튼 클릭 함수
-    private fun clickMenuRemoveButton() {
-        binding.menuRemoveButton.setOnClickListener {
-            RetrofitManager.instance.getRemoveProduct(this, productId)
-            disappearsMenu() // 메뉴버튼 전체 사라짐
-            moveBack() // 이전화면 이동
-        }
-    }
-
-    // 메뉴의 수정하기 버튼 클릭 함수
-    private fun clickMenuModifyButton() {
-        binding.menuModifyButton.setOnClickListener {
-            val intent = Intent(this, AddProductsActivity::class.java).apply {
-                putExtra(PRODUCT_TITLE,productTitle)
-                putExtra(PRODUCT_BUY_PRICE,productBuyPrice)
-                putExtra(PRODUCT_BUY_COUNT,productBuyCount)
-                putExtra(PRODUCT_SHARE_PRICE,productSharePrice)
-                putExtra(PRODUCT_SHARE_COUNT,productShareCount)
-                putExtra(PRODUCT_BUY_YEAR,productBuyYear)
-                putExtra(PRODUCT_BUY_MONTH,productBuyMonth)
-                putExtra(PRODUCT_BUY_DAY,productBuyDay)
-                putExtra(PRODUCT_DESCRIPTION,productDescription)
-                putExtra(PRODUCT_LATITUDE, latitude)
-                putExtra(PRODUCT_LONGITUDE, longitude)
-                putExtra(PRODUCT_IMAGE, productImageArray)
-                putExtra(PRODUCT_RECEIPT_IMAGE,receiptUri)
-                putExtra(PRODUCT_TYPE, 1)
-                putExtra(PRODUCT_ID, productId)
-                putExtra(PRODUCT_CATEGORY_ID, categoryId)
-
-
+            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                when (menuItem.itemId) {
+                    R.id.modifyMenu -> {
+                        // 메뉴 수정하기 클릭
+                        clickModifyMenu()
+                        return@setOnMenuItemClickListener true
+                    }
+                    R.id.removeMenu -> { // 삭제하기
+                        RetrofitManager.instance.getRemoveProduct(this, productId)
+                        return@setOnMenuItemClickListener true
+                    }
+                    R.id.reportMenu -> { // 신고하기
+                       return@setOnMenuItemClickListener true
+                    }
+                    else -> {
+                        return@setOnMenuItemClickListener true
+                    }
+                }
             }
-            startActivityForResult(intent,MOVE_MODIFY_CODE)
-            disappearsMenu() // 메뉴버튼 전체 사라짐
+            popup.show()
         }
+
     }
 
-    // 메뉴의 신고하기 버튼 클릭 함수
-    private fun clickMenuReportButton() {
-        binding.menuReportButton.setOnClickListener {
-            disappearsMenu() // 메뉴버튼 전체 사라짐
+    // 메뉴 수정하기 클릭 함수
+    private fun clickModifyMenu() {
+        val intent = Intent(this, AddProductsActivity::class.java).apply {
+            putExtra(PRODUCT_TITLE, productTitle)
+            putExtra(PRODUCT_BUY_PRICE, productBuyPrice)
+            putExtra(PRODUCT_BUY_COUNT, productBuyCount)
+            putExtra(PRODUCT_SHARE_PRICE, productSharePrice)
+            putExtra(PRODUCT_SHARE_COUNT, productShareCount)
+            putExtra(PRODUCT_BUY_YEAR, productBuyYear)
+            putExtra(PRODUCT_BUY_MONTH, productBuyMonth)
+            putExtra(PRODUCT_BUY_DAY, productBuyDay)
+            putExtra(PRODUCT_DESCRIPTION, productDescription)
+            putExtra(PRODUCT_LATITUDE, latitude)
+            putExtra(PRODUCT_LONGITUDE, longitude)
+            putExtra(PRODUCT_IMAGE, productImageArray)
+            putExtra(PRODUCT_RECEIPT_IMAGE, receiptUri)
+            putExtra(PRODUCT_TYPE, 1)
+            putExtra(PRODUCT_ID, productId)
+            putExtra(PRODUCT_CATEGORY_ID, categoryId)
         }
-    }
-
-    // 메뉴버튼 전체 사라짐
-    private fun disappearsMenu() {
-        binding.menuDecoratingImageView.isVisible = false
-        binding.menuRemoveButton.isVisible = false
-        binding.menuModifyButton.isVisible = false
-        binding.menuReportButton.isVisible = false
+        startActivityForResult(intent, MOVE_MODIFY_CODE)
     }
 
     // 이전 버튼 클릭 함수
@@ -415,5 +382,87 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
             getDetailedData()
         }
     }
+
+
+
+//    // 메뉴 버튼 함수
+//    private fun menuButton() {
+//        // 메뉴 버튼 클릭
+//        clickMenuButton()
+//
+//        // 메뉴의 삭제하기 버튼 클릭
+//        clickMenuRemoveButton()
+//
+//        // 메뉴의 수정하기 버튼 클릭
+//        clickMenuModifyButton()
+//
+//        // 메뉴의 신고하기 버튼 클릭
+//        clickMenuReportButton()
+//    }
+
+//    // 메뉴 버튼 클릭 함수
+//    private fun clickMenuButton() {
+//        binding.settingMenu.setOnClickListener {
+//            if (binding.menuDecoratingImageView.getVisibility() == View.VISIBLE) { // 메뉴가 켜져있을 때
+//                disappearsMenu()// 메뉴버튼 전체 사라짐
+//            } else if (checkOwner) { // 작성자 일 때
+//                binding.menuDecoratingImageView.isVisible = true
+//                binding.menuRemoveButton.isVisible = true
+//                binding.menuModifyButton.isVisible = true
+//            } else { // 작성자가 아닐 때
+//                binding.menuDecoratingImageView.isVisible = true
+//                binding.menuReportButton.isVisible = true
+//            }
+//        }
+//    }
+//
+//    // 메뉴의 삭제하기 버튼 클릭 함수
+//    private fun clickMenuRemoveButton() {
+//        binding.menuRemoveButton.setOnClickListener {
+//            RetrofitManager.instance.getRemoveProduct(this, productId)
+//            disappearsMenu() // 메뉴버튼 전체 사라짐
+//            moveBack() // 이전화면 이동
+//        }
+//    }
+
+//    // 메뉴의 수정하기 버튼 클릭 함수
+//    private fun clickMenuModifyButton() {
+//        binding.menuModifyButton.setOnClickListener {
+//            val intent = Intent(this, AddProductsActivity::class.java).apply {
+//                putExtra(PRODUCT_TITLE,productTitle)
+//                putExtra(PRODUCT_BUY_PRICE,productBuyPrice)
+//                putExtra(PRODUCT_BUY_COUNT,productBuyCount)
+//                putExtra(PRODUCT_SHARE_PRICE,productSharePrice)
+//                putExtra(PRODUCT_SHARE_COUNT,productShareCount)
+//                putExtra(PRODUCT_BUY_YEAR,productBuyYear)
+//                putExtra(PRODUCT_BUY_MONTH,productBuyMonth)
+//                putExtra(PRODUCT_BUY_DAY,productBuyDay)
+//                putExtra(PRODUCT_DESCRIPTION,productDescription)
+//                putExtra(PRODUCT_LATITUDE, latitude)
+//                putExtra(PRODUCT_LONGITUDE, longitude)
+//                putExtra(PRODUCT_IMAGE, productImageArray)
+//                putExtra(PRODUCT_RECEIPT_IMAGE,receiptUri)
+//                putExtra(PRODUCT_TYPE, 1)
+//                putExtra(PRODUCT_ID, productId)
+//                putExtra(PRODUCT_CATEGORY_ID, categoryId)
+//            }
+//            startActivityForResult(intent,MOVE_MODIFY_CODE)
+//        }
+//    }
+
+//    // 메뉴의 신고하기 버튼 클릭 함수
+//    private fun clickMenuReportButton() {
+//        binding.menuReportButton.setOnClickListener {
+//            disappearsMenu() // 메뉴버튼 전체 사라짐
+//        }
+//    }
+
+//    // 메뉴버튼 전체 사라짐
+//    private fun disappearsMenu() {
+//        binding.menuDecoratingImageView.isVisible = false
+//        binding.menuRemoveButton.isVisible = false
+//        binding.menuModifyButton.isVisible = false
+//        binding.menuReportButton.isVisible = false
+//    }
 
 }

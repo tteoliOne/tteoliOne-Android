@@ -10,6 +10,7 @@ import android.view.View
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
@@ -55,6 +56,25 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         // 찜 목록 닫기 버튼 클릭
         clickLikeListCloseButton()
+        //
+        binding.drawerView.addDrawerListener(object : DrawerLayout.DrawerListener{
+            override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
+
+            }
+
+            override fun onDrawerOpened(drawerView: View) {
+                // 서버에서 찜목록 가져오기
+                getSaveProduct()
+            }
+
+            override fun onDrawerClosed(drawerView: View) {
+
+            }
+
+            override fun onDrawerStateChanged(newState: Int) {
+
+            }
+        })
 
         // 로그인 상태 확인 함수 호출
         //checkHasLogin()
@@ -182,17 +202,21 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     // 홈프레그먼트에서 버튼 클릭시 동작 함수
     override fun onButtonClicked() {
-        RetrofitManager.instance.getSaveProduct(this@MainActivity){
-            it.let {
-                saveProductAdapter.submitList(it.products)
-            }
-
-        }
 
         binding.drawerView.openDrawer(Gravity.LEFT)
         Log.e("aa","MyFragmentListener")
         binding.drawerView.bringToFront()
         binding.drawerView.setScrimColor(Color.TRANSPARENT)
+    }
+
+    // 서버에서 찜목록 가져오기 함수
+    private fun getSaveProduct() {
+        RetrofitManager.instance.getSaveProduct(this@MainActivity) {
+            it.let {
+                saveProductAdapter.submitList(it.products)
+            }
+
+        }
     }
 
     override fun onLoading() {
