@@ -160,7 +160,7 @@
                 android:layout_marginTop="300dp"
                 android:id="@+id/bottomView"
                 android:layout_width="match_parent"
-                android:layout_height="?actionBarSize"
+                android:layout_height="0dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 />
 

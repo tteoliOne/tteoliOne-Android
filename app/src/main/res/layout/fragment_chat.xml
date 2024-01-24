@@ -2,7 +2,8 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <Toolbar
         android:id="@+id/toolbarLayout"
@@ -28,14 +29,17 @@
     </Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_margin="18dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginEnd="18dp"
+        android:layout_marginTop="18dp"
         android:id="@+id/chatListRecyclerView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout"
+        tools:listitem="@layout/item_chat_list"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
