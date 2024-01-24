@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".domain.home.search.SearchActivity">
+
+    <ImageView
+        android:id="@+id/backButton"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="30dp"
+        android:src="@drawable/arrow_left"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/searchLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/add_product_image_round"
+        app:layout_constraintBottom_toBottomOf="@id/backButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/backButton"
+        app:layout_constraintTop_toTopOf="@id/backButton">
+
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:src="@drawable/search" />
+
+
+        <EditText
+            android:id="@+id/searchEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginStart="10dp"
+            android:layout_weight="1"
+            android:background="@android:color/transparent"
+            android:hint="검색하기"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            app:layout_constraintBottom_toBottomOf="@id/backButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/backButton"
+            app:layout_constraintTop_toTopOf="@id/backButton" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_marginEnd="10dp"
+            android:src="@drawable/edit_text_cancle" />
+
+    </LinearLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/nav_host_signup_fragment"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:defaultNavHost="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchLayout"
+        app:navGraph="@navigation/nav_graph_search" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

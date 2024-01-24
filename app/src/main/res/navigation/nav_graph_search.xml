@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_gragh_search"
+    app:startDestination="@id/searchInitFragment">
+
+    <fragment
+        android:id="@+id/searchInitFragment"
+        android:name="com.demo.sharingapp.domain.home.search.SearchInitFragment"
+        android:label="SearchInitFragment"
+        tools:layout="@layout/fragment_search_init">
+        <action
+            android:id="@+id/action_searchInitFragment_to_searchResultFragment"
+            app:destination="@id/searchResultFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/searchResultFragment"
+        android:name="com.demo.sharingapp.domain.home.search.SearchResultFragment"
+        android:label="SearchResultFragment"
+        tools:layout="@layout/fragment_search_result"/>
+</navigation>

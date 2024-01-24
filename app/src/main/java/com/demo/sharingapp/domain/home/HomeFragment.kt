@@ -18,6 +18,7 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentHomeBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.part.DetailedProductActivity
+import com.demo.sharingapp.domain.home.search.SearchActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
@@ -77,6 +78,13 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         // 닉네임 버튼 클릭
         clickNicknameButton()
+
+        // 검색 버튼 클릭
+        binding.topBar.searchBtn.setOnClickListener {
+            Log.e("this","검색")
+            val intent = Intent(this.requireContext(), SearchActivity::class.java)
+            startActivity(intent)
+       }
 
         binding.homeScrollView.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
             if (scrollY == 0){
