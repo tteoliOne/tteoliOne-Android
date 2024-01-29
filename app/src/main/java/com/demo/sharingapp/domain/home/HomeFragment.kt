@@ -178,7 +178,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     // 좋아요 클릭 시 함수
     private fun likeClick(it: Long, accessToken: String) {
-        RetrofitManager.instance.postProductLike(this.requireContext(), it, accessToken)
+        RetrofitManager.instance.postProductLike(this.requireContext(), it)
     }
 
     // 더보기 화면으로 이동 함수

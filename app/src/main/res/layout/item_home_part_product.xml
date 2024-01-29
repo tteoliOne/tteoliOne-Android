@@ -41,14 +41,17 @@
 
             <TextView
                 android:id="@+id/titleTextView"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
                 android:text="양파 10개 공유해요!!"
                 android:textColor="@color/black"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textSize="16sp"
                 android:layout_marginBottom="-8dp"
                 app:layout_constraintBottom_toTopOf="@id/likeLayout"
+                app:layout_constraintEnd_toEndOf="@id/walkingTextView"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <ImageView

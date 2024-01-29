@@ -2,21 +2,17 @@ package com.demo.sharingapp.domain.home.part
 
 import android.app.Activity
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import android.widget.PopupMenu
-import androidx.core.view.isVisible
+import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.AddProductsActivity
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
-import com.demo.sharingapp.domain.home.HomeFragment
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
-import com.demo.sharingapp.domain.home.part.modify.DetailedProductModifyActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
@@ -44,15 +40,29 @@ import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.tabs.TabLayoutMediator
+import com.google.gson.JsonParser
+import io.reactivex.disposables.Disposable
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import org.json.JSONObject
+import ua.naiksoftware.stomp.Stomp
+import ua.naiksoftware.stomp.dto.LifecycleEvent
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 
-class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMap.OnMapClickListener {
+
+class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
+    GoogleMap.OnMapClickListener {
 
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityDetailedProductBinding
+
+    //
+    private lateinit var stompConnection: Disposable
+    private lateinit var topic: Disposable
 
     private lateinit var accessToken: String
 
@@ -62,11 +72,11 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
     private var receiptUri = ""
 
-    private var productId: Long =  0
-    private var categoryId: Int =  0
+    private var productId: Long = 0
+    private var categoryId: Int = 0
 
     private var latitude = 0.0
-    private var longitude =0.0
+    private var longitude = 0.0
     private var checkOwner = false
 
     private var productTitle = ""
@@ -74,21 +84,115 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     private var productBuyCount = ""
     private var productSharePrice = ""
     private var productShareCount = ""
-    private var productBuyYear= 0
-    private var productBuyMonth= 0
-    private var productBuyDay= 0
+    private var productBuyYear = 0
+    private var productBuyMonth = 0
+    private var productBuyDay = 0
     private var productDescription = ""
 
-    private lateinit var productImageArray : Array<String>
-
+    private lateinit var productImageArray: Array<String>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailedProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        productId = intent.getLongExtra(PRODUCT_ID,0)
+        productId = intent.getLongExtra(PRODUCT_ID, 0)
         accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+
+        //
+
+//            val url = API.BASE_URL_CHAT
+//            val intervalMillis = 1000L
+//            val client = OkHttpClient.Builder()
+//                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+//                .build()
+
+// 1. 불필요하게 OkHttpClient를 두 번 생성하지 않도록 수정
+//            val stomp = StompClient(client, intervalMillis)
+//            stomp.url = url
+
+// 2. WebSocket 연결 이벤트를 처리하는 부분 수정
+
+
+            val sockClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://118.41.215.56:8080" + "/ws-stomp/websocket"); // 소켓연결 (엔드포인트)
+            val isUnexpectedClosed = AtomicBoolean(false)
+
+            sockClient.connect()
+
+            sockClient.topic("/sub/chat/room/805a8798-1c91-4efc-a187-d908cfbd20ba").subscribe {
+
+                Log.e("Stomp",JSONObject(it.payload).toString())
+
+            }
+        sockClient.lifecycle().subscribe {
+            when(it.type){
+                LifecycleEvent.Type.OPENED ->{
+                    Log.e("Stomp", "성공1")
+                    Log.e("Stomp", isUnexpectedClosed.toString())
+                }
+                LifecycleEvent.Type.CLOSED -> {
+                    Log.e("Stomp", "성공2")
+                }
+                LifecycleEvent.Type.ERROR -> {
+                    Log.e("Stomp", "성공3")
+                }
+                else->{
+
+                }
+            }
+
+        }
+
+        binding.callButton.setOnClickListener {
+            val data = JSONObject()
+            data.put("type", "TALK")
+            data.put("roomId", "805a8798-1c91-4efc-a187-d908cfbd20ba")
+            data.put("sender", "카리나")
+            data.put("message", "하이")
+
+            sockClient.send("/pub/chat/message",data.toString()).subscribe()
+
+
+//            stompConnection = stomp.connect().subscribe {
+//                when (it.type) {
+//                    Event.Type.OPENED -> {
+//                        Log.e("g", "성공1")
+//
+//                        // WebSocket 연결 완료 후, 여기에서 원하는 작업을 수행할 수 있습니다.
+//
+//                        // 3. WebSocket 메시지를 수신하는 부분 수정
+//                        topic = stomp.join("/sub/chat/room/d5a7bcae-1338-49b3-b73c-74b31869837e").subscribe { message ->
+//                            Log.e("성공", message)
+//
+//                            // WebSocket 메시지 수신 후, 여기에서 원하는 작업을 수행할 수 있습니다.
+//                        }
+//
+//                        // 4. WebSocket 메시지를 보내는 부분 수정
+//                        stomp.send("/message", "dummy message").subscribe { isSuccess ->
+//                            if (isSuccess) {
+//                                Log.e("t", "성공")
+//                            } else {
+//                                Log.e("t", "실패")
+//                            }
+//                        }
+//                    }
+//                    Event.Type.CLOSED -> {
+//                        Log.e("g", "성공2")
+//                    }
+//                    Event.Type.ERROR -> {
+//                        Log.e("g", "성공3")
+//                    }
+//                    else -> {
+//                        // 다른 이벤트 처리
+//                    }
+//                }
+//            }
+//
+//
+//            // WebSocket 연결 해제는 필요한 시점에 진행
+//            stompConnection.dispose()
+
+        }
 
         // 맵 설정
         initMap()
@@ -107,9 +211,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
         binding.settingMenu.setOnClickListener {
             val popup = PopupMenu(this@DetailedProductActivity, it)
-            if(checkOwner){ // 작성자 일때
+            if (checkOwner) { // 작성자 일때
                 popup.menuInflater.inflate(R.menu.menu_detailed_my_product, popup.menu)
-            }else{
+            } else {
                 popup.menuInflater.inflate(R.menu.menu_detalied_other_product, popup.menu)
             }
             popup.setOnMenuItemClickListener { menuItem: MenuItem ->
@@ -124,7 +228,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
                         return@setOnMenuItemClickListener true
                     }
                     R.id.reportMenu -> { // 신고하기
-                       return@setOnMenuItemClickListener true
+                        return@setOnMenuItemClickListener true
                     }
                     else -> {
                         return@setOnMenuItemClickListener true
@@ -175,7 +279,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     }
 
     // 영수증 클릭 함수
-   private fun clickReceipt() {
+    private fun clickReceipt() {
         binding.receiptImageView.setOnClickListener {
             showDialog(receiptUri)
         }
@@ -203,7 +307,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
     // 알림창 띄우기
     private fun showDialog(uri: String) {
         val dialog = DetailedProductDialog(uri)
-        Log.e("uri",uri.toString())
+        Log.e("uri", uri.toString())
         // 알림창이 띄워져있는 동안 배경 클릭 막기
         dialog.isCancelable = false
         dialog.show(this.supportFragmentManager,
@@ -212,7 +316,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
     // 좋아요 클릭 시 함수
     private fun likeClick(it: Long, accessToken: String) {
-        RetrofitManager.instance.postProductLike(this, it, accessToken)
+        RetrofitManager.instance.postProductLike(this, it)
     }
 
     // 맵 설정 함수
@@ -224,7 +328,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
     // 서버에서 상품 데이터 받아오기 함수
     private fun getDetailedData() {
-        val productId = intent.getLongExtra(PRODUCT_ID,140)
+        val productId = intent.getLongExtra(PRODUCT_ID, 140)
         val accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
         RetrofitManager.instance.getDetailedProduct(this, productId, accessToken) {
@@ -251,9 +355,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         // 상품 이미지
         val images = it.images
             .map { uriString -> DetailedImageData(uriString) }
-        val frameAdapter = FrameAdapter(images){ // 상품 이미지 클릭 했을때
-            val intent = Intent(this,DetailedProductImageActivity::class.java)
-                .putExtra("data",it.images)
+        val frameAdapter = FrameAdapter(images) { // 상품 이미지 클릭 했을때
+            val intent = Intent(this, DetailedProductImageActivity::class.java)
+                .putExtra("data", it.images)
             startActivity(intent)
         }
         binding.productImageViewPager.adapter = frameAdapter
@@ -291,8 +395,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
         productBuyYear = inputDateTime.year
         productBuyMonth = inputDateTime.monthValue
         productBuyDay = inputDateTime.dayOfMonth
-
-
 
 
         // 좋아요 유무
@@ -367,10 +469,10 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
 
     // 맵 클릭시
     override fun onMapClick(p0: LatLng) {
-        val intent= Intent(this, DetailedProductMapActivity::class.java)
-            .putExtra(LATITUDE,latitude)
-            .putExtra(LONGITUDE,longitude)
-        Log.e("demap","${latitude} ${longitude}")
+        val intent = Intent(this, DetailedProductMapActivity::class.java)
+            .putExtra(LATITUDE, latitude)
+            .putExtra(LONGITUDE, longitude)
+        Log.e("demap", "${latitude} ${longitude}")
         startActivity(intent)
     }
 
@@ -382,7 +484,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,GoogleMa
             getDetailedData()
         }
     }
-
 
 
 //    // 메뉴 버튼 함수

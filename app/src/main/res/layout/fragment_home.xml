@@ -177,7 +177,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="18dp"
-        android:layout_marginBottom="70dp"
+        android:layout_marginBottom="20dp"
         android:text="상품등록"
         android:textColor="@color/white"
         android:textSize="16sp"

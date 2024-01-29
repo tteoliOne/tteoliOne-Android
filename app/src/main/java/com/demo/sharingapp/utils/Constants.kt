@@ -38,6 +38,7 @@ object Constants{
     const val PRODUCT_IMAGE = "productImage"
     const val PRODUCT_RECEIPT_IMAGE = "productReceiptImage"
     const val PRODUCT_TYPE = "productType"
+    const val SEARCH_RECODE = "searchRecode"
 
 
     const val ACCESS_FINE_LOCATION_CODE = 200
@@ -58,11 +59,13 @@ object Constants{
 
 object API {
     const val BASE_URL : String = "https://tteolione.store"
+//    const val BASE_URL : String = "http://118.41.215.56:8080"
+
+    const val BASE_URL_CHAT : String = "ws://118.41.215.56:8080/ws-stomp"
 
     const val KAKAO_TOKEN : String = "/api/users/kakao"
 
     const val KAKAO_TOKEN_PROFILE : String = "/api/users/kakao/profile"
-
 
     const val EMAIL_URL : String = "/api/email/send/signup"
 
@@ -73,6 +76,8 @@ object API {
     const val PRODUCTS_MODIFY : String="/api/products/{productId}"
 
     const val PRODUCTS_ME : String="/api/products/me"
+
+    const val SEARCH : String="/api/search"
 
     const val PRODUCTS_SIMPLE : String="/api/products/simple"
 

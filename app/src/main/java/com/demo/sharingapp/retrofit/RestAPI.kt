@@ -3,6 +3,7 @@ package com.demo.sharingapp.retrofit
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
+import com.demo.sharingapp.domain.home.search.data.GetSearchData
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoResponse
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoResponse
@@ -127,6 +128,20 @@ interface RestAPI {
         @Query("size") size: Int,
         @Query("sort") sort: String?,
     ): Call<PartProductData>
+
+    // 검색 - 검색 정보 가져오기
+    @GET(API.SEARCH)
+    fun getSearch(
+        @Header("Authorization") Authorization: String,
+        @Query("longitude") longitude: Double,
+        @Query("latitude") latitude: Double,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String,
+        @Query("searchStartDate") searchStartDate: String?,
+        @Query("searchEndDate") searchEndDate: String?,
+        @Query("q") q: String,
+    ): Call<GetSearchData>
 
     // 내정보 - 내공유글 목록 정보 가져오기
     @GET(API.PRODUCTS_ME)

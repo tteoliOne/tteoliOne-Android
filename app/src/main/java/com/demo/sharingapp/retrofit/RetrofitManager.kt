@@ -13,6 +13,8 @@ import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.data.PartProductListData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
+import com.demo.sharingapp.domain.home.search.data.GetSearchData
+import com.demo.sharingapp.domain.home.search.data.SearchData
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoResponse
@@ -67,28 +69,29 @@ class RetrofitManager() : Application() {
 
 
     // 찜목록 가져오기
-    fun getSaveProduct(context: Context, onSuccessData:(SaveProductsListData)->Unit){
+    fun getSaveProduct(context: Context, onSuccessData: (SaveProductsListData) -> Unit) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val getCall = api.getSaveProducts(Authorization = authorization)
 
-        getCall.enqueue(object : retrofit2.Callback<GetSaveProductData>{
+        getCall.enqueue(object : retrofit2.Callback<GetSaveProductData> {
             override fun onResponse(
                 call: Call<GetSaveProductData>,
                 response: Response<GetSaveProductData>,
             ) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.e("getSaveProduct", "success getSaveProduct data ${response.body()?.data}")
-                    Log.e("getSaveProduct", "success getSaveProduct success ${response.body()?.success}")
-                    Log.e("getSaveProduct", "success getSaveProduct message ${response.body()?.message}")
+                    Log.e("getSaveProduct",
+                        "success getSaveProduct success ${response.body()?.success}")
+                    Log.e("getSaveProduct",
+                        "success getSaveProduct message ${response.body()?.message}")
                     Log.e("getSaveProduct", "success getSaveProduct code ${response.body()?.code}")
                     val data = response.body()?.data ?: return
-                        onSuccessData(data)
+                    onSuccessData(data)
 
-                }
-                else{
+                } else {
                     Log.e("getSaveProduct", "succes, getSaveProduct but ${response.errorBody()}")
                 }
 
@@ -108,9 +111,9 @@ class RetrofitManager() : Application() {
         sort: String?,
         page: Int,
         status: String?,
-        onProducts: (PartProductListData) -> Unit
+        onProducts: (PartProductListData) -> Unit,
 
-    ){
+        ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
@@ -147,18 +150,60 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 검색 - 검색 정보 가져오기
+    fun getSearch(
+        context: Context,
+        longitude: Double,
+        latitude: Double,
+        page: Int,
+        q: String,
+        onProducts: (SearchData) -> Unit,
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getSearch(
+            Authorization = authorization,
+            longitude = longitude,
+            latitude = latitude,
+            page = page,
+            sort = "createAt-desc",
+            size = 30,
+            searchEndDate = null,
+            searchStartDate = null,
+            q = q
+        )
+        getCall.enqueue(object  : retrofit2.Callback<GetSearchData>{
+            override fun onResponse(call: Call<GetSearchData>, response: Response<GetSearchData>) {
+                if (response.isSuccessful) {
+                    Log.e("getSearch", "success ${response.body()}")
+                    val data = response.body()?.data ?: return
+                    onProducts(data)
+                } else {
+                    Log.e("getSearch", "succes, but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<GetSearchData>, t: Throwable) {
+                Log.e("getSearch", "fail ${t} $call")
+            }
+        })
+
+    }
+
     // 카테고리별 상품 가져오기
     fun getPartProduct(
         context: Context,
         longitude: Double,
         latitude: Double,
         oldAccessToken: String,
-        categoryId : Long,
+        categoryId: Long,
         sort: String?,
         page: Int,
         searchStartDate: String?,
         searchEndDate: String?,
-        onProducts: (PartProductListData) -> Unit
+        onProducts: (PartProductListData) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -247,7 +292,7 @@ class RetrofitManager() : Application() {
     }
 
     // 메이화면 토큰 재발행
-    suspend fun postReissueMain(context: Context): Boolean{
+    suspend fun postReissueMain(context: Context): Boolean {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val refreshToken = SharedPreferencesData.getData(context, REFRESH_TOKEN)
         val data = TokenData(accessToken, refreshToken)
@@ -268,10 +313,10 @@ class RetrofitManager() : Application() {
                     val success = response.body()?.success ?: false
                     Log.e("Post gn 토큰 ", "$success")
                     success
-                }else{
+                } else {
                     false
                 }
-            }catch (e: Exception) {
+            } catch (e: Exception) {
                 Log.e("aa", "오류 발생")
                 false
             }
@@ -395,22 +440,29 @@ class RetrofitManager() : Application() {
     }
 
     // 아이디 찾기 - 이메일 인증코드 보내기
-    fun postFindIdEmailVerify(findIdEmailVerifyData: FindIdEmailVerifyData, onCheckCode: (Boolean, String, LonginId?)-> Unit){
+    fun postFindIdEmailVerify(
+        findIdEmailVerifyData: FindIdEmailVerifyData,
+        onCheckCode: (Boolean, String, LonginId?) -> Unit,
+    ) {
         val call = retrofitInterface?.postFindIdEmailVerify(findIdEmailVerifyData)
-        call?.enqueue(object : Callback<FindIdResponse>{
+        call?.enqueue(object : Callback<FindIdResponse> {
             override fun onResponse(
                 call: Call<FindIdResponse>,
                 response: Response<FindIdResponse>,
             ) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.e("postFindIdEmailVerify", "success Signup data ${response.body()?.data}")
-                    Log.e("postFindIdEmailVerify", "success Signup success ${response.body()?.success}")
-                    Log.e("postFindIdEmailVerify", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindIdEmailVerify",
+                        "success Signup success ${response.body()?.success}")
+                    Log.e("postFindIdEmailVerify",
+                        "success Signup message ${response.body()?.message}")
                     Log.e("postFindIdEmailVerify", "success Signup code ${response.body()?.code}")
-                    if (response.body()?.success != null && response.body()?.message != null){
-                        onCheckCode(response.body()!!.success, response.body()!!.message, response.body()?.data)
+                    if (response.body()?.success != null && response.body()?.message != null) {
+                        onCheckCode(response.body()!!.success,
+                            response.body()!!.message,
+                            response.body()?.data)
                     }
-                }else{
+                } else {
                     Log.e("postFindIdEmailVerify", "succes, Signup but ${response.errorBody()}")
                 }
             }
@@ -422,20 +474,20 @@ class RetrofitManager() : Application() {
     }
 
     // 아이디 찾기 이메일 인증 코드 받기
-    fun postFindIdEmail(findIdData: FindIdData, onCheckEmail: (Boolean, String) -> Unit){
+    fun postFindIdEmail(findIdData: FindIdData, onCheckEmail: (Boolean, String) -> Unit) {
         val call = retrofitInterface?.postFindId(findIdData)
-        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.e("postFindIdEmail", "success Signup data ${response.body()?.data}")
                     Log.e("postFindIdEmail", "success Signup success ${response.body()?.success}")
                     Log.e("postFindIdEmail", "success Signup message ${response.body()?.message}")
                     Log.e("postFindIdEmail", "success Signup code ${response.body()?.code}")
-                    if (response.body()?.success != null && response.body()?.message != null){
+                    if (response.body()?.success != null && response.body()?.message != null) {
                         onCheckEmail(response.body()!!.success, response.body()!!.message)
                     }
 
-                }else{
+                } else {
                     Log.e("postFindIdEmail", "succes, Signup but ${response.errorBody()}")
                 }
             }
@@ -448,20 +500,25 @@ class RetrofitManager() : Application() {
 
 
     // 비밀번호 찾기 - 이메일 인증코드 받기
-    fun postFindPasswordEmail(findPasswordData: FindPasswordEmailData, onCheckEmail: (Boolean, String) -> Unit){
+    fun postFindPasswordEmail(
+        findPasswordData: FindPasswordEmailData,
+        onCheckEmail: (Boolean, String) -> Unit,
+    ) {
         val call = retrofitInterface?.postFindPasswordEmail(findPasswordData)
-        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.e("postFindPasswordEmail", "success Signup data ${response.body()?.data}")
-                    Log.e("postFindPasswordEmail", "success Signup success ${response.body()?.success}")
-                    Log.e("postFindPasswordEmail", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindPasswordEmail",
+                        "success Signup success ${response.body()?.success}")
+                    Log.e("postFindPasswordEmail",
+                        "success Signup message ${response.body()?.message}")
                     Log.e("postFindPasswordEmail", "success Signup code ${response.body()?.code}")
-                    if (response.body()?.success != null && response.body()?.message != null){
+                    if (response.body()?.success != null && response.body()?.message != null) {
                         onCheckEmail(response.body()!!.success, response.body()!!.message)
                     }
 
-                }else{
+                } else {
                     Log.e("postFindPasswordEmail", "succes, Signup but ${response.errorBody()}")
                 }
             }
@@ -473,21 +530,29 @@ class RetrofitManager() : Application() {
     }
 
     // 비밀번호 찾기 - 이메일 인증코드 보내기
-    fun postFindPasswordEmailVerify(findPasswordEmailVerifyData: FindPasswordEmailVerifyData, onCheckCode: (Boolean, String) -> Unit){
+    fun postFindPasswordEmailVerify(
+        findPasswordEmailVerifyData: FindPasswordEmailVerifyData,
+        onCheckCode: (Boolean, String) -> Unit,
+    ) {
         val call = retrofitInterface?.postFindPasswordEmailVerify(findPasswordEmailVerifyData)
-        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
-                if (response.isSuccessful){
-                    Log.e("postFindPasswordEmailVerify", "success Signup data ${response.body()?.data}")
-                    Log.e("postFindPasswordEmailVerify", "success Signup success ${response.body()?.success}")
-                    Log.e("postFindPasswordEmailVerify", "success Signup message ${response.body()?.message}")
-                    Log.e("postFindPasswordEmailVerify", "success Signup code ${response.body()?.code}")
-                    if (response.body()?.success != null && response.body()?.message != null){
+                if (response.isSuccessful) {
+                    Log.e("postFindPasswordEmailVerify",
+                        "success Signup data ${response.body()?.data}")
+                    Log.e("postFindPasswordEmailVerify",
+                        "success Signup success ${response.body()?.success}")
+                    Log.e("postFindPasswordEmailVerify",
+                        "success Signup message ${response.body()?.message}")
+                    Log.e("postFindPasswordEmailVerify",
+                        "success Signup code ${response.body()?.code}")
+                    if (response.body()?.success != null && response.body()?.message != null) {
                         onCheckCode(response.body()!!.success, response.body()!!.message)
                     }
 
-                }else{
-                    Log.e("postFindPasswordEmailVerify", "succes, Signup but ${response.errorBody()}")
+                } else {
+                    Log.e("postFindPasswordEmailVerify",
+                        "succes, Signup but ${response.errorBody()}")
                 }
             }
 
@@ -498,25 +563,33 @@ class RetrofitManager() : Application() {
     }
 
     // 내정보 - 닉내임 변경
-    fun patchChangeNickname(context: Context, accessToken: String, nickname: String, description: String, onCheckNickname:(Boolean,String)->Unit){
+    fun patchChangeNickname(
+        context: Context,
+        accessToken: String,
+        nickname: String,
+        description: String,
+        onCheckNickname: (Boolean, String) -> Unit,
+    ) {
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val changeMyInfoData = ChangeMyInfoData(nickname,description)
-        Log.e("a",description.toString())
+        val changeMyInfoData = ChangeMyInfoData(nickname, description)
+        Log.e("a", description.toString())
         val call = api.patchChangeNickname(Authorization = "Bearer $accessToken", changeMyInfoData)
-        call.enqueue(object : retrofit2.Callback<ChangeMyInfoResponse>{
+        call.enqueue(object : retrofit2.Callback<ChangeMyInfoResponse> {
             override fun onResponse(
                 call: Call<ChangeMyInfoResponse>,
                 response: Response<ChangeMyInfoResponse>,
             ) {
-                if (response.isSuccessful){
-                    Log.e("patchChangeNickname", "success Nickname success ${response.body()?.success}")
-                    Log.e("patchChangeNickname", "success Nickname message ${response.body()?.message}")
+                if (response.isSuccessful) {
+                    Log.e("patchChangeNickname",
+                        "success Nickname success ${response.body()?.success}")
+                    Log.e("patchChangeNickname",
+                        "success Nickname message ${response.body()?.message}")
                     Log.e("patchChangeNickname", "success Nickname code ${response.body()?.code}")
                     val success = response.body()?.success ?: return
                     val message = response.body()?.message ?: return
-                    onCheckNickname(success,message)
-                }else{
+                    onCheckNickname(success, message)
+                } else {
                     Log.e("patchChangeNickname", "succes, Nickname but ${response.errorBody()}")
                 }
             }
@@ -528,19 +601,24 @@ class RetrofitManager() : Application() {
     }
 
     // 비밀번호 찾기 - 재변경한 비밀번호 보내기
-    fun patchFindPasswordReset(findPasswordRestData: FindPasswordResetData, onCheckPassword: (Boolean,String)->Unit){
+    fun patchFindPasswordReset(
+        findPasswordRestData: FindPasswordResetData,
+        onCheckPassword: (Boolean, String) -> Unit,
+    ) {
         val call = retrofitInterface?.patchFindPasswordReset(findPasswordRestData)
-        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.e("postFindPasswordReset", "success Signup data ${response.body()?.data}")
-                    Log.e("postFindPasswordReset", "success Signup success ${response.body()?.success}")
-                    Log.e("postFindPasswordReset", "success Signup message ${response.body()?.message}")
+                    Log.e("postFindPasswordReset",
+                        "success Signup success ${response.body()?.success}")
+                    Log.e("postFindPasswordReset",
+                        "success Signup message ${response.body()?.message}")
                     Log.e("postFindPasswordReset", "success Signup code ${response.body()?.code}")
-                    if (response.body()?.success != null && response.body()?.message != null){
+                    if (response.body()?.success != null && response.body()?.message != null) {
                         onCheckPassword(response.body()!!.success, response.body()!!.message)
                     }
-                }else{
+                } else {
                     Log.e("postFindPasswordReset", "succes, Signup but ${response.errorBody()}")
                 }
             }
@@ -552,7 +630,11 @@ class RetrofitManager() : Application() {
     }
 
     // 회원가입 정보 보내기
-    fun postSignup(signupData: SignupData, profile: MultipartBody.Part, signupSuccess: (Boolean) -> Unit) {
+    fun postSignup(
+        signupData: SignupData,
+        profile: MultipartBody.Part,
+        signupSuccess: (Boolean) -> Unit,
+    ) {
         val call = retrofitInterface?.postSignupData(signUpRequest = signupData, profile = profile)
         call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
@@ -625,7 +707,11 @@ class RetrofitManager() : Application() {
     }
 
     // 토큰 보내기
-    fun postKaKaoToken(context: Context, token: AccessTokenRequest, onExistsUser: (Boolean)->Unit) {
+    fun postKaKaoToken(
+        context: Context,
+        token: AccessTokenRequest,
+        onExistsUser: (Boolean) -> Unit,
+    ) {
 
         val call = retrofitInterface?.postAccessToken(accessTokenRequest = token)
         call?.enqueue(object : retrofit2.Callback<TokenResponse> {
@@ -684,20 +770,21 @@ class RetrofitManager() : Application() {
     }
 
     // 상품 좋아요 여부 보내기
-    fun postProductLike(context: Context, productsId: Long, accessToken: String) {
-        val token = accessToken
+    fun postProductLike(context: Context, productsId: Long) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = api.postProductLike(Authorization = "Bearer $token", productId = productsId)
+        val call = api.postProductLike(Authorization = authorization, productId = productsId)
 
-        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
-                if (response.isSuccessful){
+                if (response.isSuccessful) {
                     Log.e("postProductLike", "success email ${response.body()?.data}")
                     Log.e("postProductLike", "success email ${response.body()?.success}")
                     Log.e("postProductLike", "success email ${response.body()?.message}")
                     Log.e("postProductLike", "success email ${response.body()?.code}")
-                }else{
+                } else {
                     Log.e("postProductLike", "succes, Signup but ${response.errorBody()}")
                 }
             }
@@ -709,20 +796,20 @@ class RetrofitManager() : Application() {
     }
 
     // 상품 삭제 하기
-    fun getRemoveProduct(context: Context, productsId: Long){
+    fun getRemoveProduct(context: Context, productsId: Long) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val call = api.getRemoveProduct(Authorization = "Bearer $accessToken", productsId)
 
-        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
                     Log.e("getRemoveProduct", "success ${response.body()?.success}")
                     Log.e("getRemoveProduct", "data ${response.body()?.data}")
                     Log.e("getRemoveProduct", "message ${response.body()?.message}")
                     Log.e("getRemoveProduct", "code ${response.body()?.code}")
-                    if (response.body()?.success == true){
+                    if (response.body()?.success == true) {
                         Toast.makeText(context, response.body()?.data, Toast.LENGTH_SHORT).show()
                     }
                 } else {
@@ -730,6 +817,7 @@ class RetrofitManager() : Application() {
 
                 }
             }
+
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("getRemoveProduct", "fail ${t} $call")
             }
@@ -737,12 +825,12 @@ class RetrofitManager() : Application() {
     }
 
     // 내 정보 조회하기
-    fun getMyInfo(context: Context, onSuccess: (MyInfoData) -> Unit){
+    fun getMyInfo(context: Context, onSuccess: (MyInfoData) -> Unit) {
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val call = api.getMyInfo(Authorization = "Bearer $accessToken")
-        call.enqueue(object : retrofit2.Callback<MyInfoResponse>{
+        call.enqueue(object : retrofit2.Callback<MyInfoResponse> {
             override fun onResponse(
                 call: Call<MyInfoResponse>,
                 response: Response<MyInfoResponse>,
@@ -768,12 +856,17 @@ class RetrofitManager() : Application() {
     }
 
     // 상세 화면 불러오기
-    fun getDetailedProduct(context: Context, productsId: Long, accessToken: String, onProductData:(DetailedProductData)->Unit ){
+    fun getDetailedProduct(
+        context: Context,
+        productsId: Long,
+        accessToken: String,
+        onProductData: (DetailedProductData) -> Unit,
+    ) {
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val call = api.getDetailedProduct(Authorization = "Bearer $accessToken", productsId)
 
-        call.enqueue(object : retrofit2.Callback<DetailedProductResponseData>{
+        call.enqueue(object : retrofit2.Callback<DetailedProductResponseData> {
             override fun onResponse(
                 call: Call<DetailedProductResponseData>,
                 response: Response<DetailedProductResponseData>,
@@ -803,9 +896,10 @@ class RetrofitManager() : Application() {
         context: Context,
         token: String,
         profile: MultipartBody.Part,
-        onSuccess: (Int) -> Unit
-    ){
-        val call = retrofitInterface?.postKaKaoProfile(profile = profile, oAuth2KakaoRequest = AccessTokenRequest(token))
+        onSuccess: (Int) -> Unit,
+    ) {
+        val call = retrofitInterface?.postKaKaoProfile(profile = profile,
+            oAuth2KakaoRequest = AccessTokenRequest(token))
         call?.enqueue(object : retrofit2.Callback<TokenResponse> {
             override fun onResponse(
                 call: Call<TokenResponse>,
@@ -849,11 +943,12 @@ class RetrofitManager() : Application() {
         val token = accessToken
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = api.postProducts(Authorization = "Bearer $token",
+        val call = api.postProducts(
+            Authorization = "Bearer $token",
             request = request,
             photos = photos,
             receipt = receipt,
-            )
+        )
 
         call.enqueue(object : retrofit2.Callback<ProductsResponse> {
             override fun onResponse(
@@ -889,12 +984,13 @@ class RetrofitManager() : Application() {
         val token = accessToken
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = api.putProductsModify(Authorization = "Bearer $token",
-            productId= productsId,
+        val call = api.putProductsModify(
+            Authorization = "Bearer $token",
+            productId = productsId,
             request = request,
             photos = photos,
             receipt = receipt,
-            )
+        )
 
         call.enqueue(object : retrofit2.Callback<ProductsResponse> {
             override fun onResponse(
@@ -932,7 +1028,7 @@ class RetrofitManager() : Application() {
 
 
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://tteolione.store")
+            .baseUrl(API.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .client(client.build())
             .build()

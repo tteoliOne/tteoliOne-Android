@@ -108,7 +108,7 @@ class HomePartProductFragment : Fragment(R.layout.fragment_home_part_product) {
     // 초기 리사이클러뷰 설정 함수
     private fun initRecyclerView(accessToken: String, linearLayoutManager: LinearLayoutManager) {
         homePartProductsAdepter = HomePartProductAdepter(onLikeClick = {
-            RetrofitManager.instance.postProductLike(this.requireContext(), it, accessToken)
+            RetrofitManager.instance.postProductLike(this.requireContext(), it)
         },
             onViewClick = {
                 val intent = Intent(this@HomePartProductFragment.requireContext(),

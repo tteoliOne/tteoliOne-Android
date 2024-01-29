@@ -54,6 +54,7 @@
             app:layout_constraintTop_toTopOf="@id/backButton" />
 
         <ImageView
+            android:id="@+id/editTextAllRemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -62,8 +63,19 @@
 
     </LinearLayout>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:visibility="gone"
+        android:id="@+id/searchInputRecyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/searchLayout"
+        tools:listitem="@layout/item_search_input"/>
+
     <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/nav_host_signup_fragment"
+        android:id="@+id/nav_host_search_fragment"
         android:name="androidx.navigation.fragment.NavHostFragment"
         android:layout_width="0dp"
         android:layout_height="0dp"

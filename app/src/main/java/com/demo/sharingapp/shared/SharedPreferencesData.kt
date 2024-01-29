@@ -25,11 +25,30 @@ object SharedPreferencesData {
         )
     }
 
+    // set 데이터 저장
+    fun saveSetData(context: Context, setTitle: String, setData: MutableSet<String>){
+        val sharedPreferences = getSharedPreferences(context)
+        with(sharedPreferences.edit()) {
+            putStringSet(setTitle, setData)
+
+            commit()
+        }
+    }
+
+    // set 데어터 불러오기
+    fun getSetData(context: Context, getTitle: String): Set<String>? {
+        val sharedPreferences = getSharedPreferences(context)
+        return sharedPreferences.getStringSet(getTitle, null)
+    }
+
+
+
     // 데이터 저장하기
     fun saveData(context: Context, sendTitle: String ,sendValue: String) {
         val sharedPreferences = getSharedPreferences(context)
         with(sharedPreferences.edit()) {
             putString(sendTitle, sendValue)
+
             commit()
         }
     }
@@ -48,6 +67,8 @@ object SharedPreferencesData {
             apply()
         }
     }
+
+
 
     // 데이터 제거하기
     fun removeData(context: Context, title: String){
