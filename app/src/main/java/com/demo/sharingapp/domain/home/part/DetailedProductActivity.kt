@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.AddProductsActivity
 import com.demo.sharingapp.R
@@ -99,99 +100,13 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         productId = intent.getLongExtra(PRODUCT_ID, 0)
         accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
-        //
 
-//            val url = API.BASE_URL_CHAT
-//            val intervalMillis = 1000L
-//            val client = OkHttpClient.Builder()
-//                .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-//                .build()
-
-// 1. 불필요하게 OkHttpClient를 두 번 생성하지 않도록 수정
-//            val stomp = StompClient(client, intervalMillis)
-//            stomp.url = url
-
-// 2. WebSocket 연결 이벤트를 처리하는 부분 수정
-
-
-            val sockClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, "ws://118.41.215.56:8080" + "/ws-stomp/websocket"); // 소켓연결 (엔드포인트)
-            val isUnexpectedClosed = AtomicBoolean(false)
-
-            sockClient.connect()
-
-            sockClient.topic("/sub/chat/room/805a8798-1c91-4efc-a187-d908cfbd20ba").subscribe {
-
-                Log.e("Stomp",JSONObject(it.payload).toString())
-
-            }
-        sockClient.lifecycle().subscribe {
-            when(it.type){
-                LifecycleEvent.Type.OPENED ->{
-                    Log.e("Stomp", "성공1")
-                    Log.e("Stomp", isUnexpectedClosed.toString())
-                }
-                LifecycleEvent.Type.CLOSED -> {
-                    Log.e("Stomp", "성공2")
-                }
-                LifecycleEvent.Type.ERROR -> {
-                    Log.e("Stomp", "성공3")
-                }
-                else->{
-
-                }
-            }
-
-        }
 
         binding.callButton.setOnClickListener {
-            val data = JSONObject()
-            data.put("type", "TALK")
-            data.put("roomId", "805a8798-1c91-4efc-a187-d908cfbd20ba")
-            data.put("sender", "카리나")
-            data.put("message", "하이")
-
-            sockClient.send("/pub/chat/message",data.toString()).subscribe()
-
-
-//            stompConnection = stomp.connect().subscribe {
-//                when (it.type) {
-//                    Event.Type.OPENED -> {
-//                        Log.e("g", "성공1")
-//
-//                        // WebSocket 연결 완료 후, 여기에서 원하는 작업을 수행할 수 있습니다.
-//
-//                        // 3. WebSocket 메시지를 수신하는 부분 수정
-//                        topic = stomp.join("/sub/chat/room/d5a7bcae-1338-49b3-b73c-74b31869837e").subscribe { message ->
-//                            Log.e("성공", message)
-//
-//                            // WebSocket 메시지 수신 후, 여기에서 원하는 작업을 수행할 수 있습니다.
-//                        }
-//
-//                        // 4. WebSocket 메시지를 보내는 부분 수정
-//                        stomp.send("/message", "dummy message").subscribe { isSuccess ->
-//                            if (isSuccess) {
-//                                Log.e("t", "성공")
-//                            } else {
-//                                Log.e("t", "실패")
-//                            }
-//                        }
-//                    }
-//                    Event.Type.CLOSED -> {
-//                        Log.e("g", "성공2")
-//                    }
-//                    Event.Type.ERROR -> {
-//                        Log.e("g", "성공3")
-//                    }
-//                    else -> {
-//                        // 다른 이벤트 처리
-//                    }
-//                }
-//            }
-//
-//
-//            // WebSocket 연결 해제는 필요한 시점에 진행
-//            stompConnection.dispose()
-
+            RetrofitManager.instance.postChatRoom(this,productId,4)
+        }
+        if (checkOwner) { // 작성자 일때
+            binding.callButton.isVisible = false
         }
 
         // 맵 설정

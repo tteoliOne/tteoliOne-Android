@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">sharingapp</string>
+    <string name="app_name">떠리원</string>
     <string name="nickname">닉네임</string>
     <string name="goodPoint">따봉</string>
     <string name="share_list">내 공유글 목록</string>
@@ -23,4 +23,7 @@
     <string name="walking_time">%dm 도보 %d분</string>
     <string name="buy_price">%s원</string>
     <string name="product_count">%d개</string>
+    <string name="default_notification_channel_id">sharingapp_notification_channel_id</string>
+    <string name="channel_name">채팅 알림</string>
+    <string name="channel_description">채팅 알림입니다.</string>
 </resources>

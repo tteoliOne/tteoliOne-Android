@@ -1,13 +1,19 @@
 package com.demo.sharingapp
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Color
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.view.WindowManager
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
@@ -41,7 +47,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     private lateinit var mainViewModel: MainViewModel
     private lateinit var navHostFragment: NavHostFragment
-    private lateinit var binding:ActivityMainBinding
+    private lateinit var binding: ActivityMainBinding
 
 
     private lateinit var saveProductAdapter: LikeListAdapter
@@ -51,13 +57,13 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val latitude = intent.getDoubleExtra(Constants.LATITUDE,0.0)
-        val longitude = intent.getDoubleExtra(LONGITUDE,0.0)
+        val latitude = intent.getDoubleExtra(Constants.LATITUDE, 0.0)
+        val longitude = intent.getDoubleExtra(LONGITUDE, 0.0)
 
         // 찜 목록 닫기 버튼 클릭
         clickLikeListCloseButton()
         //
-        binding.drawerView.addDrawerListener(object : DrawerLayout.DrawerListener{
+        binding.drawerView.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
 
             }
@@ -81,7 +87,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
-        mainViewModel.updateMyPlace(longitude,latitude)
+        mainViewModel.updateMyPlace(longitude, latitude)
 
         // 바텀네비 초기 설정 함수 호출
         initNavigation()
@@ -90,11 +96,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         initRecyclerView()
 
 
-        navHostFragment.navController.addOnDestinationChangedListener{ a,b,c ->
+        navHostFragment.navController.addOnDestinationChangedListener { a, b, c ->
             Log.e("bb", " a = $a , b = ${b.id} , ${R.id.userFragment} , c = $c")
-            if (b.id == R.id.userSettingFragment || b.id == R.id.homePartProductFragment){
+            if (b.id == R.id.userSettingFragment || b.id == R.id.homePartProductFragment) {
                 binding.bottomNavigationView.isVisible = false
-            }else if (b.id == R.id.userFragment || b.id == R.id.homeFragment) {
+            } else if (b.id == R.id.userFragment || b.id == R.id.homeFragment) {
                 binding.bottomNavigationView.isVisible = true
             }
         }
@@ -127,6 +133,10 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
             }
         }
 
+
+        //
+        askNotificationPermission()
+
     }
 
     // 찜 목록 닫기 버튼 클릭 함수
@@ -139,9 +149,9 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     // 리사이클러뷰 초기 설정 함수
     private fun initRecyclerView() {
-        saveProductAdapter = LikeListAdapter(){
-            val intent = Intent(this,DetailedProductActivity::class.java)
-                .putExtra(PRODUCT_ID,it)
+        saveProductAdapter = LikeListAdapter() {
+            val intent = Intent(this, DetailedProductActivity::class.java)
+                .putExtra(PRODUCT_ID, it)
             startActivityForResult(intent, MOVE_DETAILED_CODE)
         }
         binding.likeListRecyclerView.apply {
@@ -151,7 +161,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     }
 
     // 바텀네비 초기 설정 함수
-    private fun initNavigation(){
+    private fun initNavigation() {
         navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         binding.bottomNavigationView
@@ -162,7 +172,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     // 해쉬 키 확인 함수
     private fun findKeyHash() {
         var keyHash = Utility.getKeyHash(this)
-        Log.e("keyHash",keyHash)
+        Log.e("keyHash", keyHash)
 
     }
 
@@ -170,15 +180,16 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     private fun checkHasLogin() {
 
         val checkIsRefreshToken = SharedPreferencesData.containsData(this, REFRESH_TOKEN)
-        Log.e("Log","1")
-        if (checkIsRefreshToken){
-            val reissueData = runBlocking {RetrofitManager.instance.postReissueMain(this@MainActivity)}
-            if (!reissueData){
-                Log.e("Log","2 $reissueData")
+        Log.e("Log", "1")
+        if (checkIsRefreshToken) {
+            val reissueData =
+                runBlocking { RetrofitManager.instance.postReissueMain(this@MainActivity) }
+            if (!reissueData) {
+                Log.e("Log", "2 $reissueData")
                 moveLogin()
             }
-        }else{
-            Log.e("Log","3")
+        } else {
+            Log.e("Log", "3")
             moveLogin()
         }
 
@@ -193,10 +204,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
     // 쉐어드프리퍼런스에서 데이터 들고 오는 함수
     private fun getSharedData() {
-        val accessToken = SharedPreferencesData.getData(this,ACCESS_TOKEN)
+        val accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
         val refreshToken = SharedPreferencesData.getData(this, REFRESH_TOKEN)
         val nickname = SharedPreferencesData.getData(this, NICKNAME)
-        Log.e("getSharedData", "accessToken : $accessToken, refreshToken : $refreshToken, nickname : $nickname ")
+        Log.e("getSharedData",
+            "accessToken : $accessToken, refreshToken : $refreshToken, nickname : $nickname ")
     }
 
 
@@ -204,7 +216,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     override fun onButtonClicked() {
 
         binding.drawerView.openDrawer(Gravity.LEFT)
-        Log.e("aa","MyFragmentListener")
+        Log.e("aa", "MyFragmentListener")
         binding.drawerView.bringToFront()
         binding.drawerView.setScrimColor(Color.TRANSPARENT)
     }
@@ -220,8 +232,47 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
     }
 
     override fun onLoading() {
-        binding.loadingView.isVisible=false
+        binding.loadingView.isVisible = false
     }
+
+    // Declare the launcher at the top of your Activity/Fragment:
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission(),
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            // FCM SDK (and your app) can post notifications.
+        } else {
+            // 알림권한 없음
+        }
+    }
+
+    private fun askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+            ) {
+                // FCM SDK (and your app) can post notifications.
+            } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
+                showPermissionRationalDialog()
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private fun showPermissionRationalDialog() {
+        AlertDialog.Builder(this)
+            .setMessage("알림 권한이 없으면 알림을 받을 수 없습니다.")
+            .setPositiveButton("권한 허용하기") { _, _ ->
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
+            .show()
+
+    }
+
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -232,5 +283,6 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         }
     }
+
 
 }

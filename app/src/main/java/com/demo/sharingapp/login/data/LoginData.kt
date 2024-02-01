@@ -8,4 +8,7 @@ data class LoginData(
 
     @SerializedName("password")
     val password: String,
+
+    @SerializedName("targetToken")
+    val targetToken: String?
 )

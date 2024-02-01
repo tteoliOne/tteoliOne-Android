@@ -3,79 +3,93 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="18dp"
-    android:background="@drawable/chat_list_round">
-
-    <LinearLayout
-        android:id="@+id/profileImageLayout"
-        android:layout_width="wrap_content"
+    >
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/chat_list_round"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="5dp"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_margin="20dp"
-        app:layout_constraintTop_toTopOf="parent">
-        <ImageView
-            android:id="@+id/profileImageView"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:padding="5dp"
-            android:src="@drawable/user_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/chat_list_round"
+        android:elevation="5dp"
+        >
+
+        <LinearLayout
+            android:id="@+id/profileImageLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/chat_list_round"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="20dp"
+            app:layout_constraintTop_toTopOf="parent">
+            <ImageView
+                android:id="@+id/profileImageView"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:padding="5dp"
+                android:src="@drawable/user_image"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </LinearLayout>
+
+
+
+        <TextView
+            android:id="@+id/nicknameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:text="닉네임"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/profileImageLayout"
+            app:layout_constraintTop_toTopOf="@id/profileImageLayout" />
+
+        <TextView
+            android:id="@+id/descriptionTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="안녕하세요"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="@id/titleTextView"
+            app:layout_constraintStart_toStartOf="@id/nicknameTextView"
+            app:layout_constraintTop_toBottomOf="@id/nicknameTextView" />
+
+        <TextView
+            android:id="@+id/titleTextView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="제목을 입력하는 공간zzzzzzzzzzzzzz"
+            android:textSize="14sp"
+            app:layout_constraintBottom_toBottomOf="@id/nicknameTextView"
+            app:layout_constraintEnd_toStartOf="@id/enterIcon"
+            app:layout_constraintStart_toEndOf="@id/nicknameTextView"
+            app:layout_constraintTop_toTopOf="@id/nicknameTextView" />
+
+        <ImageView
+            android:id="@+id/enterIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="30dp"
+            android:src="@drawable/chat_left_image"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 
-
-    <TextView
-        android:id="@+id/nicknameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="18dp"
-        android:text="닉네임"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        app:layout_constraintStart_toEndOf="@id/profileImageLayout"
-        app:layout_constraintTop_toTopOf="@id/profileImageLayout" />
-
-    <TextView
-        android:id="@+id/descriptionTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="5dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="안녕하세요"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="@id/titleTextView"
-        app:layout_constraintStart_toStartOf="@id/nicknameTextView"
-        app:layout_constraintTop_toBottomOf="@id/nicknameTextView" />
-
-    <TextView
-        android:id="@+id/titleTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="8dp"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:text="제목을 입력하는 공간zzzzzzzzzzzzzz"
-        android:textSize="14sp"
-        app:layout_constraintBottom_toBottomOf="@id/nicknameTextView"
-        app:layout_constraintEnd_toStartOf="@id/enterIcon"
-        app:layout_constraintStart_toEndOf="@id/nicknameTextView"
-        app:layout_constraintTop_toTopOf="@id/nicknameTextView" />
-
-    <ImageView
-        android:id="@+id/enterIcon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
-        android:src="@drawable/chat_left_image"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

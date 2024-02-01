@@ -4,6 +4,7 @@ plugins {
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
     id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+    id 'com.google.gms.google-services'
 }
 
 android {
@@ -46,6 +47,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+
 
     //카카오톡
     implementation "com.kakao.sdk:v2-user:2.17.0" // 카카오 로그인
@@ -90,14 +92,18 @@ dependencies {
     implementation 'com.makeramen:roundedimageview:2.3.0'
 
     // stomp
-//    implementation 'com.github.bishoybasily:stomp:2.0.5'
     implementation 'com.github.NaikSoftware:StompProtocolAndroid:1.6.6'
-
-
 
     //rx
     implementation 'io.reactivex.rxjava2:rxjava:2.2.5'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+
+    // firebase
+    implementation(platform("com.google.firebase:firebase-bom:31.2.2"))
+
+    implementation 'com.google.firebase:firebase-auth-ktx'
+    implementation 'com.google.firebase:firebase-database-ktx'
+    implementation 'com.google.firebase:firebase-messaging-ktx'
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'

@@ -13,6 +13,7 @@ import androidx.core.view.isVisible
 import com.demo.sharingapp.databinding.ActivityLoginViewBinding
 import com.demo.sharingapp.login.data.AccessTokenRequest
 import com.demo.sharingapp.login.data.LoginData
+import com.demo.sharingapp.login.data.LoginTokenData
 import com.demo.sharingapp.login.find_id.FindIdActivity
 import com.demo.sharingapp.login.find_password.FindPasswordActivity
 import com.demo.sharingapp.login.signup.basic.SignUpActivity
@@ -20,6 +21,9 @@ import com.demo.sharingapp.login.signup.SignupProfileActivity
 
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.ktx.app
+import com.google.firebase.messaging.ktx.messaging
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
 import com.kakao.sdk.common.model.ClientError
@@ -79,15 +83,20 @@ class LoginView : AppCompatActivity() {
     // 로그인 버튼 클릭 함수
     private fun clickLogin() {
         binding.loginButton.setOnClickListener {
+
             val id = binding.idEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
-            val loginData = LoginData(id, password)
-            RetrofitManager.instance.postLogin(this, loginData) {
-                if (it) {
-                    val intent = Intent(this, UserPlace::class.java)
-                    startActivity(intent)
-                } else {
-                    // todo 실패 알림창 표시
+            Firebase.messaging.token.addOnCompleteListener {
+                val fmcToken = it.result
+                Log.e("fmcToken", fmcToken)
+                val loginData = LoginData(id, password,fmcToken)
+                RetrofitManager.instance.postLogin(this, loginData) {
+                    if (it) {
+                        val intent = Intent(this, UserPlace::class.java)
+                        startActivity(intent)
+                    } else {
+                        // todo 실패 알림창 표시
+                    }
                 }
             }
         }
@@ -164,6 +173,8 @@ class LoginView : AppCompatActivity() {
 
     //카카오로그인 함수
     private fun kakaoLogin() {
+
+
         // 카카오계정으로 로그인 공통 callback 구성
 // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
@@ -172,8 +183,13 @@ class LoginView : AppCompatActivity() {
             } else if (token != null) {
                 Log.i("kakaoLogin", "카카오계정으로 로그인 성공 ${token.accessToken}")
 
-                // 레트로핏에 토큰 보내는 함수 호출
-                postKaKaoAccessToken(token.accessToken)
+                Firebase.messaging.token.addOnCompleteListener {
+                    val fmcToken = it.result
+                    Log.e("fmcToken",fmcToken)
+                    // 레트로핏에 토큰 보내는 함수 호출
+                    postKaKaoAccessToken(token.accessToken, fmcToken)
+                }
+
 
             }
         }
@@ -196,7 +212,12 @@ class LoginView : AppCompatActivity() {
                     Log.i("kakaoLogin", "카카오톡으로 로그인 성공 ${token.accessToken}")
 
                     // post 에서 데이터 받아서 쉐어드프리퍼런스에 저장 함수 호출
-                    postKaKaoAccessToken(token.accessToken)
+                    Firebase.messaging.token.addOnCompleteListener {
+                        val fmcToken = it.result
+                        Log.e("fmcToken",fmcToken)
+                        // 레트로핏에 토큰 보내는 함수 호출
+                        postKaKaoAccessToken(token.accessToken, fmcToken)
+                    }
 
                 }
             }
@@ -207,8 +228,8 @@ class LoginView : AppCompatActivity() {
 
 
     // 레트로핏에 토큰 보내는 함수
-    private fun postKaKaoAccessToken(token: String) {
-        val accessTokenRequest = AccessTokenRequest("$token")
+    private fun postKaKaoAccessToken(token: String, targetToken: String? =null ) {
+        val accessTokenRequest = LoginTokenData(token,targetToken)
 
         RetrofitManager.instance.postKaKaoToken(this, token = accessTokenRequest){
             if(it){

@@ -1,6 +1,9 @@
 package com.demo.sharingapp.retrofit
 
 import com.demo.sharingapp.data.GetSaveProductData
+import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
+import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
+import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
@@ -45,6 +48,13 @@ interface RestAPI {
         @Path("productId") productId: Long,
     ): Call<EmailResponse>
 
+    // 채팅방 개설
+    @POST(API.CHAT_ROOM) // Replace with your API endpoint
+    fun postChatRoom(
+        @Header("Authorization") Authorization: String,
+        @Body createChatRoomData: CreateChatRoomData,
+    ): Call<CreateChatRoomResponse>
+
     // 닉네임 중복 확인 보내기
     @POST(API.CHECK_NICKNAME) // Replace with your API endpoint
     fun postCheckNickname(@Body nicknameData: NicknameData): Call<EmailResponse>
@@ -84,7 +94,7 @@ interface RestAPI {
 
     // 카카오 토큰 보내기
     @POST(API.KAKAO_TOKEN) // Replace with your API endpoint
-    fun postAccessToken(@Body accessTokenRequest: AccessTokenRequest): Call<TokenResponse>
+    fun postAccessToken(@Body accessTokenRequest: LoginTokenData): Call<TokenResponse>
 
     // 카카오 프로필 보내기
     @Multipart

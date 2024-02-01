@@ -9,6 +9,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.data.SaveProductsListData
+import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
+import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
+import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.data.PartProductListData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
@@ -706,10 +709,45 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 채팅방 개설
+    fun postChatRoom(
+        context: Context,
+        productsId: Long,
+        createMember: Long
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val data = CreateChatRoomData(productsId,createMember)
+        val call = api.postChatRoom(Authorization = authorization, createChatRoomData =data )
+        call.enqueue(object : retrofit2.Callback<CreateChatRoomResponse>{
+            override fun onResponse(
+                call: Call<CreateChatRoomResponse>,
+                response: Response<CreateChatRoomResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("Post", "success createMember ${response.body()?.data?.createMember}")
+                    Log.e("Post", "success chatId ${response.body()?.data?.chatId}")
+                    Log.e("Post", "success regDate ${response.body()?.data?.regDate}")
+                    Log.e("Post", "success joinMember ${response.body()?.data?.joinMember}")
+                    Log.e("Post", "success productNo ${response.body()?.data?.productNo}")
+                }
+                else {
+                    Log.e("Post", "succes, but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<CreateChatRoomResponse>, t: Throwable) {
+                Log.e("Post", "fail ${t} $call")
+            }
+        })
+    }
+
     // 토큰 보내기
     fun postKaKaoToken(
         context: Context,
-        token: AccessTokenRequest,
+        token: LoginTokenData,
         onExistsUser: (Boolean) -> Unit,
     ) {
 
