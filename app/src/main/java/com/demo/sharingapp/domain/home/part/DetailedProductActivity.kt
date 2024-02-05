@@ -12,6 +12,7 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.AddProductsActivity
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
+import com.demo.sharingapp.domain.chat.chatroom.ChatRoomActivity
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.retrofit.RetrofitManager
@@ -21,6 +22,7 @@ import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.MOVE_MODIFY_CODE
+import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_COUNT
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_DAY
 import com.demo.sharingapp.utils.Constants.PRODUCT_BUY_MONTH
@@ -47,7 +49,6 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.json.JSONObject
 import ua.naiksoftware.stomp.Stomp
-import ua.naiksoftware.stomp.dto.LifecycleEvent
 import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -89,6 +90,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     private var productBuyMonth = 0
     private var productBuyDay = 0
     private var productDescription = ""
+    private var sendUserNickname = ""
 
     private lateinit var productImageArray: Array<String>
 
@@ -100,10 +102,14 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         productId = intent.getLongExtra(PRODUCT_ID, 0)
         accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
-
-
         binding.callButton.setOnClickListener {
-            RetrofitManager.instance.postChatRoom(this,productId,4)
+            val intent = Intent(this,ChatRoomActivity::class.java)
+                .putExtra(NICKNAME,sendUserNickname)
+                .putExtra(PRODUCT_TITLE, productTitle)
+                .putExtra(PRODUCT_IMAGE, productImageArray[0])
+                .putExtra(PRODUCT_SHARE_PRICE, productSharePrice)
+            startActivity(intent)
+            RetrofitManager.instance.postChatRoom(this,productId)
         }
         if (checkOwner) { // 작성자 일때
             binding.callButton.isVisible = false
@@ -300,6 +306,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
         // 유저 닉네임
         binding.userNicknameTextView.text = it.sellerNickname
+        sendUserNickname = it.sellerNickname
 
         // 상품 제목
         binding.productTitleTextView.text = it.title
@@ -334,7 +341,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
         // 공유 가격
         binding.sharePriceTextView.text = getString(R.string.buy_price, sharePrice)
-        productSharePrice = it.sharePrice.toString()
+        productSharePrice = sharePrice
 
         // 공유 수량
         binding.shareCountTextView.text = getString(R.string.product_count, it.shareCount)

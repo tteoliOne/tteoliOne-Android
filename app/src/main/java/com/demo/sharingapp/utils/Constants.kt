@@ -107,6 +107,8 @@ object API {
 
     const val SAVE_PRODUCTS : String="/api/products/saved"
 
+    const val GET_CHAT_LIST : String="/api/chatRoom"
+
     const val MY_INFO : String="/api/users"
 
     const val DETAILED_PRODUCT : String="/api/products/{productId}"

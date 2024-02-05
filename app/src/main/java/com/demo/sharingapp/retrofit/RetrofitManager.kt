@@ -12,6 +12,8 @@ import com.demo.sharingapp.data.SaveProductsListData
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
+import com.demo.sharingapp.domain.chat.data.GetChatList
+import com.demo.sharingapp.domain.chat.data.GetChatListData
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.data.PartProductListData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
@@ -70,6 +72,36 @@ class RetrofitManager() : Application() {
     private val retrofitInterface: RestAPI? =
         RetrofitClient.getClient(API.BASE_URL)?.create(RestAPI::class.java)
 
+    // 채팅 리스트 가져오기
+    fun getChatList(context: Context, onSuccess: (List<GetChatListData>) -> Unit) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getChatList(Authorization = authorization)
+
+        getCall.enqueue(object : retrofit2.Callback<GetChatList> {
+            override fun onResponse(call: Call<GetChatList>, response: Response<GetChatList>) {
+                if (response.isSuccessful) {
+                    Log.e("getChatList", "success getChatList data ${response.body()?.data}")
+                    Log.e("getChatList",
+                        "success getChatList success ${response.body()?.success}")
+                    Log.e("getChatList",
+                        "success getChatList message ${response.body()?.message}")
+                    Log.e("getChatList", "success getChatList code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onSuccess(data)
+                } else {
+                    Log.e("getChatList", "succes, getChatList but ${response.errorBody()}")
+                }
+
+            }
+
+            override fun onFailure(call: Call<GetChatList>, t: Throwable) {
+                Log.e("getChatList", "fail ${t} $call")
+            }
+        })
+    }
 
     // 찜목록 가져오기
     fun getSaveProduct(context: Context, onSuccessData: (SaveProductsListData) -> Unit) {
@@ -177,7 +209,7 @@ class RetrofitManager() : Application() {
             searchStartDate = null,
             q = q
         )
-        getCall.enqueue(object  : retrofit2.Callback<GetSearchData>{
+        getCall.enqueue(object : retrofit2.Callback<GetSearchData> {
             override fun onResponse(call: Call<GetSearchData>, response: Response<GetSearchData>) {
                 if (response.isSuccessful) {
                     Log.e("getSearch", "success ${response.body()}")
@@ -713,15 +745,14 @@ class RetrofitManager() : Application() {
     fun postChatRoom(
         context: Context,
         productsId: Long,
-        createMember: Long
-    ){
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val data = CreateChatRoomData(productsId,createMember)
-        val call = api.postChatRoom(Authorization = authorization, createChatRoomData =data )
-        call.enqueue(object : retrofit2.Callback<CreateChatRoomResponse>{
+        val data = CreateChatRoomData(productsId)
+        val call = api.postChatRoom(Authorization = authorization, createChatRoomData = data)
+        call.enqueue(object : retrofit2.Callback<CreateChatRoomResponse> {
             override fun onResponse(
                 call: Call<CreateChatRoomResponse>,
                 response: Response<CreateChatRoomResponse>,
@@ -732,8 +763,7 @@ class RetrofitManager() : Application() {
                     Log.e("Post", "success regDate ${response.body()?.data?.regDate}")
                     Log.e("Post", "success joinMember ${response.body()?.data?.joinMember}")
                     Log.e("Post", "success productNo ${response.body()?.data?.productNo}")
-                }
-                else {
+                } else {
                     Log.e("Post", "succes, but ${response.errorBody()}")
                 }
             }

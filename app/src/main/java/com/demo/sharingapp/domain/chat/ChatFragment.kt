@@ -12,6 +12,8 @@ import com.demo.sharingapp.domain.chat.chatroom.ChatRoomActivity
 import com.demo.sharingapp.domain.chat.data.ChatListData
 import com.demo.sharingapp.domain.home.HomePartProductAdepter
 import com.demo.sharingapp.login.LoginView
+import com.demo.sharingapp.retrofit.RetrofitManager
+import com.demo.sharingapp.utils.Constants
 import com.kakao.sdk.user.UserApiClient
 
 class ChatFragment: Fragment(R.layout.fragment_chat) {
@@ -24,12 +26,18 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
 
         chatListAdepter = ChatListAdepter(){
             val intent = Intent(this.requireContext(), ChatRoomActivity::class.java)
+                .putExtra(Constants.NICKNAME,it.participant.username)
+                .putExtra(Constants.PRODUCT_TITLE, it.productTitle)
             startActivity(intent)
         }
 
         binding.chatListRecyclerView.apply {
             adapter = chatListAdepter
             layoutManager = LinearLayoutManager(this@ChatFragment.requireContext())
+        }
+
+        RetrofitManager.instance.getChatList(this@ChatFragment.requireContext()){
+            chatListAdepter.submitList(it)
         }
 
         val itemList = listOf(
@@ -48,7 +56,7 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
             ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
 
             )
-        chatListAdepter.submitList(itemList)
+
 
 
     }

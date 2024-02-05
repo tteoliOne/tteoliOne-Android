@@ -4,6 +4,7 @@ import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
+import com.demo.sharingapp.domain.chat.data.GetChatList
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
@@ -124,6 +125,12 @@ interface RestAPI {
         @Part receipt: MultipartBody.Part,
         @Part("request") request: Products,
     ): Call<ProductsResponse>
+
+    // 채팅방 리스트 가져오기
+    @GET(API.GET_CHAT_LIST)
+    fun getChatList(
+        @Header("Authorization") Authorization: String,
+    ): Call<GetChatList>
 
     // 카테고리별 상품 정보 가져오기
     @GET(API.PRODUCTS)

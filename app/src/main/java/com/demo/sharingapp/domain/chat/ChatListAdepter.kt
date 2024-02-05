@@ -9,28 +9,33 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.databinding.ItemChatListBinding
 import com.demo.sharingapp.domain.chat.data.ChatListData
+import com.demo.sharingapp.domain.chat.data.GetChatListData
 
-class ChatListAdepter(val onClick:() -> Unit): ListAdapter<ChatListData,ChatListAdepter.ChatListViewHolder>(object : DiffUtil.ItemCallback<ChatListData>(){
-    override fun areItemsTheSame(oldItem: ChatListData, newItem: ChatListData): Boolean {
+class ChatListAdepter(val onClick:(item:GetChatListData) -> Unit): ListAdapter<GetChatListData,ChatListAdepter.ChatListViewHolder>(object : DiffUtil.ItemCallback<GetChatListData>(){
+    override fun areItemsTheSame(oldItem: GetChatListData, newItem: GetChatListData): Boolean {
         return oldItem === newItem
     }
 
-    override fun areContentsTheSame(oldItem: ChatListData, newItem: ChatListData): Boolean {
+    override fun areContentsTheSame(oldItem: GetChatListData, newItem: GetChatListData): Boolean {
         return oldItem == newItem
     }
 }) {
     inner class ChatListViewHolder(private val binding: ItemChatListBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item:ChatListData){
-            binding.nicknameTextView.text = item.nickname
-            binding.descriptionTextView.text = item.description
-            binding.titleTextView.text = item.title
+        fun bind(item:GetChatListData){
+
+            binding.nicknameTextView.text = item.participant.username
+            if (item.latestMessage != null){
+                binding.descriptionTextView.text = item.latestMessage.context
+            }
+
+            binding.titleTextView.text = item.productTitle
             Glide.with(binding.profileImageView)
-                .load(item.profile)
+                .load(item.participant.profile)
                 .circleCrop()
                 .into(binding.profileImageView)
 
             binding.root.setOnClickListener {
-                onClick()
+                onClick(item)
             }
         }
 
