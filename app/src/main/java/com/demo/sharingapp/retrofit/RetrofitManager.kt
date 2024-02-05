@@ -9,6 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.data.SaveProductsListData
+import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
@@ -745,6 +746,7 @@ class RetrofitManager() : Application() {
     fun postChatRoom(
         context: Context,
         productsId: Long,
+        onSuccess: (CreateChatRoomResponseData) -> Unit
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -763,6 +765,8 @@ class RetrofitManager() : Application() {
                     Log.e("Post", "success regDate ${response.body()?.data?.regDate}")
                     Log.e("Post", "success joinMember ${response.body()?.data?.joinMember}")
                     Log.e("Post", "success productNo ${response.body()?.data?.productNo}")
+                    val data = response.body()?.data?: return
+                    onSuccess(data)
                 } else {
                     Log.e("Post", "succes, but ${response.errorBody()}")
                 }
@@ -892,6 +896,33 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 채팅내역가져오기
+    fun getChatRoomData(context: Context, roomNum: Long) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
+
+        call.enqueue(object : retrofit2.Callback<DetailedProductResponseData> {
+            override fun onResponse(call: Call<DetailedProductResponseData>, response: Response<DetailedProductResponseData>) {
+                if (response.isSuccessful) {
+                    Log.e("getRemoveProduct", "success ${response.body()?.success}")
+                    Log.e("getRemoveProduct", "data ${response.body()?.data}")
+                    Log.e("getRemoveProduct", "message ${response.body()?.message}")
+                    Log.e("getRemoveProduct", "code ${response.body()?.code}")
+
+                } else {
+                    Log.e("getRemoveProduct", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<DetailedProductResponseData>, t: Throwable) {
+                Log.e("getRemoveProduct", "fail ${t} $call")
+            }
+        })
+    }
+
     // 내 정보 조회하기
     fun getMyInfo(context: Context, onSuccess: (MyInfoData) -> Unit) {
         val retrofit = initRetrofit(context)
@@ -918,6 +949,36 @@ class RetrofitManager() : Application() {
             }
 
             override fun onFailure(call: Call<MyInfoResponse>, t: Throwable) {
+                Log.e("getMyInfo", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 채팅 메시지 전송 콜백
+    fun postChatSendCallBack(
+        context: Context,
+        chatSendCallBack : ChatSendCallBack
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.postChatSendCallBack(Authorization =  authorization, chatSendCallBack = chatSendCallBack)
+
+        call.enqueue(object : retrofit2.Callback<TokenResponse>{
+            override fun onResponse(call: Call<TokenResponse>, response: Response<TokenResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("getMyInfo", "success ${response.body()?.success}")
+                    Log.e("getMyInfo", "data ${response.body()?.data}")
+                    Log.e("getMyInfo", "message ${response.body()?.message}")
+                    Log.e("getMyInfo", "code ${response.body()?.code}")
+                }else{
+                    Log.e("getMyInfo", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
                 Log.e("getMyInfo", "fail ${t} $call")
             }
         })

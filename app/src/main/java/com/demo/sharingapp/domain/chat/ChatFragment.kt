@@ -14,6 +14,7 @@ import com.demo.sharingapp.domain.home.HomePartProductAdepter
 import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.utils.Constants
+import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
 import com.kakao.sdk.user.UserApiClient
 
 class ChatFragment: Fragment(R.layout.fragment_chat) {
@@ -28,6 +29,7 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
             val intent = Intent(this.requireContext(), ChatRoomActivity::class.java)
                 .putExtra(Constants.NICKNAME,it.participant.username)
                 .putExtra(Constants.PRODUCT_TITLE, it.productTitle)
+                .putExtra(CHATROOM_NUMBER,it.chatNo.toString())
             startActivity(intent)
         }
 

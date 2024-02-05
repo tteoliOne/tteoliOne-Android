@@ -39,6 +39,7 @@ object Constants{
     const val PRODUCT_RECEIPT_IMAGE = "productReceiptImage"
     const val PRODUCT_TYPE = "productType"
     const val SEARCH_RECODE = "searchRecode"
+    const val CHATROOM_NUMBER = "chatroomNumber"
 
 
     const val ACCESS_FINE_LOCATION_CODE = 200
@@ -110,6 +111,10 @@ object API {
     const val GET_CHAT_LIST : String="/api/chatRoom"
 
     const val MY_INFO : String="/api/users"
+
+    const val CHATROOM_DATA : String="/api/chatRoom/{roomNo}"
+
+    const val CHAT_SEND_CALLBACK : String="/api/chatRoom/notification"
 
     const val DETAILED_PRODUCT : String="/api/products/{productId}"
 

@@ -5,5 +5,4 @@ data class TokenResponse(
     val code: Int,
     val message: String,
     val data: Data
-    
 )

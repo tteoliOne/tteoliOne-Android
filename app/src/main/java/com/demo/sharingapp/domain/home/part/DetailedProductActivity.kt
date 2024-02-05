@@ -19,6 +19,7 @@ import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
+import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.MOVE_MODIFY_CODE
@@ -103,13 +104,17 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
         binding.callButton.setOnClickListener {
-            val intent = Intent(this,ChatRoomActivity::class.java)
-                .putExtra(NICKNAME,sendUserNickname)
-                .putExtra(PRODUCT_TITLE, productTitle)
-                .putExtra(PRODUCT_IMAGE, productImageArray[0])
-                .putExtra(PRODUCT_SHARE_PRICE, productSharePrice)
-            startActivity(intent)
-            RetrofitManager.instance.postChatRoom(this,productId)
+            RetrofitManager.instance.postChatRoom(this,productId){
+                val intent = Intent(this,ChatRoomActivity::class.java)
+                    .putExtra(NICKNAME,sendUserNickname)
+                    .putExtra(PRODUCT_TITLE, productTitle)
+                    .putExtra(PRODUCT_IMAGE, productImageArray[0])
+                    .putExtra(PRODUCT_SHARE_PRICE, productSharePrice)
+                    .putExtra(CHATROOM_NUMBER,it.chatId.toString())
+                startActivity(intent)
+            }
+
+
         }
         if (checkOwner) { // 작성자 일때
             binding.callButton.isVisible = false

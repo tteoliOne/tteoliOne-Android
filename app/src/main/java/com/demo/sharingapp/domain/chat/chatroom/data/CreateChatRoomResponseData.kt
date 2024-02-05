@@ -8,5 +8,5 @@ data class CreateChatRoomResponseData(
     val createMember: Long,
     val joinMember: Long,
     val productNo: Long,
-    val regDate: LocalDateTime,
+    val regDate: String,
 )

@@ -1,6 +1,7 @@
 package com.demo.sharingapp.retrofit
 
 import com.demo.sharingapp.data.GetSaveProductData
+import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
 import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
@@ -97,6 +98,13 @@ interface RestAPI {
     @POST(API.KAKAO_TOKEN) // Replace with your API endpoint
     fun postAccessToken(@Body accessTokenRequest: LoginTokenData): Call<TokenResponse>
 
+    // 채팅_메시지 전송 후 callback
+    @POST(API.CHAT_SEND_CALLBACK) // Replace with your API endpoint
+    fun postChatSendCallBack(
+        @Header("Authorization") Authorization: String,
+        @Body chatSendCallBack: ChatSendCallBack,
+    ): Call<TokenResponse>
+
     // 카카오 프로필 보내기
     @Multipart
     @POST(API.KAKAO_TOKEN_PROFILE) // Replace with your API endpoint
@@ -190,9 +198,8 @@ interface RestAPI {
     // 내 정보 조회
     @GET(API.MY_INFO)
     fun getMyInfo(
-        @Header("Authorization") Authorization: String
+        @Header("Authorization") Authorization: String,
     ): Call<MyInfoResponse>
-
 
 
     // 상세 상품 데이터 가져오기
@@ -200,6 +207,13 @@ interface RestAPI {
     fun getDetailedProduct(
         @Header("Authorization") Authorization: String,
         @Path("productId") productId: Long,
+    ): Call<DetailedProductResponseData>
+
+    // 채팅내역 조회
+    @GET(API.CHATROOM_DATA)
+    fun getChatRoomData(
+        @Header("Authorization") Authorization: String,
+        @Path("roomNo") roomNo: Long,
     ): Call<DetailedProductResponseData>
 
     // 상품 삭제
@@ -215,8 +229,6 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
         @Body changeMyInfoData: ChangeMyInfoData,
     ): Call<ChangeMyInfoResponse>
-
-
 
 
     // 도로명 주소 정보 가져오기
