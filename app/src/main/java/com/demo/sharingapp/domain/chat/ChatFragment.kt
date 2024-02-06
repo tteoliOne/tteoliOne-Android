@@ -15,6 +15,7 @@ import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
+import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.kakao.sdk.user.UserApiClient
 
 class ChatFragment: Fragment(R.layout.fragment_chat) {
@@ -30,6 +31,7 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
                 .putExtra(Constants.NICKNAME,it.participant.username)
                 .putExtra(Constants.PRODUCT_TITLE, it.productTitle)
                 .putExtra(CHATROOM_NUMBER,it.chatNo.toString())
+                .putExtra(PRODUCT_ID, it.productNo)
             startActivity(intent)
         }
 
@@ -42,22 +44,6 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
             chatListAdepter.submitList(it)
         }
 
-        val itemList = listOf(
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-            ChatListData("https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg", "윈터","양파 싸게 팔아요","언제 사셨나요?"),
-
-            )
 
 
 

@@ -18,9 +18,11 @@ import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
 import com.demo.sharingapp.utils.Constants.NICKNAME
+import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_IMAGE
 import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TITLE
+import com.demo.sharingapp.utils.Constants.USER_ID
 import com.google.android.gms.common.api.Api.Client
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -62,6 +64,10 @@ class ChatRoomActivity : AppCompatActivity() {
         val productSharePrice = intent.getStringExtra(PRODUCT_SHARE_PRICE)
         val productImage = intent.getStringExtra(PRODUCT_IMAGE)
         val chatRoomNum = intent.getStringExtra(CHATROOM_NUMBER) ?: ""
+        val productId = intent.getLongExtra(PRODUCT_ID, 0)
+        val userId = SharedPreferencesData.getLongData(this, USER_ID)
+
+        Log.e("userId", userId.toString())
 
         RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong())
 
@@ -88,7 +94,7 @@ class ChatRoomActivity : AppCompatActivity() {
         sendHeaderList.add(StompHeader("destination", "/pub/message"))
 
 
-        val sockClient = initMessage(headerList, chatRoomNum)
+        val sockClient = initMessage(headerList, chatRoomNum, userId)
 
 
         binding.backButton.setOnClickListener {
@@ -102,16 +108,11 @@ class ChatRoomActivity : AppCompatActivity() {
             if (serverState) {
                 val sendData = binding.chatEditText.text.toString()
                 val data = JSONObject()
-//                data.put("id", "1")
                 data.put("chatRoomNo", chatRoomNum)
                 data.put("contentType", "notice")
                 data.put("content", sendData)
-//                data.put("senderName", "카리나")
                 data.put("senderNo", 1)
-//                data.put("sendTime", 1643000000)
-                data.put("productNo", 1)
-//                data.put("readCount", 1)
-//                data.put("senderLoginId", "aws5624")
+                data.put("productNo", productId)
                 sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
                     .subscribe()
                 binding.chatEditText.text.clear()
@@ -197,7 +198,7 @@ class ChatRoomActivity : AppCompatActivity() {
         chatRoomAdepter.submitList(itemList)
     }
 
-    private fun initMessage(headerList: ArrayList<StompHeader>, chatRoomNum: String): StompClient {
+    private fun initMessage(headerList: ArrayList<StompHeader>, chatRoomNum: String, userId: Long): StompClient {
 
         val client = OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
@@ -211,7 +212,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
 //        val headerTokenList = listOf<StompHeader>(headerToken)
         // 메시지 구독
-        chatSubscribe(sockClient, headerList, chatRoomNum)
+        chatSubscribe(sockClient, headerList, chatRoomNum, userId)
 
         // 에러 메시지 구독
         errorSubscribe(sockClient, headerList)
@@ -298,14 +299,14 @@ class ChatRoomActivity : AppCompatActivity() {
         sockClient: StompClient,
         headerList: ArrayList<StompHeader>,
         chatRoomNum: String,
+        userId : Long
     ) {
         sockClient.topic("/sub/pub/$chatRoomNum", headerList).subscribe({
             // 성공적인 경우 처리
 
             val d = JsonParser()
             val data = Gson().fromJson(it.payload, SendMessageResponse::class.java)
-            if (data.senderNo == 4L) { // 보내는 사람일때
-
+            if (data.senderNo == userId) { // 보내는 사람일때
 
                 val chatSendCallBack = ChatSendCallBack(id =data.id,
                     chatRoomNo = data.chatRoomNo,
@@ -329,137 +330,6 @@ class ChatRoomActivity : AppCompatActivity() {
         })
     }
 
-    private fun connectStomp(token: String): Pair<StompClient, ArrayList<StompHeader>> {
-        val sockClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
-            "ws://118.41.215.56:8081" + "/ws-stomp/websocket")
-
-
-        val isUnexpectedClosed = AtomicBoolean(false)
-
-        Log.e("sadfasf",
-            StompHeader("Authorization",
-                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhd3M1NjI0IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MzUwNjU0NDk1Mn0.LeSt9ARQ3aLAlqgZgwnWE4f2PkjCpDmJ9_zXRscqUDctulttCJQACGH1ZYCbE-cwH4xAM13OwX7TXkNzuB25Jw").toString())
-        val data = listOf<StompHeader>(StompHeader("Authorization", token))
-
-
-
-        sockClient.topic("/sub/pub/1", data).subscribe({ topicMessage ->
-            if (topicMessage is StompMessage) {
-                // 헤더 가져오기
-                val headers = topicMessage.stompHeaders
-
-                // 각 헤더에 접근하여 정보 출력 또는 사용
-                for (header in headers) {
-                    val headerName = header.key
-                    val headerValue = header.value
-                    // 헤더 정보를 로그에 출력 또는 사용
-                    Log.e("StompHeader", "$headerName: $headerValue")
-
-                }
-
-                // 페이로드 가져오기
-                val payload = topicMessage.payload
-                // 페이로드 정보를 로그에 출력 또는 사용
-                Log.d("StompPayload", payload)
-            }
-        }, { throwable ->
-            // 구독 중 오류가 발생한 경우
-            Log.e("StompError", "Subscription error: ${throwable.message}")
-            Log.e("StompError", "Subscription error: ${throwable.message}")
-
-        })
-
-        sockClient.topic("/pub/message", data).subscribe({ topicMessage ->
-            if (topicMessage is StompMessage) {
-                // 헤더 가져오기
-                val headers = topicMessage.stompHeaders
-
-                // 각 헤더에 접근하여 정보 출력 또는 사용
-                for (header in headers) {
-                    val headerName = header.key
-                    val headerValue = header.value
-                    // 헤더 정보를 로그에 출력 또는 사용
-                    Log.e("StompHeader", "$headerName: $headerValue")
-                    if (headerValue.equals("UNAUTHORIZED")) {
-                        Log.e("오류", "오류 발생")
-                        val reissueData =
-                            runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) }
-                        if (reissueData) {
-                            val token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
-                            val (sockClient, headerList) = connectStomp(token)
-                        }
-                    }
-                }
-
-                // 페이로드 가져오기
-                val payload = topicMessage.payload
-                // 페이로드 정보를 로그에 출력 또는 사용
-                Log.d("StompPayload", payload)
-            }
-        }, { throwable ->
-            // 구독 중 오류가 발생한 경우
-            Log.e("StompError", "Subscription error: ${throwable.message}")
-            Log.e("StompError", "Subscription error: ${throwable.message}")
-
-        })
-
-        val headerList = arrayListOf<StompHeader>()
-        headerList.add(StompHeader("chatRoomNo", "1"))
-        headerList.add(StompHeader("Authorization", token))
-        sockClient.connect(headerList)
-
-        sockClient.lifecycle().subscribe {
-            when (it.type) {
-
-                LifecycleEvent.Type.OPENED -> {
-                    Log.e("Stomp", "서버 연결")
-                    Log.e("Stomp", isUnexpectedClosed.toString())
-
-                }
-                LifecycleEvent.Type.ERROR -> {
-                    Log.e("Stomp", "에러")
-                    Log.e("Stomp", it.exception.toString())
-
-                }
-                LifecycleEvent.Type.CLOSED -> {
-                    Log.e("Stomp", "서버 닫음")
-                    Log.e("message", "${it.message}")
-
-                }
-                LifecycleEvent.Type.FAILED_SERVER_HEARTBEAT -> {
-                    Log.e("message", "${it.message}")
-                }
-
-
-            }
-
-        }
-        binding.requestButton.setOnClickListener {
-            val data = JSONObject()
-            data.put("id", "1")
-            data.put("chatRoomNo", "1")
-            data.put("contentType", "notice")
-            data.put("content", "하이")
-            data.put("senderName", "카리나")
-            data.put("senderNo", 1)
-            data.put("sendTime", 1643000000)
-            data.put("productNo", 1)
-            data.put("readCount", 1)
-            data.put("senderLoginId", "aws5624")
-//            sockClient.send("/pub/message", data.toString()).subscribe()
-            val headerList1 = arrayListOf<StompHeader>()
-            headerList1.add(StompHeader("chatRoomNo", "1"))
-            headerList1.add(StompHeader("Authorization",
-                "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJhd3M1NjI0IiwiYXV0aCI6IlJPTEVfVVNFUiIsImV4cCI6MTY5OTgwNzc1N30.mlezbDa5KG7UQ3OZ7sHRlvJdSkTwUuM1aqqCP9kEw4giCHHkDI7R7P2CVkLdszvzWjkuuKB-B7vYZev4fkAzbg"))
-            headerList.add(StompHeader(StompHeader.DESTINATION, "/pub/message"))
-
-
-
-            sockClient.send(StompMessage(StompCommand.SEND, headerList, data.toString()))
-                .subscribe()
-        }
-        return Pair(sockClient, headerList)
-    }
 
     private fun isTokenExpiredError(throwable: Throwable): Boolean {
         // 토큰 만료와 관련된 오류 여부를 판단하는 로직

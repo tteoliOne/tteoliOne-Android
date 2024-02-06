@@ -1,36 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_marginTop="10dp">
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_margin="5dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:background="@drawable/chat_list_round"
         android:elevation="5dp"
-        >
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/profileImageLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_margin="15dp"
             android:background="@drawable/chat_list_round"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="20dp"
             app:layout_constraintTop_toTopOf="parent">
+
             <ImageView
                 android:id="@+id/profileImageView"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
-                android:padding="5dp"
+                android:padding="1dp"
                 android:src="@drawable/user_image"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -39,17 +40,16 @@
         </LinearLayout>
 
 
-
         <TextView
             android:id="@+id/nicknameTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="18dp"
-            tools:text="닉네임"
             android:textColor="@color/black"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@id/profileImageLayout"
-            app:layout_constraintTop_toTopOf="@id/profileImageLayout" />
+            app:layout_constraintTop_toTopOf="@id/profileImageLayout"
+            tools:text="닉네임" />
 
         <TextView
             android:id="@+id/descriptionTextView"
@@ -58,40 +58,60 @@
             android:layout_marginTop="5dp"
             android:ellipsize="end"
             android:maxLines="1"
-            tools:text="안녕하세요"
-            android:textSize="18sp"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="@id/titleTextView"
             app:layout_constraintStart_toStartOf="@id/nicknameTextView"
-            app:layout_constraintTop_toBottomOf="@id/nicknameTextView" />
+            app:layout_constraintBottom_toBottomOf="@id/profileImageLayout"
+            tools:text="안녕하세요" />
 
         <TextView
             android:id="@+id/titleTextView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginStart="28dp"
             android:ellipsize="end"
             android:maxLines="1"
-            tools:text="제목을 입력하는 공간zzzzzzzzzzzzzz"
             android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="@id/nicknameTextView"
-            app:layout_constraintEnd_toStartOf="@id/enterIcon"
+            app:layout_constraintEnd_toStartOf="@id/timeTextView"
             app:layout_constraintStart_toEndOf="@id/nicknameTextView"
-            app:layout_constraintTop_toTopOf="@id/nicknameTextView" />
+            tools:text="제목을 입력하는 공간zzzzzzzzzzzzzz" />
 
-        <ImageView
-            android:id="@+id/enterIcon"
+        <TextView
+            android:id="@+id/timeTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="30dp"
-            android:src="@drawable/chat_left_image"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginEnd="18dp"
+            android:textSize="11sp"
+            app:layout_constraintBottom_toBottomOf="@id/titleTextView"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            tools:text="1분 전" />
+
+        <LinearLayout
+            android:visibility="gone"
+            android:id="@+id/unReadLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/user_menu_round"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="@id/timeTextView"
+            tools:visibility="visible"
+            app:layout_constraintTop_toTopOf="@id/descriptionTextView">
+
+            <TextView
+                android:id="@+id/unReadTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingStart="5dp"
+                android:paddingEnd="5dp"
+                android:textColor="@color/white"
+                android:textSize="13sp"
+                tools:text="1" />
+
+        </LinearLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

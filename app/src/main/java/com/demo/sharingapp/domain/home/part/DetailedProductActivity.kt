@@ -111,6 +111,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
                     .putExtra(PRODUCT_IMAGE, productImageArray[0])
                     .putExtra(PRODUCT_SHARE_PRICE, productSharePrice)
                     .putExtra(CHATROOM_NUMBER,it.chatId.toString())
+                    .putExtra(PRODUCT_ID, productId)
                 startActivity(intent)
             }
 
