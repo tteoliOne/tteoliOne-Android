@@ -18,6 +18,7 @@ object Constants{
     const val SIGNUP_NICKNAME = "nickname"
     const val SIGNUP_PASSWORD = "password"
     const val PRODUCT_ID = "productId"
+    const val USER_PROFILE = "profile"
     const val PRODUCT_CATEGORY_ID = "productId"
     const val DETAILED_LIKED = "detailedLiked"
     const val DETAILED_LIKED_POINT = "detailedLikedPoint"
@@ -40,6 +41,7 @@ object Constants{
     const val PRODUCT_TYPE = "productType"
     const val SEARCH_RECODE = "searchRecode"
     const val CHATROOM_NUMBER = "chatroomNumber"
+    const val PUSH_MESSAGE = "pushMessage"
 
 
     const val ACCESS_FINE_LOCATION_CODE = 200

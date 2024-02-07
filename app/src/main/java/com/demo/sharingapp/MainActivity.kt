@@ -1,6 +1,7 @@
 package com.demo.sharingapp
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -35,6 +36,7 @@ import com.demo.sharingapp.utils.Constants.LONGITUDE
 import com.demo.sharingapp.utils.Constants.MOVE_DETAILED_CODE
 import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
+import com.demo.sharingapp.utils.Constants.PUSH_MESSAGE
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.kakao.sdk.auth.AuthApiClient
 import com.kakao.sdk.common.KakaoSdk
@@ -60,8 +62,10 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         val latitude = intent.getDoubleExtra(Constants.LATITUDE, 0.0)
         val longitude = intent.getDoubleExtra(LONGITUDE, 0.0)
 
+
         // 찜 목록 닫기 버튼 클릭
         clickLikeListCloseButton()
+
         //
         binding.drawerView.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -283,6 +287,5 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         }
     }
-
 
 }

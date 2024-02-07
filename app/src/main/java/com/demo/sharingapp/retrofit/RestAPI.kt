@@ -1,10 +1,7 @@
 package com.demo.sharingapp.retrofit
 
 import com.demo.sharingapp.data.GetSaveProductData
-import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
-import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
-import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
-import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
+import com.demo.sharingapp.domain.chat.chatroom.data.*
 import com.demo.sharingapp.domain.chat.data.GetChatList
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
@@ -214,7 +211,7 @@ interface RestAPI {
     fun getChatRoomData(
         @Header("Authorization") Authorization: String,
         @Path("roomNo") roomNo: Long,
-    ): Call<DetailedProductResponseData>
+    ): Call<GetChatRoomResponse>
 
     // 상품 삭제
     @DELETE(API.DETAILED_PRODUCT)

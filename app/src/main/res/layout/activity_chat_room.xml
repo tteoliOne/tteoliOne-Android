@@ -2,6 +2,7 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mainLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".domain.chat.chatroom.ChatRoomActivity">
@@ -40,25 +41,25 @@
         android:id="@+id/productImageView"
         android:layout_width="68dp"
         android:layout_height="55dp"
-        app:riv_corner_radius_top_left="20dp"
-        app:riv_corner_radius_top_right="20dp"
-        app:riv_corner_radius_bottom_left="20dp"
-        app:riv_corner_radius_bottom_right="20dp"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="10dp"
         android:scaleType="centerCrop"
         android:src="@drawable/image_100"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/toolbarLayout" />
+        app:layout_constraintTop_toBottomOf="@id/toolbarLayout"
+        app:riv_corner_radius_bottom_left="20dp"
+        app:riv_corner_radius_bottom_right="20dp"
+        app:riv_corner_radius_top_left="20dp"
+        app:riv_corner_radius_top_right="20dp" />
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="5dp"
         android:layout_marginEnd="18dp"
         android:ellipsize="end"
         android:maxLines="1"
-        android:layout_marginTop="5dp"
         android:text="제목을 적혀질 공간입니다"
         android:textColor="@color/black"
         android:textSize="20sp"
@@ -80,10 +81,10 @@
         android:id="@+id/buyPriceTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textStyle="bold"
         android:text="0,000"
         android:textColor="#FF0000"
         android:textSize="14sp"
+        android:textStyle="bold"
         app:layout_constraintStart_toEndOf="@id/unitTextView"
         app:layout_constraintTop_toBottomOf="@id/titleTextView" />
 
@@ -91,10 +92,10 @@
         android:id="@+id/wonTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
         android:text="원"
         android:textColor="#FF0000"
         android:textSize="12sp"
-        android:layout_marginEnd="8dp"
         app:layout_constraintBottom_toBottomOf="@id/buyPriceTextView"
         app:layout_constraintEnd_toStartOf="@+id/requestButton"
         app:layout_constraintStart_toEndOf="@id/buyPriceTextView" />
@@ -103,7 +104,7 @@
         android:id="@+id/requestButton"
         android:layout_width="150dp"
         android:layout_height="30dp"
-        android:layout_margin="10dp"
+        android:layout_marginEnd="10dp"
         android:background="@drawable/product_next_button_round"
         android:text="요청하기"
         android:textColor="@color/white"
@@ -118,6 +119,7 @@
         android:layout_marginTop="5dp"
         android:background="@color/black"
         app:layout_constraintTop_toBottomOf="@id/requestButton" />
+
 
     <LinearLayout
         android:id="@+id/chatEditLayout"
@@ -142,17 +144,44 @@
             android:textSize="18sp" />
     </LinearLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chatRoomRecyclerView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+    <LinearLayout
+        android:id="@+id/chatRoomRecyclerLayout"
+        android:layout_width="match_parent"
         app:layout_constraintTop_toBottomOf="@id/guideline"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        tools:listitem="@layout/item_chat_room"
-        app:layout_constraintBottom_toTopOf="@id/chatEditLayout"/>
+        app:layout_constraintBottom_toTopOf="@id/chatEditLayout"
+        android:layout_height="0dp">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/chatRoomRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                tools:listitem="@layout/item_chat_room" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </LinearLayout>
+
+
+<!--    <androidx.recyclerview.widget.RecyclerView-->
+<!--        android:id="@+id/chatRoomRecyclerView"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="0dp"-->
+<!--        android:layout_marginStart="8dp"-->
+<!--        android:layout_marginEnd="8dp"-->
+<!--        app:layout_constraintBottom_toTopOf="@id/chatEditLayout"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/guideline"-->
+<!--        tools:listitem="@layout/item_chat_room" />-->
 
     <ImageView
         android:id="@+id/sendButton"

@@ -9,10 +9,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.demo.sharingapp.data.GetSaveProductData
 import com.demo.sharingapp.data.SaveProductsListData
-import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
-import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomData
-import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponse
-import com.demo.sharingapp.domain.chat.chatroom.data.CreateChatRoomResponseData
+import com.demo.sharingapp.domain.chat.chatroom.data.*
 import com.demo.sharingapp.domain.chat.data.GetChatList
 import com.demo.sharingapp.domain.chat.data.GetChatListData
 import com.demo.sharingapp.domain.home.data.PartProductData
@@ -897,19 +894,21 @@ class RetrofitManager() : Application() {
     }
 
     // 채팅내역가져오기
-    fun getChatRoomData(context: Context, roomNum: Long) {
+    fun getChatRoomData(context: Context, roomNum: Long, onSuccess: (GetChatRoomData) -> Unit) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val call = api.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
 
-        call.enqueue(object : retrofit2.Callback<DetailedProductResponseData> {
-            override fun onResponse(call: Call<DetailedProductResponseData>, response: Response<DetailedProductResponseData>) {
+        call.enqueue(object : retrofit2.Callback<GetChatRoomResponse> {
+            override fun onResponse(call: Call<GetChatRoomResponse>, response: Response<GetChatRoomResponse>) {
                 if (response.isSuccessful) {
                     Log.e("getRemoveProduct", "success ${response.body()?.success}")
                     Log.e("getRemoveProduct", "data ${response.body()?.data}")
                     Log.e("getRemoveProduct", "message ${response.body()?.message}")
                     Log.e("getRemoveProduct", "code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onSuccess(data)
 
                 } else {
                     Log.e("getRemoveProduct", "succes, but ${response.errorBody()}")
@@ -917,7 +916,7 @@ class RetrofitManager() : Application() {
                 }
             }
 
-            override fun onFailure(call: Call<DetailedProductResponseData>, t: Throwable) {
+            override fun onFailure(call: Call<GetChatRoomResponse>, t: Throwable) {
                 Log.e("getRemoveProduct", "fail ${t} $call")
             }
         })

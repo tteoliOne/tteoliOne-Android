@@ -40,6 +40,7 @@ import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_COUNT
 import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TITLE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TYPE
+import com.demo.sharingapp.utils.Constants.USER_PROFILE
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
@@ -92,6 +93,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     private var productBuyDay = 0
     private var productDescription = ""
     private var sendUserNickname = ""
+    private var profile = ""
 
     private lateinit var productImageArray: Array<String>
 
@@ -106,19 +108,13 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         binding.callButton.setOnClickListener {
             RetrofitManager.instance.postChatRoom(this,productId){
                 val intent = Intent(this,ChatRoomActivity::class.java)
-                    .putExtra(NICKNAME,sendUserNickname)
-                    .putExtra(PRODUCT_TITLE, productTitle)
-                    .putExtra(PRODUCT_IMAGE, productImageArray[0])
-                    .putExtra(PRODUCT_SHARE_PRICE, productSharePrice)
                     .putExtra(CHATROOM_NUMBER,it.chatId.toString())
                     .putExtra(PRODUCT_ID, productId)
+                    .putExtra(USER_PROFILE, profile)
                 startActivity(intent)
             }
 
 
-        }
-        if (checkOwner) { // 작성자 일때
-            binding.callButton.isVisible = false
         }
 
         // 맵 설정
@@ -268,6 +264,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun settingData(it: DetailedProductData) {
 
         checkOwner = it.checkOwner // 작성자 확인
+        if (!checkOwner){
+            binding.callButton.isVisible = true
+        }
 
         //가격 변환
         val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
@@ -304,6 +303,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
             .load(it.sellerProfile)
             .circleCrop()
             .into(binding.profileImageView)
+
+        profile = it.sellerProfile
 
         showLocationOnMap(it.latitude, it.longitude)
         latitude = it.latitude

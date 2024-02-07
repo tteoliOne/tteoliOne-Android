@@ -11,32 +11,49 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.databinding.ItemChatRoomBinding
 import com.demo.sharingapp.domain.chat.chatroom.data.ChatRoomData
+import com.demo.sharingapp.domain.chat.chatroom.data.GetChatRoomInfoData
 
-class ChatRoomAdepter: ListAdapter<ChatRoomData,ChatRoomAdepter.ChatRoomViewHolder> (object :DiffUtil.ItemCallback<ChatRoomData>(){
-    override fun areItemsTheSame(oldItem: ChatRoomData, newItem: ChatRoomData): Boolean {
+class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoData,ChatRoomAdepter.ChatRoomViewHolder> (object :DiffUtil.ItemCallback<GetChatRoomInfoData>(){
+    override fun areItemsTheSame(oldItem: GetChatRoomInfoData, newItem: GetChatRoomInfoData): Boolean {
         return oldItem === newItem
     }
 
-    override fun areContentsTheSame(oldItem: ChatRoomData, newItem: ChatRoomData): Boolean {
+    override fun areContentsTheSame(oldItem: GetChatRoomInfoData, newItem: GetChatRoomInfoData): Boolean {
         return oldItem == newItem
     }
 }){
     inner class ChatRoomViewHolder(private val binding: ItemChatRoomBinding) :RecyclerView.ViewHolder(binding.root){
-        fun bind(item: ChatRoomData){
-            if (item.chatType == 1){ // 상대방
-                binding.profileImageView.isVisible= true
+        fun bind(item: GetChatRoomInfoData){
+            binding.root.setOnClickListener{
+
+            }
+            if (item.mine){ // 자신일때
+                binding.layout.gravity= Gravity.END
+                binding.profileImageLayout.visibility= View.INVISIBLE
+                binding.descriptionTextView.text = item.content
+            }else{ // 상대방 일때
+                binding.profileImageLayout.visibility= View.VISIBLE
                 binding.layout.gravity= Gravity.START
                 Glide.with(binding.profileImageView)
-                    .load(item.profile)
+                    .load(profile)
                     .circleCrop()
                     .into(binding.profileImageView)
-                binding.descriptionTextView.text = item.description
-            }else{
-                binding.layout.gravity= Gravity.END
-                binding.profileImageView.isVisible= false
-                binding.descriptionTextView.text = item.description
+                binding.descriptionTextView.text = item.content
             }
 
+//            if (item.mine){ // 자신일때
+//                binding.profileImageView.isVisible= true
+//                binding.layout.gravity= Gravity.START
+//                Glide.with(binding.profileImageView)
+//                    .load(item.profile)
+//                    .circleCrop()
+//                    .into(binding.profileImageView)
+//                binding.descriptionTextView.text = item.description
+//            }else{ // 상대방 일때
+//                binding.layout.gravity= Gravity.END
+//                binding.profileImageView.isVisible= false
+//                binding.descriptionTextView.text = item.description
+//            }
 
 
         }

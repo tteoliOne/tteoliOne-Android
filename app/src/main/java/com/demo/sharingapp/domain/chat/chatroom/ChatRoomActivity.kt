@@ -1,20 +1,30 @@
 package com.demo.sharingapp.domain.chat.chatroom
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.util.Log
+import android.view.MotionEvent
+import android.view.View
+import android.view.ViewTreeObserver
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityChatRoomBinding
 import com.demo.sharingapp.domain.chat.chatroom.data.ChatRoomData
 import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
+import com.demo.sharingapp.domain.chat.chatroom.data.GetChatRoomInfoData
 import com.demo.sharingapp.domain.chat.chatroom.data.SendMessageResponse
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.retrofit.TokenAuthenticator
 import com.demo.sharingapp.shared.SharedPreferencesData
+import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
 import com.demo.sharingapp.utils.Constants.NICKNAME
@@ -23,6 +33,9 @@ import com.demo.sharingapp.utils.Constants.PRODUCT_IMAGE
 import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TITLE
 import com.demo.sharingapp.utils.Constants.USER_ID
+import com.demo.sharingapp.utils.Constants.USER_PROFILE
+import com.demo.sharingapp.utils.ViewUtil.hideKeyboard
+import com.demo.sharingapp.utils.ViewUtil.showKeyboard
 import com.google.android.gms.common.api.Api.Client
 import com.google.gson.Gson
 import com.google.gson.JsonParser
@@ -43,41 +56,64 @@ import ua.naiksoftware.stomp.dto.StompHeader
 import ua.naiksoftware.stomp.dto.StompMessage
 import ua.naiksoftware.stomp.provider.AbstractConnectionProvider
 import ua.naiksoftware.stomp.provider.WebSocketsConnectionProvider
+import java.text.NumberFormat
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.collections.ArrayList
 
 class ChatRoomActivity : AppCompatActivity() {
     private lateinit var chatRoomAdepter: ChatRoomAdepter
+    private lateinit var linearLayoutManger: LinearLayoutManager
     private lateinit var binding: ActivityChatRoomBinding
 
     private var serverState = false
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatRoomBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val productTitle = intent.getStringExtra(PRODUCT_TITLE)
-        val sendUserNickname = intent.getStringExtra(NICKNAME)
-        val productSharePrice = intent.getStringExtra(PRODUCT_SHARE_PRICE)
-        val productImage = intent.getStringExtra(PRODUCT_IMAGE)
-        val chatRoomNum = intent.getStringExtra(CHATROOM_NUMBER) ?: ""
+        val profile = intent.getStringExtra(USER_PROFILE) ?: ""
+        val chatRoomNum = intent.getStringExtra(CHATROOM_NUMBER) ?: "0"
         val productId = intent.getLongExtra(PRODUCT_ID, 0)
         val userId = SharedPreferencesData.getLongData(this, USER_ID)
+        var opponentProfile = ""
+
 
         Log.e("userId", userId.toString())
+        chatRoomAdepter= ChatRoomAdepter(profile)
+        linearLayoutManger = LinearLayoutManager(applicationContext).apply {
+            reverseLayout = true
+        }
+        binding.chatRoomRecyclerView.apply {
+            adapter = chatRoomAdepter
+            layoutManager = linearLayoutManger
+        }
 
-        RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong())
 
-        binding.titleTextView.text = productTitle
-        binding.buyPriceTextView.text = productSharePrice
-        Glide.with(binding.productImageView)
-            .load(productImage)
-            .into(binding.productImageView)
+        RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong()){
+            binding.titleTextView.text = it.title
+            val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
+            val sharePrice = currencyFormat.format(it.sharePrice)
+            binding.buyPriceTextView.text = sharePrice
+            Glide.with(binding.productImageView)
+                .load(it.productImage)
+                .into(binding.productImageView)
+            binding.nicknameTextView.text = it.opponentNickname + " 채팅"
+            val chatList = it.chatList.reversed()
 
-        binding.nicknameTextView.text = sendUserNickname + " 채팅"
+            chatRoomAdepter.submitList(chatList)
+
+        }
+
+
+//        binding.titleTextView.text = productTitle
+//        binding.buyPriceTextView.text = productSharePrice
+//        Glide.with(binding.productImageView)
+//            .load(productImage)
+//            .into(binding.productImageView)
+//
+//        binding.nicknameTextView.text = sendUserNickname + " 채팅"
 
         runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) }
 
@@ -116,8 +152,9 @@ class ChatRoomActivity : AppCompatActivity() {
                 sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
                     .subscribe()
                 binding.chatEditText.text.clear()
-                val a = ChatRoomData("", "", "", sendData, 0, "", 0)
-                chatRoomAdepter.submitList(chatRoomAdepter.currentList + a)
+                val a = listOf( GetChatRoomInfoData("", 0, 0, "", "", sendData, 0,0,true))
+
+                chatRoomAdepter.submitList( a + chatRoomAdepter.currentList )
 
 
             } else {
@@ -126,14 +163,24 @@ class ChatRoomActivity : AppCompatActivity() {
 
         }
 
+//        binding.root.setOnTouchListener { v, event ->
+//            Log.e("aa","aa")
+//            return@setOnTouchListener false
+//        }
 
-        chatRoomAdepter = ChatRoomAdepter()
-        binding.chatRoomRecyclerView.apply {
-            adapter = chatRoomAdepter
-            layoutManager = LinearLayoutManager(this@ChatRoomActivity)
-        }
+        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView,null,0)
+            }
+        })
 
-        exampleTest()
+
+
+
+
+
+//        exampleTest()
 
     }
 
@@ -195,7 +242,7 @@ class ChatRoomActivity : AppCompatActivity() {
             ),
 
             )
-        chatRoomAdepter.submitList(itemList)
+//        chatRoomAdepter.submitList()
     }
 
     private fun initMessage(headerList: ArrayList<StompHeader>, chatRoomNum: String, userId: Long): StompClient {
@@ -276,7 +323,7 @@ class ChatRoomActivity : AppCompatActivity() {
                             runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) }
                         if (reissueData) {
                             serverState = true
-                            val token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+
                         }
                     }
                 }
@@ -304,7 +351,6 @@ class ChatRoomActivity : AppCompatActivity() {
         sockClient.topic("/sub/pub/$chatRoomNum", headerList).subscribe({
             // 성공적인 경우 처리
 
-            val d = JsonParser()
             val data = Gson().fromJson(it.payload, SendMessageResponse::class.java)
             if (data.senderNo == userId) { // 보내는 사람일때
 
@@ -321,6 +367,11 @@ class ChatRoomActivity : AppCompatActivity() {
                 RetrofitManager.instance.postChatSendCallBack(this, chatSendCallBack)
                 Log.e("Asad", data.toString())
 //                Log.e("Asad", chatSendCallBack.toString())
+            }else{ // 상대방 일때
+                val content = data.content
+                val a = listOf( GetChatRoomInfoData("", 0, 0, "", "", content, 0,0,false,))
+
+                chatRoomAdepter.submitList( a + chatRoomAdepter.currentList )
             }
             Log.e("Asad", data.content)
 
@@ -335,4 +386,25 @@ class ChatRoomActivity : AppCompatActivity() {
         // 토큰 만료와 관련된 오류 여부를 판단하는 로직
         return throwable.message?.contains("Token expired") == true
     }
+
+    // 화면 터치 시 키보드 내리기
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val y = ev.y
+        Log.e("aa",ev.toString())
+        Log.e("aa", "Y 좌표: $y")
+        val location = IntArray(2)
+        binding.chatEditText.getLocationOnScreen(location)
+
+        val buttonY = location[1]
+        Log.e("aa", "Y chat 좌표: $buttonY")
+        if(y < buttonY){
+            val imm: InputMethodManager =
+                getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+        }
+
+        return super.dispatchTouchEvent(ev)
+    }
+
 }
+
