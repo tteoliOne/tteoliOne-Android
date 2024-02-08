@@ -2,7 +2,10 @@ package com.demo.sharingapp.domain.chat.chatroom
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
@@ -106,6 +109,23 @@ class ChatRoomActivity : AppCompatActivity() {
 
         }
 
+        binding.chatEditText.addTextChangedListener(object : TextWatcher{
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                if (s.toString().trim().isNotEmpty()) {
+                    binding.sendButton.setImageResource(R.drawable.chat_send_button)
+                    binding.sendButton.isClickable = true
+                } else {
+                    binding.sendButton.setImageResource(R.drawable.chat_no_send_button)
+                    binding.sendButton.isClickable = false
+                }
+
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
 
 //        binding.titleTextView.text = productTitle
 //        binding.buyPriceTextView.text = productSharePrice
@@ -117,7 +137,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
         runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) }
 
-        var token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+        val token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
         val headerToken = StompHeader("Authorization", token)
         val headerList = arrayListOf<StompHeader>()
@@ -155,7 +175,6 @@ class ChatRoomActivity : AppCompatActivity() {
                 val a = listOf( GetChatRoomInfoData("", 0, 0, "", "", sendData, 0,0,true))
 
                 chatRoomAdepter.submitList( a + chatRoomAdepter.currentList )
-
 
             } else {
                 Toast.makeText(this, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()

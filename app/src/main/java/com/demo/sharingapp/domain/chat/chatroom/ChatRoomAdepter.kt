@@ -23,7 +23,7 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
     }
 }){
     inner class ChatRoomViewHolder(private val binding: ItemChatRoomBinding) :RecyclerView.ViewHolder(binding.root){
-        fun bind(item: GetChatRoomInfoData){
+        fun bind(item: GetChatRoomInfoData, position: Int){
             binding.root.setOnClickListener{
 
             }
@@ -32,7 +32,16 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
                 binding.profileImageLayout.visibility= View.INVISIBLE
                 binding.descriptionTextView.text = item.content
             }else{ // 상대방 일때
-                binding.profileImageLayout.visibility= View.VISIBLE
+                if (position+1 <= itemCount-1){
+                    if (currentList[position+1].mine){
+                        binding.profileImageLayout.visibility= View.VISIBLE
+                    }else {
+                        binding.profileImageLayout.visibility= View.INVISIBLE
+                    }
+                }else{
+                    binding.profileImageLayout.visibility= View.VISIBLE
+                }
+//                binding.profileImageLayout.visibility= View.VISIBLE
                 binding.layout.gravity= Gravity.START
                 Glide.with(binding.profileImageView)
                     .load(profile)
@@ -64,6 +73,6 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
     }
 
     override fun onBindViewHolder(holder: ChatRoomViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        holder.bind(currentList[position],position)
     }
 }
