@@ -2,6 +2,7 @@ package com.demo.sharingapp.domain.chat.chatroom
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
@@ -157,6 +158,8 @@ class ChatRoomActivity : AppCompatActivity() {
             if (serverState) {
                 sockClient.disconnect()
             }
+            val resultIntent = Intent()
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
 

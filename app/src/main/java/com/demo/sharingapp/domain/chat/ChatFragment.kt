@@ -1,5 +1,6 @@
 package com.demo.sharingapp.domain.chat
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -15,6 +16,7 @@ import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
+import com.demo.sharingapp.utils.Constants.MOVE_CHAT_CODE
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.USER_PROFILE
 import com.kakao.sdk.user.UserApiClient
@@ -32,7 +34,8 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
                 .putExtra(CHATROOM_NUMBER,it.chatNo.toString())
                 .putExtra(PRODUCT_ID, it.productNo)
                 .putExtra(USER_PROFILE, it.participant.profile)
-            startActivity(intent)
+//            startActivity(intent)
+            startActivityForResult(intent,MOVE_CHAT_CODE)
         }
 
         binding.chatListRecyclerView.apply {
@@ -40,13 +43,26 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
             layoutManager = LinearLayoutManager(this@ChatFragment.requireContext())
         }
 
-        RetrofitManager.instance.getChatList(this@ChatFragment.requireContext()){
+        // 채팅 리스트 불러오기
+        getChatList()
+
+
+
+
+    }
+
+    // 채팅 리스트 불러오기 함수
+    private fun getChatList() {
+        RetrofitManager.instance.getChatList(this@ChatFragment.requireContext()) {
             chatListAdepter.submitList(it)
         }
+    }
 
-
-
-
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == MOVE_CHAT_CODE && resultCode == Activity.RESULT_OK) {
+            getChatList()
+        }
     }
 
 
