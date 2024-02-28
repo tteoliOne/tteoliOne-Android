@@ -62,8 +62,8 @@ object Constants{
 }
 
 object API {
-//    const val BASE_URL : String = "https://tteolione.store"
-    const val BASE_URL : String = "http://118.41.215.56:8081"
+    const val BASE_URL : String = "https://tteolione.store"
+//    const val BASE_URL : String = "http://118.41.215.56:8081"
 
     const val BASE_URL_CHAT : String = "ws://118.41.215.56:8080/ws-stomp"
 

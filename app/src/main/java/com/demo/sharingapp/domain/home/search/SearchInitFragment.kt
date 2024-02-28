@@ -38,9 +38,7 @@ class SearchInitFragment : Fragment(R.layout.fragment_search_init) {
         })
         binding.searchInitRecyclerView.apply {
             adapter = searchInitAdepter
-            layoutManager = LinearLayoutManager(this@SearchInitFragment.requireContext()).also {
-                it.orientation = LinearLayoutManager.HORIZONTAL
-            }
+            layoutManager = LinearLayoutManager(this@SearchInitFragment.requireContext())
         }
 
         if (SharedPreferencesData.containsData(this.requireContext(), Constants.SEARCH_RECODE)) {

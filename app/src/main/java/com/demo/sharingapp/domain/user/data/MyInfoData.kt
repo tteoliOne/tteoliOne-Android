@@ -4,5 +4,5 @@ data class MyInfoData(
     val profile: String,
     val nickname: String,
     val intro: String,
-    val thumbsUpScore: Int
+    val thumbsUpScore: Double
 )

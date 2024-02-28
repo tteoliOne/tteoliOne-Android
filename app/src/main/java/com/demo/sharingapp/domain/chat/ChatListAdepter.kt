@@ -29,7 +29,6 @@ class ChatListAdepter(val onClick:(item:GetChatListData) -> Unit): ListAdapter<G
             binding.nicknameTextView.text = item.participant.username
             if (item.latestMessage != null){
                 binding.descriptionTextView.text = item.latestMessage.context
-
                 val time = item.latestMessage.sendAt
                 val sendTime = Instant.ofEpochMilli(time)
                 val currentTime = Instant.now()
@@ -41,6 +40,10 @@ class ChatListAdepter(val onClick:(item:GetChatListData) -> Unit): ListAdapter<G
                     binding.unReadTextView.text = item.unReadCount.toString()
                     binding.unReadLayout.isVisible = true
                 }
+            }else{
+                binding.descriptionTextView.text = ""
+                binding.timeTextView.text = ""
+                binding.unReadLayout.isVisible = false
             }
 
 

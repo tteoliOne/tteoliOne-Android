@@ -16,6 +16,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -85,7 +86,7 @@ class ChatRoomActivity : AppCompatActivity() {
 
 
         Log.e("userId", userId.toString())
-        chatRoomAdepter= ChatRoomAdepter(profile)
+        chatRoomAdepter = ChatRoomAdepter(profile)
         linearLayoutManger = LinearLayoutManager(applicationContext).apply {
             reverseLayout = true
         }
@@ -95,7 +96,7 @@ class ChatRoomActivity : AppCompatActivity() {
         }
 
 
-        RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong()){
+        RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong()) {
             binding.titleTextView.text = it.title
             val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
             val sharePrice = currencyFormat.format(it.sharePrice)
@@ -107,10 +108,15 @@ class ChatRoomActivity : AppCompatActivity() {
             val chatList = it.chatList.reversed()
 
             chatRoomAdepter.submitList(chatList)
+            if (it.checkSeller) { // 판매자일때
+                binding.noApproveButton.visibility = View.INVISIBLE
 
+            } else { // 소비자일때
+                binding.requestButton.visibility = View.INVISIBLE
+            }
         }
 
-        binding.chatEditText.addTextChangedListener(object : TextWatcher{
+        binding.chatEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -168,16 +174,16 @@ class ChatRoomActivity : AppCompatActivity() {
                 val sendData = binding.chatEditText.text.toString()
                 val data = JSONObject()
                 data.put("chatRoomNo", chatRoomNum)
-                data.put("contentType", "notice")
+                data.put("contentType", "chat")
                 data.put("content", sendData)
                 data.put("senderNo", 1)
                 data.put("productNo", productId)
                 sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
                     .subscribe()
                 binding.chatEditText.text.clear()
-                val a = listOf( GetChatRoomInfoData("", 0, 0, "", "", sendData, 0,0,true))
+                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", sendData, 0, 0, true))
 
-                chatRoomAdepter.submitList( a + chatRoomAdepter.currentList )
+                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
 
             } else {
                 Toast.makeText(this, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
@@ -190,16 +196,12 @@ class ChatRoomActivity : AppCompatActivity() {
 //            return@setOnTouchListener false
 //        }
 
-        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver(){
+        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                 super.onItemRangeInserted(positionStart, itemCount)
-                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView,null,0)
+                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
             }
         })
-
-
-
-
 
 
 //        exampleTest()
@@ -267,7 +269,11 @@ class ChatRoomActivity : AppCompatActivity() {
 //        chatRoomAdepter.submitList()
     }
 
-    private fun initMessage(headerList: ArrayList<StompHeader>, chatRoomNum: String, userId: Long): StompClient {
+    private fun initMessage(
+        headerList: ArrayList<StompHeader>,
+        chatRoomNum: String,
+        userId: Long,
+    ): StompClient {
 
         val client = OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
@@ -275,7 +281,7 @@ class ChatRoomActivity : AppCompatActivity() {
 //        val clientHeader = mapOf("Authorization" to token)
 
         val sockClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
-            "ws://118.41.215.56:8081" + "/ws-stomp/websocket", null, client)
+            "ws://43.200.94.118:8081" + "/ws-stomp/websocket", null, client)
 
         sockClient.connect(headerList)
 
@@ -368,33 +374,36 @@ class ChatRoomActivity : AppCompatActivity() {
         sockClient: StompClient,
         headerList: ArrayList<StompHeader>,
         chatRoomNum: String,
-        userId : Long
+        userId: Long,
     ) {
         sockClient.topic("/sub/pub/$chatRoomNum", headerList).subscribe({
             // 성공적인 경우 처리
 
             val data = Gson().fromJson(it.payload, SendMessageResponse::class.java)
-            if (data.senderNo == userId) { // 보내는 사람일때
+            if (data.contentType == "chat") {
+                if (data.senderNo == userId) { // 보내는 사람일때
 
-                val chatSendCallBack = ChatSendCallBack(id =data.id,
-                    chatRoomNo = data.chatRoomNo,
-                    contentType = data.contentType,
-                    content = data.content,
-                    senderName = data.senderName,
-                    senderNo = data.senderNo,
-                    productNo = data.productNo,
-                    sendTime = data.sendTime,
-                    readCount = data.readCount,
-                    senderLoginId = data.senderLoginId)
-                RetrofitManager.instance.postChatSendCallBack(this, chatSendCallBack)
-                Log.e("Asad", data.toString())
+                    val chatSendCallBack = ChatSendCallBack(id = data.id,
+                        chatRoomNo = data.chatRoomNo,
+                        contentType = data.contentType,
+                        content = data.content,
+                        senderName = data.senderName,
+                        senderNo = data.senderNo,
+                        productNo = data.productNo,
+                        sendTime = data.sendTime,
+                        readCount = data.readCount,
+                        senderLoginId = data.senderLoginId)
+                    RetrofitManager.instance.postChatSendCallBack(this, chatSendCallBack)
+                    Log.e("Asad", data.toString())
 //                Log.e("Asad", chatSendCallBack.toString())
-            }else{ // 상대방 일때
-                val content = data.content
-                val a = listOf( GetChatRoomInfoData("", 0, 0, "", "", content, 0,0,false,))
+                } else { // 상대방 일때
+                    val content = data.content
+                    val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", content, 0, 0, false))
 
-                chatRoomAdepter.submitList( a + chatRoomAdepter.currentList )
+                    chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+                }
             }
+
             Log.e("Asad", data.content)
 
             Log.e("Asad", it.payload)
@@ -412,14 +421,14 @@ class ChatRoomActivity : AppCompatActivity() {
     // 화면 터치 시 키보드 내리기
     override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
         val y = ev.y
-        Log.e("aa",ev.toString())
+        Log.e("aa", ev.toString())
         Log.e("aa", "Y 좌표: $y")
         val location = IntArray(2)
         binding.chatEditText.getLocationOnScreen(location)
 
         val buttonY = location[1]
         Log.e("aa", "Y chat 좌표: $buttonY")
-        if(y < buttonY){
+        if (y < buttonY) {
             val imm: InputMethodManager =
                 getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
             imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)

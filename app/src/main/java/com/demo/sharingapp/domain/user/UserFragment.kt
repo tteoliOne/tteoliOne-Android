@@ -21,6 +21,7 @@ import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.kakao.sdk.user.UserApiClient
+import kotlin.math.roundToInt
 
 class UserFragment: Fragment(R.layout.fragment_user) {
 
@@ -35,7 +36,7 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         RetrofitManager.instance.getMyInfo(this.requireContext()){
             binding.nicknameTextView.text = it.nickname
             nickname = it.nickname
-            binding.goodCountTextView.text = it.thumbsUpScore.toString()
+            binding.goodCountTextView.text = ((it.thumbsUpScore*10).roundToInt()/10.0).toString()
             if(it.intro != null && it.intro != ""){
                 binding.descriptionTextView.text = it.intro
                 description = it.intro

@@ -35,7 +35,7 @@
             android:orientation="vertical"
             app:layout_constraintEnd_toStartOf="@id/usernameLayout"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" >
+            app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
                 android:id="@+id/userImageView"
@@ -45,8 +45,6 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
         </LinearLayout>
-
-
 
 
         <LinearLayout
