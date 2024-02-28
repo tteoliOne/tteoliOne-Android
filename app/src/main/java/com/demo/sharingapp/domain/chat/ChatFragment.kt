@@ -34,7 +34,6 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
                 .putExtra(CHATROOM_NUMBER,it.chatNo.toString())
                 .putExtra(PRODUCT_ID, it.productNo)
                 .putExtra(USER_PROFILE, it.participant.profile)
-//            startActivity(intent)
             startActivityForResult(intent,MOVE_CHAT_CODE)
         }
 
@@ -45,9 +44,6 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
 
         // 채팅 리스트 불러오기
         getChatList()
-
-
-
 
     }
 

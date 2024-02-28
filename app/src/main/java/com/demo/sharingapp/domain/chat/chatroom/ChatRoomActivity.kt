@@ -82,10 +82,32 @@ class ChatRoomActivity : AppCompatActivity() {
         val chatRoomNum = intent.getStringExtra(CHATROOM_NUMBER) ?: "0"
         val productId = intent.getLongExtra(PRODUCT_ID, 0)
         val userId = SharedPreferencesData.getLongData(this, USER_ID)
-        var opponentProfile = ""
 
+        // 리사이클러뷰 초기설정
+        initRecyclerView(profile)
 
-        Log.e("userId", userId.toString())
+        // 채팅 내역 정보 받아오기
+        getChatRoomData(chatRoomNum)
+
+        // 채팅예외처리
+        chattingException()
+
+        val sockClient = initMessage(chatRoomNum, userId, productId)
+
+        // 이전 버튼 클릭
+        clickBackButton(sockClient)
+
+//        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+//            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+//                super.onItemRangeInserted(positionStart, itemCount)
+//                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
+//            }
+//        })
+
+    }
+
+    // 리사이클러뷰 초기설정 함수
+    private fun initRecyclerView(profile: String) {
         chatRoomAdepter = ChatRoomAdepter(profile)
         linearLayoutManger = LinearLayoutManager(applicationContext).apply {
             reverseLayout = true
@@ -94,8 +116,10 @@ class ChatRoomActivity : AppCompatActivity() {
             adapter = chatRoomAdepter
             layoutManager = linearLayoutManger
         }
+    }
 
-
+    // 채팅 내역 정보 받아오기 함수
+    private fun getChatRoomData(chatRoomNum: String) {
         RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong()) {
             binding.titleTextView.text = it.title
             val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
@@ -115,7 +139,10 @@ class ChatRoomActivity : AppCompatActivity() {
                 binding.requestButton.visibility = View.INVISIBLE
             }
         }
+    }
 
+    // 채팅예외처리 함수
+    private fun chattingException() {
         binding.chatEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -132,20 +159,18 @@ class ChatRoomActivity : AppCompatActivity() {
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
 
+    // Stomp 초기 설정(채팅) 함수
+    private fun initMessage(
+        chatRoomNum: String,
+        userId: Long,
+        productId: Long
+    ): StompClient {
 
-//        binding.titleTextView.text = productTitle
-//        binding.buyPriceTextView.text = productSharePrice
-//        Glide.with(binding.productImageView)
-//            .load(productImage)
-//            .into(binding.productImageView)
-//
-//        binding.nicknameTextView.text = sendUserNickname + " 채팅"
-
-        runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) }
+        runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) } // 채팅서버에 연결하기 전에 토큰 재발급
 
         val token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
-
         val headerToken = StompHeader("Authorization", token)
         val headerList = arrayListOf<StompHeader>()
         headerList.add(StompHeader("chatRoomNo", chatRoomNum))
@@ -156,136 +181,15 @@ class ChatRoomActivity : AppCompatActivity() {
         sendHeaderList.add(headerToken)
         sendHeaderList.add(StompHeader("destination", "/pub/message"))
 
-
-        val sockClient = initMessage(headerList, chatRoomNum, userId)
-
-
-        binding.backButton.setOnClickListener {
-            if (serverState) {
-                sockClient.disconnect()
-            }
-            val resultIntent = Intent()
-            setResult(RESULT_OK, resultIntent)
-            finish()
-        }
-
-        binding.sendButton.setOnClickListener {
-            if (serverState) {
-                val sendData = binding.chatEditText.text.toString()
-                val data = JSONObject()
-                data.put("chatRoomNo", chatRoomNum)
-                data.put("contentType", "chat")
-                data.put("content", sendData)
-                data.put("senderNo", 1)
-                data.put("productNo", productId)
-                sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
-                    .subscribe()
-                binding.chatEditText.text.clear()
-                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", sendData, 0, 0, true))
-
-                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
-
-            } else {
-                Toast.makeText(this, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
-            }
-
-        }
-
-//        binding.root.setOnTouchListener { v, event ->
-//            Log.e("aa","aa")
-//            return@setOnTouchListener false
-//        }
-
-        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
-            }
-        })
-
-
-//        exampleTest()
-
-    }
-
-    private fun exampleTest() {
-        val itemList = listOf(
-            ChatRoomData(
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
-                "윈터",
-                "양파 싸게 팔아요",
-                "언제 사셨나요?",
-                10000,
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
-                1
-            ),
-            ChatRoomData(
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
-                "윈터",
-                "양파 싸게 팔아요",
-                "한달정도 지났어요",
-                10000,
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
-                2
-            ),
-            ChatRoomData(
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
-                "윈터",
-                "양파 싸게 팔아요",
-                "혹시 네고 가능할까요?",
-                10000,
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
-                1
-            ),
-            ChatRoomData(
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
-                "윈터",
-                "양파 싸게 팔아요",
-                "당연히 안되죠",
-                10000,
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
-                2
-            ),
-            ChatRoomData(
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
-                "윈터",
-                "양파 싸게 팔아요",
-                "네",
-                10000,
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
-                1
-            ),
-            ChatRoomData(
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
-                "윈터",
-                "양파 싸게 팔아요",
-                "ㅋㅋㅋㅋㅋㅋ",
-                10000,
-                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
-                2
-            ),
-
-            )
-//        chatRoomAdepter.submitList()
-    }
-
-    private fun initMessage(
-        headerList: ArrayList<StompHeader>,
-        chatRoomNum: String,
-        userId: Long,
-    ): StompClient {
-
         val client = OkHttpClient.Builder()
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .build()
-//        val clientHeader = mapOf("Authorization" to token)
 
         val sockClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
             "ws://43.200.94.118:8081" + "/ws-stomp/websocket", null, client)
 
         sockClient.connect(headerList)
 
-//        val headerTokenList = listOf<StompHeader>(headerToken)
         // 메시지 구독
         chatSubscribe(sockClient, headerList, chatRoomNum, userId)
 
@@ -295,11 +199,16 @@ class ChatRoomActivity : AppCompatActivity() {
         // stomp 생명주기
         stompLifecycle(sockClient)
 
+        // 메시지 보내기
+        sendMessage(chatRoomNum, productId, sockClient, sendHeaderList)
+
 
         return sockClient
 
     }
 
+
+    // stomp 생명주기 함수
     @SuppressLint("CheckResult")
     private fun stompLifecycle(sockClient: StompClient) {
         sockClient.lifecycle().subscribe {
@@ -412,10 +321,46 @@ class ChatRoomActivity : AppCompatActivity() {
         })
     }
 
+    // 메시지 보내기 함수
+    private fun sendMessage(
+        chatRoomNum: String,
+        productId: Long,
+        sockClient: StompClient,
+        sendHeaderList: ArrayList<StompHeader>,
+    ) {
+        binding.sendButton.setOnClickListener {
+            if (serverState) {
+                val sendData = binding.chatEditText.text.toString()
+                val data = JSONObject()
+                data.put("chatRoomNo", chatRoomNum)
+                data.put("contentType", "chat")
+                data.put("content", sendData)
+                data.put("senderNo", 1)
+                data.put("productNo", productId)
+                sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
+                    .subscribe()
+                binding.chatEditText.text.clear()
+                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", sendData, 0, 0, true))
 
-    private fun isTokenExpiredError(throwable: Throwable): Boolean {
-        // 토큰 만료와 관련된 오류 여부를 판단하는 로직
-        return throwable.message?.contains("Token expired") == true
+                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+
+            } else {
+                Toast.makeText(this, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+    }
+
+    // 이전 버튼 클릭 함수
+    private fun clickBackButton(sockClient: StompClient) {
+        binding.backButton.setOnClickListener {
+            if (serverState) {
+                sockClient.disconnect()
+            }
+            val resultIntent = Intent()
+            setResult(RESULT_OK, resultIntent)
+            finish()
+        }
     }
 
     // 화면 터치 시 키보드 내리기
@@ -435,6 +380,68 @@ class ChatRoomActivity : AppCompatActivity() {
         }
 
         return super.dispatchTouchEvent(ev)
+    }
+
+
+    private fun exampleTest() {
+        val itemList = listOf(
+            ChatRoomData(
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
+                "윈터",
+                "양파 싸게 팔아요",
+                "언제 사셨나요?",
+                10000,
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
+                1
+            ),
+            ChatRoomData(
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
+                "윈터",
+                "양파 싸게 팔아요",
+                "한달정도 지났어요",
+                10000,
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
+                2
+            ),
+            ChatRoomData(
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
+                "윈터",
+                "양파 싸게 팔아요",
+                "혹시 네고 가능할까요?",
+                10000,
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
+                1
+            ),
+            ChatRoomData(
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
+                "윈터",
+                "양파 싸게 팔아요",
+                "당연히 안되죠",
+                10000,
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
+                2
+            ),
+            ChatRoomData(
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
+                "윈터",
+                "양파 싸게 팔아요",
+                "네",
+                10000,
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
+                1
+            ),
+            ChatRoomData(
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/cb1e1376-4384-44a9-9dae-087d32d791ce.jpeg",
+                "윈터",
+                "양파 싸게 팔아요",
+                "ㅋㅋㅋㅋㅋㅋ",
+                10000,
+                "https://tteolione-bucket.s3.ap-northeast-2.amazonaws.com/test/29087992-a912-41d6-9d84-2e96575120d8.jpeg",
+                2
+            ),
+
+            )
+//        chatRoomAdepter.submitList()
     }
 
 }

@@ -28,7 +28,6 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
 
             }
             if (item.mine){ // 자신일때
-                binding.layout.gravity= Gravity.END
                 binding.profileImageLayout.visibility= View.INVISIBLE
                 binding.descriptionTextView.text = item.content
             }else{ // 상대방 일때
@@ -42,7 +41,7 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
                     binding.profileImageLayout.visibility= View.VISIBLE
                 }
 //                binding.profileImageLayout.visibility= View.VISIBLE
-                binding.layout.gravity= Gravity.START
+
                 Glide.with(binding.profileImageView)
                     .load(profile)
                     .circleCrop()
