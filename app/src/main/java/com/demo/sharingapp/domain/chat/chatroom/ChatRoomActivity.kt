@@ -1,22 +1,16 @@
 package com.demo.sharingapp.domain.chat.chatroom
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.AttributeSet
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewTreeObserver
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -27,31 +21,16 @@ import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
 import com.demo.sharingapp.domain.chat.chatroom.data.GetChatRoomInfoData
 import com.demo.sharingapp.domain.chat.chatroom.data.SendMessageResponse
 import com.demo.sharingapp.retrofit.RetrofitManager
-import com.demo.sharingapp.retrofit.TokenAuthenticator
 import com.demo.sharingapp.shared.SharedPreferencesData
-import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.CHATROOM_NUMBER
-import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
-import com.demo.sharingapp.utils.Constants.PRODUCT_IMAGE
-import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
-import com.demo.sharingapp.utils.Constants.PRODUCT_TITLE
 import com.demo.sharingapp.utils.Constants.USER_ID
 import com.demo.sharingapp.utils.Constants.USER_PROFILE
-import com.demo.sharingapp.utils.ViewUtil.hideKeyboard
-import com.demo.sharingapp.utils.ViewUtil.showKeyboard
-import com.google.android.gms.common.api.Api.Client
 import com.google.gson.Gson
-import com.google.gson.JsonParser
-import io.reactivex.Flowable
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
-import okhttp3.internal.notify
 import okhttp3.logging.HttpLoggingInterceptor
-import org.java_websocket.client.WebSocketClient
 import org.json.JSONObject
 import ua.naiksoftware.stomp.Stomp
 import ua.naiksoftware.stomp.StompClient
@@ -59,12 +38,12 @@ import ua.naiksoftware.stomp.dto.LifecycleEvent
 import ua.naiksoftware.stomp.dto.StompCommand
 import ua.naiksoftware.stomp.dto.StompHeader
 import ua.naiksoftware.stomp.dto.StompMessage
-import ua.naiksoftware.stomp.provider.AbstractConnectionProvider
-import ua.naiksoftware.stomp.provider.WebSocketsConnectionProvider
+import ua.naiksoftware.stomp.provider.ConnectionProvider
 import java.text.NumberFormat
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.collections.ArrayList
+
 
 class ChatRoomActivity : AppCompatActivity() {
     private lateinit var chatRoomAdepter: ChatRoomAdepter
@@ -95,14 +74,14 @@ class ChatRoomActivity : AppCompatActivity() {
         val sockClient = initMessage(chatRoomNum, userId, productId)
 
         // 이전 버튼 클릭
-        clickBackButton(sockClient)
+        clickBackButton(sockClient,chatRoomNum.toLong())
 
-//        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-//            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-//                super.onItemRangeInserted(positionStart, itemCount)
-//                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
-//            }
-//        })
+        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
+            }
+        })
 
     }
 
@@ -131,12 +110,20 @@ class ChatRoomActivity : AppCompatActivity() {
             binding.nicknameTextView.text = it.opponentNickname + " 채팅"
             val chatList = it.chatList.reversed()
 
+            binding.requestButton.setOnClickListener {
+                Log.e("button","요청하기")
+            }
+            binding.noApproveButton.setOnClickListener {
+                Log.e("button","승인")
+            }
+
             chatRoomAdepter.submitList(chatList)
             if (it.checkSeller) { // 판매자일때
-                binding.noApproveButton.visibility = View.INVISIBLE
+                binding.requestButton.visibility = View.INVISIBLE
 
             } else { // 소비자일때
-                binding.requestButton.visibility = View.INVISIBLE
+                binding.noApproveButton.visibility = View.INVISIBLE
+
             }
         }
     }
@@ -165,7 +152,7 @@ class ChatRoomActivity : AppCompatActivity() {
     private fun initMessage(
         chatRoomNum: String,
         userId: Long,
-        productId: Long
+        productId: Long,
     ): StompClient {
 
         runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) } // 채팅서버에 연결하기 전에 토큰 재발급
@@ -190,6 +177,8 @@ class ChatRoomActivity : AppCompatActivity() {
 
         sockClient.connect(headerList)
 
+
+
         // 메시지 구독
         chatSubscribe(sockClient, headerList, chatRoomNum, userId)
 
@@ -211,7 +200,7 @@ class ChatRoomActivity : AppCompatActivity() {
     // stomp 생명주기 함수
     @SuppressLint("CheckResult")
     private fun stompLifecycle(sockClient: StompClient) {
-        sockClient.lifecycle().subscribe {
+        val dispLifecycle = sockClient.lifecycle().subscribe {
             when (it.type) {
                 LifecycleEvent.Type.OPENED -> {
                     Log.e("Stomp", "서버 연결")
@@ -234,6 +223,7 @@ class ChatRoomActivity : AppCompatActivity() {
             }
 
         }
+
     }
 
     // 에러 메시지 구독 함수
@@ -289,9 +279,9 @@ class ChatRoomActivity : AppCompatActivity() {
             // 성공적인 경우 처리
 
             val data = Gson().fromJson(it.payload, SendMessageResponse::class.java)
+            Log.e("Asad", data.toString())
             if (data.contentType == "chat") {
                 if (data.senderNo == userId) { // 보내는 사람일때
-
                     val chatSendCallBack = ChatSendCallBack(id = data.id,
                         chatRoomNo = data.chatRoomNo,
                         contentType = data.contentType,
@@ -302,14 +292,25 @@ class ChatRoomActivity : AppCompatActivity() {
                         sendTime = data.sendTime,
                         readCount = data.readCount,
                         senderLoginId = data.senderLoginId)
-                    RetrofitManager.instance.postChatSendCallBack(this, chatSendCallBack)
-                    Log.e("Asad", data.toString())
+                    RetrofitManager.instance.postChatSendCallBack(this, chatSendCallBack){
+                        val a = listOf(GetChatRoomInfoData("", 0, 0, it.data.senderName, "", it.data.content, it.data.sendTime, it.data.readCount.toLong(), true))
+
+                        chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+                    }
+
 //                Log.e("Asad", chatSendCallBack.toString())
                 } else { // 상대방 일때
                     val content = data.content
-                    val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", content, 0, 0, false))
+                    val currentMillis = LocalDateTime.now()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()?.toEpochMilli() ?: 0
+                    val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", content, currentMillis, 0, false))
 
                     chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+                }
+            }else if(data.contentType == "notice"){
+                if (data.content.contains("돌아오셨습니다")){
+                    getChatRoomData(chatRoomNum)
                 }
             }
 
@@ -330,6 +331,9 @@ class ChatRoomActivity : AppCompatActivity() {
     ) {
         binding.sendButton.setOnClickListener {
             if (serverState) {
+                val currentMillis = LocalDateTime.now()
+                    .atZone(ZoneId.systemDefault())
+                    .toInstant()?.toEpochMilli() ?: 0
                 val sendData = binding.chatEditText.text.toString()
                 val data = JSONObject()
                 data.put("chatRoomNo", chatRoomNum)
@@ -340,9 +344,9 @@ class ChatRoomActivity : AppCompatActivity() {
                 sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
                     .subscribe()
                 binding.chatEditText.text.clear()
-                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", sendData, 0, 0, true))
-
-                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+//                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", sendData, currentMillis, 0, true))
+//
+//                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
 
             } else {
                 Toast.makeText(this, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
@@ -352,9 +356,11 @@ class ChatRoomActivity : AppCompatActivity() {
     }
 
     // 이전 버튼 클릭 함수
-    private fun clickBackButton(sockClient: StompClient) {
+    private fun clickBackButton(sockClient: StompClient,chatRoomNum: Long) {
         binding.backButton.setOnClickListener {
+
             if (serverState) {
+                RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum)
                 sockClient.disconnect()
             }
             val resultIntent = Intent()

@@ -956,7 +956,8 @@ class RetrofitManager() : Application() {
     // 채팅 메시지 전송 콜백
     fun postChatSendCallBack(
         context: Context,
-        chatSendCallBack : ChatSendCallBack
+        chatSendCallBack : ChatSendCallBack,
+        onSuccess: (ChatRoomCallBack) -> Unit
     ){
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -964,20 +965,22 @@ class RetrofitManager() : Application() {
         val api = retrofit.create(RestAPI::class.java)
         val call = api.postChatSendCallBack(Authorization =  authorization, chatSendCallBack = chatSendCallBack)
 
-        call.enqueue(object : retrofit2.Callback<TokenResponse>{
-            override fun onResponse(call: Call<TokenResponse>, response: Response<TokenResponse>) {
+        call.enqueue(object : retrofit2.Callback<ChatRoomCallBack>{
+            override fun onResponse(call: Call<ChatRoomCallBack>, response: Response<ChatRoomCallBack>) {
                 if (response.isSuccessful) {
-                    Log.e("getMyInfo", "success ${response.body()?.success}")
-                    Log.e("getMyInfo", "data ${response.body()?.data}")
-                    Log.e("getMyInfo", "message ${response.body()?.message}")
-                    Log.e("getMyInfo", "code ${response.body()?.code}")
+                    Log.e("getMyInfo", "success ${response.body()?.data?.readCount}")
+                    val success = response.body()?.success ?: return
+                    if (success){
+                        val data = response.body() ?: return
+                        onSuccess(data)
+                    }
                 }else{
                     Log.e("getMyInfo", "succes, but ${response.errorBody()}")
 
                 }
             }
 
-            override fun onFailure(call: Call<TokenResponse>, t: Throwable) {
+            override fun onFailure(call: Call<ChatRoomCallBack>, t: Throwable) {
                 Log.e("getMyInfo", "fail ${t} $call")
             }
         })
@@ -1094,6 +1097,44 @@ class RetrofitManager() : Application() {
             }
 
             override fun onFailure(call: Call<ProductsResponse>, t: Throwable) {
+                Log.e("Post", "fail ${t} $call")
+            }
+        })
+
+    }
+
+    // putLeaveChatRoom
+    fun putLeaveChatRoom(
+        context: Context,
+        chatRoomId: Long
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.putLeaveChatRoom(
+            Authorization = authorization,
+            chatRoomId = chatRoomId
+        )
+
+        call.enqueue(object : retrofit2.Callback<EmailResponse> {
+            override fun onResponse(
+                call: Call<EmailResponse>,
+                response: Response<EmailResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "상품이 등록 되었습니다.", Toast.LENGTH_SHORT).show()
+                    Log.e("Post", "success ${response.body()?.data}")
+                    Log.e("Post", "success ${response.body()?.success}")
+                    Log.e("Post", "success ${response.body()?.message}")
+                    Log.e("Post", "success ${response.body()?.code}")
+                } else {
+                    Log.e("Post", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("Post", "fail ${t} $call")
             }
         })

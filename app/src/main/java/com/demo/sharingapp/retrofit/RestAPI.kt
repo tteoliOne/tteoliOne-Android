@@ -100,7 +100,7 @@ interface RestAPI {
     fun postChatSendCallBack(
         @Header("Authorization") Authorization: String,
         @Body chatSendCallBack: ChatSendCallBack,
-    ): Call<TokenResponse>
+    ): Call<ChatRoomCallBack>
 
     // 카카오 프로필 보내기
     @Multipart
@@ -119,6 +119,13 @@ interface RestAPI {
         @Part receipt: MultipartBody.Part,
         @Part("request") request: Products,
     ): Call<ProductsResponse>
+
+    //
+    @PUT(API.LEAVE_CHATROOM) // Replace with your API endpoint
+    fun putLeaveChatRoom(
+        @Header("Authorization") Authorization: String,
+        @Path("chatRoomId") chatRoomId: Long,
+    ): Call<EmailResponse>
 
     // 등록 상품 정보 보내기
     @Multipart

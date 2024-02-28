@@ -125,6 +125,10 @@ object API {
 
     const val CHANGE_MY_INFO : String="/api/users"
 
+    const val PRODUCT_REQUEST : String="/api/products/:productId/request"
+
+    const val LEAVE_CHATROOM : String="/api/chatRoom/{chatRoomId}"
+
 
     const val GET_PRODUCTS : String="/api/products/userId=&longitude=&latitude="
 
