@@ -95,6 +95,12 @@ interface RestAPI {
     @POST(API.KAKAO_TOKEN) // Replace with your API endpoint
     fun postAccessToken(@Body accessTokenRequest: LoginTokenData): Call<TokenResponse>
 
+    // 로그아웃
+    @POST(API.LOGOUT)
+    fun postLogout(
+        @Header("Authorization") Authorization: String,
+    ): Call<EmailResponse>
+
     // 채팅_메시지 전송 후 callback
     @POST(API.CHAT_SEND_CALLBACK) // Replace with your API endpoint
     fun postChatSendCallBack(
@@ -120,12 +126,21 @@ interface RestAPI {
         @Part("request") request: Products,
     ): Call<ProductsResponse>
 
-    //
-    @PUT(API.LEAVE_CHATROOM) // Replace with your API endpoint
+    // 방에서 이전 화면으로 이동
+    @PUT(API.LEAVE_CHATROOM)
     fun putLeaveChatRoom(
         @Header("Authorization") Authorization: String,
         @Path("chatRoomId") chatRoomId: Long,
     ): Call<EmailResponse>
+
+    // 상품 공유 요청
+    @PUT(API.PRODUCT_REQUEST)
+    fun putProductRequest(
+        @Header("Authorization") Authorization: String,
+        @Path("productId") productId: Long,
+    ): Call<EmailResponse>
+
+
 
     // 등록 상품 정보 보내기
     @Multipart

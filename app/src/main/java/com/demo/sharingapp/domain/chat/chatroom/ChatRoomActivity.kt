@@ -103,6 +103,7 @@ class ChatRoomActivity : AppCompatActivity() {
             binding.titleTextView.text = it.title
             val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
             val sharePrice = currencyFormat.format(it.sharePrice)
+            val productId = it.productId
             binding.buyPriceTextView.text = sharePrice
             Glide.with(binding.productImageView)
                 .load(it.productImage)
@@ -111,7 +112,7 @@ class ChatRoomActivity : AppCompatActivity() {
             val chatList = it.chatList.reversed()
 
             binding.requestButton.setOnClickListener {
-                Log.e("button","요청하기")
+                RetrofitManager.instance.putProductRequest(this, productsId = productId)
             }
             binding.noApproveButton.setOnClickListener {
                 Log.e("button","승인")

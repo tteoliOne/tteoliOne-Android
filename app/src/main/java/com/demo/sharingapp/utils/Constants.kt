@@ -125,7 +125,11 @@ object API {
 
     const val CHANGE_MY_INFO : String="/api/users"
 
-    const val PRODUCT_REQUEST : String="/api/products/:productId/request"
+    // 공유 요청
+    const val PRODUCT_REQUEST : String="/api/products/{productId}/request"
+
+    // 로그아웃
+    const val LOGOUT : String="/api/users/logout"
 
     const val LEAVE_CHATROOM : String="/api/chatRoom/{chatRoomId}"
 

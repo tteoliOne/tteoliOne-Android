@@ -1,7 +1,7 @@
 package com.demo.sharingapp.domain.home.data
 
 data class PartProductPageable(
-    val sort: SortData,
+    //val sort: SortData,
     val offset: Int,
     val pageNumber: Int,
     val pageSize: Int,

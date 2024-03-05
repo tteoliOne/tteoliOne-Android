@@ -562,6 +562,36 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 로그아웃
+    fun postLogout(
+        context: Context
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.postLogout(Authorization = authorization)
+
+        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
+                    Log.e("postLogout", "data ${response.body()?.data}")
+                    Log.e("postLogout", "success ${response.body()?.success}")
+                    Log.e("postLogout", "message ${response.body()?.message}")
+                    Log.e("postLogout", "code ${response.body()?.code}")
+                } else {
+                    Log.e("postLogout", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postLogout", "fail ${t} $call")
+            }
+        })
+    }
+
     // 비밀번호 찾기 - 이메일 인증코드 보내기
     fun postFindPasswordEmailVerify(
         findPasswordEmailVerifyData: FindPasswordEmailVerifyData,
@@ -758,6 +788,7 @@ class RetrofitManager() : Application() {
             ) {
                 if (response.isSuccessful) {
                     Log.e("Post", "success createMember ${response.body()?.data?.createMember}")
+                    Log.e("Post", "success createMember ${response.body()?.success}")
                     Log.e("Post", "success chatId ${response.body()?.data?.chatId}")
                     Log.e("Post", "success regDate ${response.body()?.data?.regDate}")
                     Log.e("Post", "success joinMember ${response.body()?.data?.joinMember}")
@@ -1103,6 +1134,42 @@ class RetrofitManager() : Application() {
 
     }
 
+    // 상품 공유 요청
+    fun putProductRequest(
+        context: Context,
+        productsId: Long
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+//        val retrofit = initRetrofit(context)
+//        val api = retrofit.create(RestAPI::class.java)
+//        val call = api.putProductRequest(
+//            Authorization = authorization,
+//            productId = productsId
+//        )
+        val call = retrofitInterface?.putProductRequest(Authorization = authorization,
+            productId = productsId)
+
+        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
+                    Log.e("putProductRequest", "data ${response.body()?.data}")
+                    Log.e("putProductRequest", "success ${response.body()?.success}")
+                    Log.e("putProductRequest", "message ${response.body()?.message}")
+                    Log.e("putProductRequest", "code ${response.body()?.code}")
+                } else {
+                    Log.e("putProductRequest", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("putProductRequest", "fail ${t} $call")
+            }
+        })
+    }
+
     // putLeaveChatRoom
     fun putLeaveChatRoom(
         context: Context,
@@ -1123,7 +1190,7 @@ class RetrofitManager() : Application() {
                 response: Response<EmailResponse>,
             ) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "상품이 등록 되었습니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
                     Log.e("Post", "success ${response.body()?.data}")
                     Log.e("Post", "success ${response.body()?.success}")
                     Log.e("Post", "success ${response.body()?.message}")

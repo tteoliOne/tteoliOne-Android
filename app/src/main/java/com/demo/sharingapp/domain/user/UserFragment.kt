@@ -68,11 +68,15 @@ class UserFragment: Fragment(R.layout.fragment_user) {
             findNavController().navigate(action)
         }
 
+        // 로그아웃 클릭
         binding.logoutButton.setOnClickListener {
             //logout()
+
+            RetrofitManager.instance.postLogout(this.requireContext())
             SharedPreferencesData.removeAllData(this.requireContext())
             val intent = Intent(context, LoginView::class.java)
             startActivity(intent)
+            this.requireActivity().finish()
         }
 
         //초기 닉네임 입력 함수 호출
