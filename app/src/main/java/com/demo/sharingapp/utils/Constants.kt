@@ -131,6 +131,9 @@ object API {
     // 로그아웃
     const val LOGOUT : String="/api/users/logout"
 
+    // 채팅 _ 방 떠나기
+    const val CHATROOM_LEAVE : String="/api/chatRoom/{chatRoomId}"
+
     const val LEAVE_CHATROOM : String="/api/chatRoom/{chatRoomId}"
 
 

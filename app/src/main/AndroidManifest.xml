@@ -19,6 +19,13 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
         <activity
+            android:name=".domain.other_profile.OtherProfileActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".domain.chat.chatroom.ChatRoomActivity"
             android:exported="false"
             android:windowSoftInputMode="adjustResize">
@@ -191,8 +198,6 @@
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/app_main" />
-
-
     </application>
 
 </manifest>

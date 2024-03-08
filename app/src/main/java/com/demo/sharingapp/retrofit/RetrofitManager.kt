@@ -895,6 +895,35 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 채팅 방 떠나기
+    fun deleteChatRoomLeave(context: Context, chatRoomId: Long){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val call = api.deleteChatRoomLeave(Authorization = "Bearer $accessToken", chatRoomId = chatRoomId)
+
+        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("deleteChatRoomLeave", "success ${response.body()?.success}")
+                    Log.e("deleteChatRoomLeave", "data ${response.body()?.data}")
+                    Log.e("deleteChatRoomLeave", "message ${response.body()?.message}")
+                    Log.e("deleteChatRoomLeave", "code ${response.body()?.code}")
+                    if (response.body()?.success == true) {
+                        Toast.makeText(context, response.body()?.data, Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    Log.e("deleteChatRoomLeave", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("deleteChatRoomLeave", "fail ${t} $call")
+            }
+        })
+    }
+
     // 상품 삭제 하기
     fun getRemoveProduct(context: Context, productsId: Long) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)

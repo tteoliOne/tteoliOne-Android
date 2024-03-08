@@ -15,6 +15,7 @@ import com.demo.sharingapp.databinding.ActivityDetailedProductBinding
 import com.demo.sharingapp.domain.chat.chatroom.ChatRoomActivity
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
+import com.demo.sharingapp.domain.other_profile.OtherProfileActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
@@ -131,6 +132,11 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
         // 영수증 클릭
         clickReceipt()
+
+        binding.profileImageView.setOnClickListener {
+            val intent = Intent(this,OtherProfileActivity::class.java)
+            startActivity(intent)
+        }
 
         binding.settingMenu.setOnClickListener {
             val popup = PopupMenu(this@DetailedProductActivity, it)

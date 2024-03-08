@@ -1,6 +1,7 @@
 package com.demo.sharingapp.domain.user
 
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -33,6 +34,7 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         var nickname = ""
         var description = ""
         var profileImage = ""
+
         RetrofitManager.instance.getMyInfo(this.requireContext()){
             binding.nicknameTextView.text = it.nickname
             nickname = it.nickname

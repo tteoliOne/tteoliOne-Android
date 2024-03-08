@@ -242,6 +242,13 @@ interface RestAPI {
         @Path("productId") productId: Long,
     ): Call<EmailResponse>
 
+    // 채팅 _ 방 떠나기
+    @DELETE(API.CHATROOM_LEAVE)
+    fun deleteChatRoomLeave(
+        @Header("Authorization") Authorization: String,
+        @Path("chatRoomId") chatRoomId: Long,
+    ): Call<EmailResponse>
+
     // 내정보 변경
     @PATCH(API.CHANGE_MY_INFO)
     fun patchChangeNickname(

@@ -6,9 +6,11 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -75,6 +77,29 @@ class ChatRoomActivity : AppCompatActivity() {
 
         // 이전 버튼 클릭
         clickBackButton(sockClient,chatRoomNum.toLong())
+
+        binding.menuButton.setOnClickListener {
+            val popup = PopupMenu(this@ChatRoomActivity, it)
+            popup.menuInflater.inflate(R.menu.menu_chat, popup.menu)
+            popup.setOnMenuItemClickListener { menuItem: MenuItem ->
+                when (menuItem.itemId) {
+                    R.id.leaveMenu -> { // 나가기
+                        Log.e("chatMenu","나가기")
+                        RetrofitManager.instance.deleteChatRoomLeave(this, chatRoomId = chatRoomNum.toLong())
+                        finish()
+                        return@setOnMenuItemClickListener true
+                    }
+                    R.id.reportMenu -> { // 신고하기
+                        Log.e("chatMenu","신고하기")
+                        return@setOnMenuItemClickListener true
+                    }
+                    else -> {
+                        return@setOnMenuItemClickListener true
+                    }
+                }
+            }
+            popup.show()
+        }
 
         chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
