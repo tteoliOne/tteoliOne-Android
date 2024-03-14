@@ -2,6 +2,7 @@ package com.demo.sharingapp.domain.chat.chatroom
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.ColorStateList
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -18,10 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityChatRoomBinding
-import com.demo.sharingapp.domain.chat.chatroom.data.ChatRoomData
-import com.demo.sharingapp.domain.chat.chatroom.data.ChatSendCallBack
-import com.demo.sharingapp.domain.chat.chatroom.data.GetChatRoomInfoData
-import com.demo.sharingapp.domain.chat.chatroom.data.SendMessageResponse
+import com.demo.sharingapp.domain.chat.chatroom.data.*
+import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
@@ -47,7 +46,7 @@ import java.time.ZoneId
 import java.util.*
 
 
-class ChatRoomActivity : AppCompatActivity() {
+class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface {
     private lateinit var chatRoomAdepter: ChatRoomAdepter
     private lateinit var linearLayoutManger: LinearLayoutManager
     private lateinit var binding: ActivityChatRoomBinding
@@ -78,19 +77,47 @@ class ChatRoomActivity : AppCompatActivity() {
         // 이전 버튼 클릭
         clickBackButton(sockClient,chatRoomNum.toLong())
 
+        // 메뉴 버튼 클릭
+        clickMenuButton(chatRoomNum)
+
+        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                super.onItemRangeInserted(positionStart, itemCount)
+                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
+            }
+        })
+        val sendHeaderList = arrayListOf<StompHeader>()
+        val token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
+        val headerToken = StompHeader("Authorization", token)
+        sendHeaderList.add(StompHeader("chatRoomNo", chatRoomNum))
+        sendHeaderList.add(headerToken)
+        sendHeaderList.add(StompHeader("destination", "/pub/message"))
+
+        binding.requestButton.setOnClickListener {
+            showDialog(productId,chatRoomNum, sockClient = sockClient, sendHeaderList = sendHeaderList, contentType = "notice" )
+        }
+        binding.noApproveButton.setOnClickListener {
+            Log.e("button","승인")
+        }
+
+    }
+
+    // 메뉴 버튼 클릭 함수
+    private fun clickMenuButton(chatRoomNum: String) {
         binding.menuButton.setOnClickListener {
             val popup = PopupMenu(this@ChatRoomActivity, it)
             popup.menuInflater.inflate(R.menu.menu_chat, popup.menu)
             popup.setOnMenuItemClickListener { menuItem: MenuItem ->
                 when (menuItem.itemId) {
                     R.id.leaveMenu -> { // 나가기
-                        Log.e("chatMenu","나가기")
-                        RetrofitManager.instance.deleteChatRoomLeave(this, chatRoomId = chatRoomNum.toLong())
+                        Log.e("chatMenu", "나가기")
+                        RetrofitManager.instance.deleteChatRoomLeave(this,
+                            chatRoomId = chatRoomNum.toLong())
                         finish()
                         return@setOnMenuItemClickListener true
                     }
                     R.id.reportMenu -> { // 신고하기
-                        Log.e("chatMenu","신고하기")
+                        Log.e("chatMenu", "신고하기")
                         return@setOnMenuItemClickListener true
                     }
                     else -> {
@@ -100,14 +127,6 @@ class ChatRoomActivity : AppCompatActivity() {
             }
             popup.show()
         }
-
-        chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                super.onItemRangeInserted(positionStart, itemCount)
-                linearLayoutManger.smoothScrollToPosition(binding.chatRoomRecyclerView, null, 0)
-            }
-        })
-
     }
 
     // 리사이클러뷰 초기설정 함수
@@ -125,34 +144,66 @@ class ChatRoomActivity : AppCompatActivity() {
     // 채팅 내역 정보 받아오기 함수
     private fun getChatRoomData(chatRoomNum: String) {
         RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong()) {
-            binding.titleTextView.text = it.title
-            val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
-            val sharePrice = currencyFormat.format(it.sharePrice)
-            val productId = it.productId
-            binding.buyPriceTextView.text = sharePrice
+
+            // 채팅 제목
+            binding.nicknameTextView.text = getString(R.string.nickname_input, it.opponentNickname)
+
+            // 상품 이미지
             Glide.with(binding.productImageView)
                 .load(it.productImage)
                 .into(binding.productImageView)
-            binding.nicknameTextView.text = it.opponentNickname + " 채팅"
-            val chatList = it.chatList.reversed()
 
-            binding.requestButton.setOnClickListener {
-                RetrofitManager.instance.putProductRequest(this, productsId = productId)
-            }
-            binding.noApproveButton.setOnClickListener {
-                Log.e("button","승인")
-            }
+            // 상품명
+            binding.titleTextView.text = it.title
 
-            chatRoomAdepter.submitList(chatList)
+            // 개당 가격
+            val sharePrice = changePrice(it)
+            binding.buyPriceTextView.text = sharePrice
+
             if (it.checkSeller) { // 판매자일때
                 binding.requestButton.visibility = View.INVISIBLE
+                if(it.soldStatus == "eReservation"){
+                    val newTintColor = ColorStateList.valueOf(resources.getColor(R.color.app_main, theme))
+                    binding.noApproveButton.backgroundTintList = newTintColor
+                }else if (it.soldStatus == "eSolodOut"){
+                    val newTintColor = ColorStateList.valueOf(resources.getColor(R.color.gray, theme))
+                    binding.noApproveButton.backgroundTintList = newTintColor
+                    binding.noApproveButton.text = "공유 완료"
+                }
+
+
 
             } else { // 소비자일때
                 binding.noApproveButton.visibility = View.INVISIBLE
+                if(it.soldStatus == "eReservation"){
+                    binding.requestButton.text = "요청 중..."
+                    binding.requestButton.isClickable = false
+                }else if(it.soldStatus == "eSolodOut"){
+                    val newTintColor = ColorStateList.valueOf(resources.getColor(R.color.gray, theme))
+                    binding.requestButton.text = "공유 완료"
+                    binding.requestButton.backgroundTintList = newTintColor
+
+                }
 
             }
+
+            val productId = it.productId
+
+
+
+
+            val chatList = it.chatList.reversed()
+
+
+
+            chatRoomAdepter.submitList(chatList)
+
         }
     }
+
+    // 가격 int -> 원화문자열로 변환
+    private fun changePrice(it: GetChatRoomData) =
+        NumberFormat.getInstance(Locale.KOREA).format(it.sharePrice)
 
     // 채팅예외처리 함수
     private fun chattingException() {
@@ -215,7 +266,7 @@ class ChatRoomActivity : AppCompatActivity() {
         stompLifecycle(sockClient)
 
         // 메시지 보내기
-        sendMessage(chatRoomNum, productId, sockClient, sendHeaderList)
+        sendMessage(chatRoomNum, productId, sockClient, sendHeaderList,"chat",userId)
 
 
         return sockClient
@@ -338,6 +389,10 @@ class ChatRoomActivity : AppCompatActivity() {
                 if (data.content.contains("돌아오셨습니다")){
                     getChatRoomData(chatRoomNum)
                 }
+                else if(data.content.contains("true")){
+                    val newTintColor = ColorStateList.valueOf(resources.getColor(R.color.app_main, theme))
+                    binding.noApproveButton.backgroundTintList = newTintColor
+                }
             }
 
             Log.e("Asad", data.content)
@@ -354,6 +409,8 @@ class ChatRoomActivity : AppCompatActivity() {
         productId: Long,
         sockClient: StompClient,
         sendHeaderList: ArrayList<StompHeader>,
+        contentType: String,
+        userId: Long
     ) {
         binding.sendButton.setOnClickListener {
             if (serverState) {
@@ -363,9 +420,9 @@ class ChatRoomActivity : AppCompatActivity() {
                 val sendData = binding.chatEditText.text.toString()
                 val data = JSONObject()
                 data.put("chatRoomNo", chatRoomNum)
-                data.put("contentType", "chat")
+                data.put("contentType", contentType)
                 data.put("content", sendData)
-                data.put("senderNo", 1)
+                data.put("senderNo", userId)
                 data.put("productNo", productId)
                 sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
                     .subscribe()
@@ -474,6 +531,34 @@ class ChatRoomActivity : AppCompatActivity() {
 
             )
 //        chatRoomAdepter.submitList()
+    }
+
+    // 알림창 띄우기
+    private fun showDialog(productId: Long, chatRoomNum: String, sockClient: StompClient, sendHeaderList: ArrayList<StompHeader>, contentType: String ) {
+        val dialog = RequestDialog(this, productId, chatRoomNum, sockClient, sendHeaderList,contentType)
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this.supportFragmentManager,
+            "SignupDialog")
+    }
+
+    override fun onYesButtonClick(productId: Long, chatRoomNum: String, sockClient: StompClient, sendHeaderList: ArrayList<StompHeader>, contentType: String ) {
+        RetrofitManager.instance.putProductRequest(this, productsId = productId){
+            if (it){
+                binding.requestButton.text = "요청 중..."
+                binding.requestButton.isClickable = false
+                val sendData = "true"
+                val data = JSONObject()
+                data.put("chatRoomNo", chatRoomNum)
+                data.put("contentType", contentType)
+                data.put("content", sendData)
+                data.put("senderNo", 1)
+                data.put("productNo", productId)
+                sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
+                    .subscribe()
+            }
+        }
+
     }
 
 }

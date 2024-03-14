@@ -1285,6 +1285,7 @@ class RetrofitManager() : Application() {
     fun putProductRequest(
         context: Context,
         productsId: Long,
+        onSuccess: (Boolean) -> Unit
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -1305,6 +1306,8 @@ class RetrofitManager() : Application() {
                     Log.e("putProductRequest", "success ${response.body()?.success}")
                     Log.e("putProductRequest", "message ${response.body()?.message}")
                     Log.e("putProductRequest", "code ${response.body()?.code}")
+                    val data = response.body()?.success?:return
+                    onSuccess(data)
                 } else {
                     Log.e("putProductRequest", "succes, but ${response.errorBody()}")
 
