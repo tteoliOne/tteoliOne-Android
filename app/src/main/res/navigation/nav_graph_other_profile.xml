@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph_other_profile"
+    app:startDestination="@id/onSellFragment">
+
+    <fragment
+        android:id="@+id/onSellFragment"
+        android:name="com.demo.sharingapp.domain.other_profile.OnSellFragment"
+        android:label="OnSellFragment"
+        tools:layout="@layout/fragment_other_onsell"
+        >
+        <argument
+            android:name="sellerId"
+            app:argType="long" />
+    </fragment>
+    <fragment
+        android:id="@+id/salesCompleteFragment"
+        android:name="com.demo.sharingapp.domain.other_profile.SalesCompleteFragment"
+        android:label="SalesCompleteFragment"
+        tools:layout="@layout/fragment_sales_complete"/>
+    <fragment
+        android:id="@+id/reviewFragment"
+        android:name="com.demo.sharingapp.domain.other_profile.ReviewFragment"
+        android:label="ReviewFragment"
+        tools:layout="@layout/fragment_other_profile_review"/>
+</navigation>

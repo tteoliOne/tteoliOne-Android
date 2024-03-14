@@ -301,11 +301,13 @@
             android:textSize="13sp" />
 
         <TextView
+            android:id="@+id/deleteAccountButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="10dp"
             android:text="@string/unregister"
             android:textSize="13sp"
+            android:textColor="@drawable/color_click_nickname"
             tools:ignore="RtlSymmetry" />
 
 

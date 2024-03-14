@@ -6,6 +6,9 @@ import com.demo.sharingapp.domain.chat.data.GetChatList
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
+import com.demo.sharingapp.domain.other_profile.data.OtherProfileResponse
+import com.demo.sharingapp.domain.other_profile.data.OtherProfileSimpleResponse
+import com.demo.sharingapp.domain.user.data.DeleteAccountData
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoResponse
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoResponse
@@ -27,6 +30,8 @@ interface RestAPI {
     // 이메일 보내기
     @POST(API.EMAIL_URL) // Replace with your API endpoint
     fun postEmailData(@Body email: EmailData): Call<EmailResponse>
+
+
 
     // 회원가입 정보 보내기
     @Multipart
@@ -101,6 +106,13 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
     ): Call<EmailResponse>
 
+    @HTTP(method = "DELETE", path = API.DELETE_ACCOUNT, hasBody = true)
+    fun deleteAccount(
+        @Header("Authorization") Authorization: String,
+        @Body authorizationCode: String,
+        @Path("userId") userId: Long,
+    ): Call<EmailResponse>
+
     // 채팅_메시지 전송 후 callback
     @POST(API.CHAT_SEND_CALLBACK) // Replace with your API endpoint
     fun postChatSendCallBack(
@@ -158,6 +170,25 @@ interface RestAPI {
     fun getChatList(
         @Header("Authorization") Authorization: String,
     ): Call<GetChatList>
+
+    // 상대방 프로필 간단조회
+    @GET(API.GET_OTHER_PROFILE_SIMPLE)
+    fun getOtherProfileSimple(
+        @Header("Authorization") Authorization: String,
+        @Path("userId") userId: Long,
+    ): Call<OtherProfileSimpleResponse>
+
+    // 상대방 프로필 조회
+    @GET(API.GET_OTHER_PROFILE)
+    fun getOtherProfile(
+        @Header("Authorization") Authorization: String,
+        @Path("userId") userId: Long,
+        @Query("longitude") longitude: Double,
+        @Query("latitude") latitude: Double,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("soldStatus") soldStatus: String,
+    ): Call<OtherProfileResponse>
 
     // 카테고리별 상품 정보 가져오기
     @GET(API.PRODUCTS)
@@ -250,10 +281,12 @@ interface RestAPI {
     ): Call<EmailResponse>
 
     // 내정보 변경
+    @Multipart
     @PATCH(API.CHANGE_MY_INFO)
     fun patchChangeNickname(
         @Header("Authorization") Authorization: String,
-        @Body changeMyInfoData: ChangeMyInfoData,
+        @Part ("editUserInfoRequest") editUserInfoRequest: ChangeMyInfoData,
+        @Part profile: MultipartBody.Part?,
     ): Call<ChangeMyInfoResponse>
 
 

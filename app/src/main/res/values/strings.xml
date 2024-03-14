@@ -22,6 +22,9 @@
     <string name="buy_date_local">%d-%02d-%02dT15:53:16</string>
     <string name="walking_time">%dm 도보 %d분</string>
     <string name="buy_price">%s원</string>
+    <string name="on_sell_count">판매 중 %d</string>
+    <string name="sold_out_product_count">판매 완료 %d</string>
+    <string name="review_count">후기 %d</string>
 
     <string name="product_count">%d개</string>
     <string name="default_notification_channel_id">sharingapp_notification_channel_id</string>

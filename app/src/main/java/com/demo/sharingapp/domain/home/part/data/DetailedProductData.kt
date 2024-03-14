@@ -21,4 +21,5 @@ data class DetailedProductData(
     val checkLiked: Boolean,
     val checkOwner: Boolean,
     val soldStatus: String,
+    val sellerId: Long
 )

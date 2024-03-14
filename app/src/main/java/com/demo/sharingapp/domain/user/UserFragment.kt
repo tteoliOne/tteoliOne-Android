@@ -21,6 +21,7 @@ import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
+import com.demo.sharingapp.utils.Constants.USER_ID
 import com.kakao.sdk.user.UserApiClient
 import kotlin.math.roundToInt
 
@@ -76,6 +77,14 @@ class UserFragment: Fragment(R.layout.fragment_user) {
 
             RetrofitManager.instance.postLogout(this.requireContext())
             SharedPreferencesData.removeAllData(this.requireContext())
+            val intent = Intent(context, LoginView::class.java)
+            startActivity(intent)
+            this.requireActivity().finish()
+        }
+
+        binding.deleteAccountButton.setOnClickListener {
+            val userId = SharedPreferencesData.getLongData(this.requireContext(), USER_ID)
+            RetrofitManager.instance.deleteAccount(this.requireContext(),userId)
             val intent = Intent(context, LoginView::class.java)
             startActivity(intent)
             this.requireActivity().finish()

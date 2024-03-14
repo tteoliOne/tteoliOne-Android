@@ -18,10 +18,11 @@ import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
 import com.demo.sharingapp.domain.home.search.data.SearchData
-import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
-import com.demo.sharingapp.domain.user.data.MyInfoData
-import com.demo.sharingapp.domain.user.data.MyInfoResponse
-import com.demo.sharingapp.domain.user.data.ChangeMyInfoResponse
+import com.demo.sharingapp.domain.other_profile.data.OtherProfileContent
+import com.demo.sharingapp.domain.other_profile.data.OtherProfileResponse
+import com.demo.sharingapp.domain.other_profile.data.OtherProfileSimpleData
+import com.demo.sharingapp.domain.other_profile.data.OtherProfileSimpleResponse
+import com.demo.sharingapp.domain.user.data.*
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -69,6 +70,78 @@ class RetrofitManager() : Application() {
     // 레트로핏 인터페이스 가져오기
     private val retrofitInterface: RestAPI? =
         RetrofitClient.getClient(API.BASE_URL)?.create(RestAPI::class.java)
+
+    // 상대방 프로필 조회
+    fun getOtherProfile(context: Context, sellerId: Long, longitude: Double, latitude: Double, page: Int, soldStatus: String, onSuccess: (List<OtherProfileContent>) -> Unit){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getOtherProfile(Authorization = authorization, userId = sellerId, longitude = longitude, latitude = latitude, page = page, size = 30, soldStatus = soldStatus)
+
+        getCall.enqueue(object : retrofit2.Callback<OtherProfileResponse>{
+            override fun onResponse(
+                call: Call<OtherProfileResponse>,
+                response: Response<OtherProfileResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getOtherProfile", "success getChatList data ${response.body()?.data}")
+                    Log.e("getOtherProfile",
+                        "success getChatList success ${response.body()?.success}")
+                    Log.e("getOtherProfile",
+                        "success getChatList message ${response.body()?.message}")
+                    Log.e("getOtherProfile", "success getChatList code ${response.body()?.code}")
+
+                    val data = response.body()?.data?.content ?: return
+                    onSuccess(data)
+
+                } else {
+                    Log.e("getOtherProfile", "succes, getChatList but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<OtherProfileResponse>, t: Throwable) {
+                Log.e("getOtherProfile", "fail ${t} $call")
+            }
+        })
+
+
+    }
+
+
+    // 상대방 프로필 간단조회
+    fun getOtherProfileSimple(context: Context, sellerId: Long, onSuccess: (OtherProfileSimpleData) -> Unit) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getOtherProfileSimple(Authorization = authorization, userId = sellerId)
+
+        getCall.enqueue(object : retrofit2.Callback<OtherProfileSimpleResponse> {
+            override fun onResponse(
+                call: Call<OtherProfileSimpleResponse>,
+                response: Response<OtherProfileSimpleResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getOtherProfile", "success getChatList data ${response.body()?.data}")
+                    Log.e("getOtherProfile",
+                        "success getChatList success ${response.body()?.success}")
+                    Log.e("getOtherProfile",
+                        "success getChatList message ${response.body()?.message}")
+                    Log.e("getOtherProfile", "success getChatList code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onSuccess(data)
+                } else {
+                    Log.e("getOtherProfile", "succes, getChatList but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<OtherProfileSimpleResponse>, t: Throwable) {
+                Log.e("getOtherProfile", "fail ${t} $call")
+            }
+        })
+
+    }
 
     // 채팅 리스트 가져오기
     fun getChatList(context: Context, onSuccess: (List<GetChatListData>) -> Unit) {
@@ -562,17 +635,51 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 회윈탈퇴
+    fun deleteAccount(
+        context: Context,
+        userId: Long,
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val data = DeleteAccountData("")
+        val call = api.deleteAccount(Authorization = authorization,
+            userId = userId,
+            authorizationCode = " ")
+
+        call.enqueue(object : retrofit2.Callback<EmailResponse> {
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
+                    Log.e("deleteAccount", "data ${response.body()?.data}")
+                    Log.e("deleteAccount", "success ${response.body()?.success}")
+                    Log.e("deleteAccount", "message ${response.body()?.message}")
+                    Log.e("deleteAccount", "code ${response.body()?.code}")
+                } else {
+                    Log.e("deleteAccount", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("deleteAccount", "fail ${t} $call")
+            }
+        })
+    }
+
     // 로그아웃
     fun postLogout(
-        context: Context
-    ){
+        context: Context,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val call = api.postLogout(Authorization = authorization)
 
-        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
                     Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
@@ -631,13 +738,16 @@ class RetrofitManager() : Application() {
         accessToken: String,
         nickname: String,
         description: String,
+        profile: MultipartBody.Part?,
         onCheckNickname: (Boolean, String) -> Unit,
     ) {
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val changeMyInfoData = ChangeMyInfoData(nickname, description)
         Log.e("a", description.toString())
-        val call = api.patchChangeNickname(Authorization = "Bearer $accessToken", changeMyInfoData)
+        val call = api.patchChangeNickname(Authorization = "Bearer $accessToken",
+            editUserInfoRequest = changeMyInfoData,
+            profile = profile)
         call.enqueue(object : retrofit2.Callback<ChangeMyInfoResponse> {
             override fun onResponse(
                 call: Call<ChangeMyInfoResponse>,
@@ -773,7 +883,7 @@ class RetrofitManager() : Application() {
     fun postChatRoom(
         context: Context,
         productsId: Long,
-        onSuccess: (CreateChatRoomResponseData) -> Unit
+        onSuccess: (CreateChatRoomResponseData) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -793,7 +903,7 @@ class RetrofitManager() : Application() {
                     Log.e("Post", "success regDate ${response.body()?.data?.regDate}")
                     Log.e("Post", "success joinMember ${response.body()?.data?.joinMember}")
                     Log.e("Post", "success productNo ${response.body()?.data?.productNo}")
-                    val data = response.body()?.data?: return
+                    val data = response.body()?.data ?: return
                     onSuccess(data)
                 } else {
                     Log.e("Post", "succes, but ${response.errorBody()}")
@@ -896,13 +1006,14 @@ class RetrofitManager() : Application() {
     }
 
     // 채팅 방 떠나기
-    fun deleteChatRoomLeave(context: Context, chatRoomId: Long){
+    fun deleteChatRoomLeave(context: Context, chatRoomId: Long) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = api.deleteChatRoomLeave(Authorization = "Bearer $accessToken", chatRoomId = chatRoomId)
+        val call =
+            api.deleteChatRoomLeave(Authorization = "Bearer $accessToken", chatRoomId = chatRoomId)
 
-        call.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
                     Log.e("deleteChatRoomLeave", "success ${response.body()?.success}")
@@ -961,7 +1072,10 @@ class RetrofitManager() : Application() {
         val call = api.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
 
         call.enqueue(object : retrofit2.Callback<GetChatRoomResponse> {
-            override fun onResponse(call: Call<GetChatRoomResponse>, response: Response<GetChatRoomResponse>) {
+            override fun onResponse(
+                call: Call<GetChatRoomResponse>,
+                response: Response<GetChatRoomResponse>,
+            ) {
                 if (response.isSuccessful) {
                     Log.e("getRemoveProduct", "success ${response.body()?.success}")
                     Log.e("getRemoveProduct", "data ${response.body()?.data}")
@@ -1016,25 +1130,29 @@ class RetrofitManager() : Application() {
     // 채팅 메시지 전송 콜백
     fun postChatSendCallBack(
         context: Context,
-        chatSendCallBack : ChatSendCallBack,
-        onSuccess: (ChatRoomCallBack) -> Unit
-    ){
+        chatSendCallBack: ChatSendCallBack,
+        onSuccess: (ChatRoomCallBack) -> Unit,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = api.postChatSendCallBack(Authorization =  authorization, chatSendCallBack = chatSendCallBack)
+        val call = api.postChatSendCallBack(Authorization = authorization,
+            chatSendCallBack = chatSendCallBack)
 
-        call.enqueue(object : retrofit2.Callback<ChatRoomCallBack>{
-            override fun onResponse(call: Call<ChatRoomCallBack>, response: Response<ChatRoomCallBack>) {
+        call.enqueue(object : retrofit2.Callback<ChatRoomCallBack> {
+            override fun onResponse(
+                call: Call<ChatRoomCallBack>,
+                response: Response<ChatRoomCallBack>,
+            ) {
                 if (response.isSuccessful) {
                     Log.e("getMyInfo", "success ${response.body()?.data?.readCount}")
                     val success = response.body()?.success ?: return
-                    if (success){
+                    if (success) {
                         val data = response.body() ?: return
                         onSuccess(data)
                     }
-                }else{
+                } else {
                     Log.e("getMyInfo", "succes, but ${response.errorBody()}")
 
                 }
@@ -1166,8 +1284,8 @@ class RetrofitManager() : Application() {
     // 상품 공유 요청
     fun putProductRequest(
         context: Context,
-        productsId: Long
-    ){
+        productsId: Long,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
 //        val retrofit = initRetrofit(context)
@@ -1179,7 +1297,7 @@ class RetrofitManager() : Application() {
         val call = retrofitInterface?.putProductRequest(Authorization = authorization,
             productId = productsId)
 
-        call?.enqueue(object : retrofit2.Callback<EmailResponse>{
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
                     Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
@@ -1202,7 +1320,7 @@ class RetrofitManager() : Application() {
     // putLeaveChatRoom
     fun putLeaveChatRoom(
         context: Context,
-        chatRoomId: Long
+        chatRoomId: Long,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"

@@ -1,6 +1,7 @@
 package com.demo.sharingapp.utils
 
 import android.Manifest
+import retrofit2.http.DELETE
 
 object Constants{
     const val TAG : String = "로그"
@@ -24,6 +25,7 @@ object Constants{
     const val DETAILED_LIKED_POINT = "detailedLikedPoint"
     const val KAKAO_TOKEN = "kaKaoToken"
     const val SIGNUP_TYPE = "signupType"
+    const val SELLER_ID = "sellerId"
 
     const val PRODUCT_TITLE = "productTitle"
     const val PRODUCT_BUY_PRICE = "productBuyPrice"
@@ -130,6 +132,17 @@ object API {
 
     // 로그아웃
     const val LOGOUT : String="/api/users/logout"
+
+    // 회원탈퇴
+    const val DELETE_ACCOUNT : String="/api/users/{userId}"
+
+    // 상대방 프로필 간단 조회
+    const val GET_OTHER_PROFILE_SIMPLE : String=" /api/users/{userId}/simple"
+
+    // 상대방 프로필 조회
+    const val GET_OTHER_PROFILE : String=" /api/products/users/{userId}"
+
+
 
     // 채팅 _ 방 떠나기
     const val CHATROOM_LEAVE : String="/api/chatRoom/{chatRoomId}"

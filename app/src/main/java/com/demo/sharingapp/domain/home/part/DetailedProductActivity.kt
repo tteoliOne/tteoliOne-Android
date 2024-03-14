@@ -41,6 +41,7 @@ import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_COUNT
 import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TITLE
 import com.demo.sharingapp.utils.Constants.PRODUCT_TYPE
+import com.demo.sharingapp.utils.Constants.SELLER_ID
 import com.demo.sharingapp.utils.Constants.USER_PROFILE
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
@@ -95,6 +96,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     private var productDescription = ""
     private var sendUserNickname = ""
     private var profile = ""
+    private var sellerId = 0L
 
     private lateinit var productImageArray: Array<String>
 
@@ -135,7 +137,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
         binding.profileImageView.setOnClickListener {
             val intent = Intent(this,OtherProfileActivity::class.java)
+                .putExtra(SELLER_ID,sellerId)
             startActivity(intent)
+
         }
 
         binding.settingMenu.setOnClickListener {
@@ -295,6 +299,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         binding.productImageViewPager.adapter = frameAdapter
         productImageArray = it.images
 
+        //상대방 id
+        sellerId = it.sellerId
 
         // 상품 id
         it.productId
