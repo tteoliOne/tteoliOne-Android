@@ -2,27 +2,28 @@ package com.demo.sharingapp.login
 
 import android.content.Intent
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import com.demo.sharingapp.databinding.ActivityLoginViewBinding
-import com.demo.sharingapp.login.data.AccessTokenRequest
 import com.demo.sharingapp.login.data.LoginData
 import com.demo.sharingapp.login.data.LoginTokenData
 import com.demo.sharingapp.login.find_id.FindIdActivity
 import com.demo.sharingapp.login.find_password.FindPasswordActivity
-import com.demo.sharingapp.login.signup.basic.SignUpActivity
 import com.demo.sharingapp.login.signup.SignupProfileActivity
-
+import com.demo.sharingapp.login.signup.basic.SignUpActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.google.firebase.ktx.Firebase
-import com.google.firebase.ktx.app
 import com.google.firebase.messaging.ktx.messaging
 import com.kakao.sdk.auth.model.OAuthToken
 import com.kakao.sdk.common.KakaoSdk
@@ -30,9 +31,12 @@ import com.kakao.sdk.common.model.ClientError
 import com.kakao.sdk.common.model.ClientErrorCause
 import com.kakao.sdk.user.UserApiClient
 
+
 class LoginView : AppCompatActivity() {
 
     private lateinit var binding: ActivityLoginViewBinding
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -56,6 +60,23 @@ class LoginView : AppCompatActivity() {
 
         // 아이디 찾기 버튼 클릭 함수 호출
         clickFindIdButton()
+
+        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+            .requestEmail()
+            .requestIdToken("401559191984-o21q6qsehagmffuaubjun3nrtkorklgj.apps.googleusercontent.com")
+            .requestServerAuthCode("401559191984-o21q6qsehagmffuaubjun3nrtkorklgj.apps.googleusercontent.com")
+            .build()
+        val client = GoogleSignIn.getClient(this, gso)
+
+        binding.googleLoginButton.setOnClickListener {
+            val signInClient = client.signInIntent
+            startActivityForResult(signInClient, 10001)
+//            onLogin(signInClient)
+        }
+
+        binding.naverLoginButton.setOnClickListener {
+            client.signOut()
+        }
 
     }
 
@@ -262,6 +283,59 @@ class LoginView : AppCompatActivity() {
         imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
         editTextFocus()
         return super.dispatchTouchEvent(ev)
+    }
+
+//    fun loginGoogle(activity: Activity){
+//        val webClientId = activity.getString(R.string.google_login_web_client_id)
+//
+//        var signInOptions =
+//            GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(webClientId)
+//                .requestEmail().build()
+//
+//        googleLoginClient = GoogleSignIn.getClient(activity, signInOptions)
+//
+//        googleLoginClient?.let { client ->
+//
+//            client.signOut().addOnCompleteListener {
+//                // 로그아웃 후 진행
+//                activity.startActivityForResult(
+//                    client.signInIntent,
+//                    REQ_GOOGLE_LOGIN
+//                )
+//            }
+//        }
+//    }
+
+    fun onLogin(client: GoogleSignInClient) {
+
+        val signInIntent: Intent = client.signInIntent
+        startActivityForResult(signInIntent, 10001)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        when(requestCode) {
+            10001 -> {
+                try {
+
+                        val task = GoogleSignIn.getSignedInAccountFromIntent(data) ?: return
+                        Log.d("PASS", task.toString())
+                        val boolean = GoogleSignIn.getLastSignedInAccount(this)
+                        Log.d("PASS1", boolean.toString())
+                        val account = task.result
+
+                        Log.d("PASS", account.idToken ?: "")
+                        Log.d("PASS", account.serverAuthCode ?: "")
+                        Log.d("PASS", account.id ?: "")
+                        Log.d("PASS", account.email ?: "")
+
+
+                } catch (e: ApiException) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 
 

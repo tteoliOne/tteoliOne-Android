@@ -31,4 +31,5 @@
     <string name="default_notification_channel_id">sharingapp_notification_channel_id</string>
     <string name="channel_name">채팅 알림</string>
     <string name="channel_description">채팅 알림입니다.</string>
+    <string name="google_login_web_client_id">408821974772-v8qf26j0dubv3lu6jns6mhdputubm9e7.apps.googleusercontent.com</string>
 </resources>
