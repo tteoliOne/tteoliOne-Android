@@ -17,9 +17,9 @@
     </fragment>
     <fragment
         android:id="@+id/salesCompleteFragment"
-        android:name="com.demo.sharingapp.domain.other_profile.SalesCompleteFragment"
+        android:name="com.demo.sharingapp.domain.other_profile.SoldOutFragment"
         android:label="SalesCompleteFragment"
-        tools:layout="@layout/fragment_sales_complete"/>
+        tools:layout="@layout/fragment_other_sold_out"/>
     <fragment
         android:id="@+id/reviewFragment"
         android:name="com.demo.sharingapp.domain.other_profile.ReviewFragment"
