@@ -23,6 +23,7 @@ import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.demo.sharingapp.utils.Constants.USER_ID
 import com.kakao.sdk.user.UserApiClient
+import ua.naiksoftware.stomp.StompClient
 import kotlin.math.roundToInt
 
 class UserFragment: Fragment(R.layout.fragment_user) {
@@ -58,11 +59,13 @@ class UserFragment: Fragment(R.layout.fragment_user) {
             startActivity(intent)
         }
 
+
         // 저장글 목록 클릭
         binding.saveProductListButton.setOnClickListener {
             Log.e("button","버튼 클릭 저장글 목록")
             val intent = Intent(context, SaveProductListActivity::class.java)
             startActivity(intent)
+
         }
 
         // 내 정보 수정 클릭

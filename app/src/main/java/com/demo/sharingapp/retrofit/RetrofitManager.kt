@@ -72,14 +72,28 @@ class RetrofitManager() : Application() {
         RetrofitClient.getClient(API.BASE_URL)?.create(RestAPI::class.java)
 
     // 상대방 프로필 조회
-    fun getOtherProfile(context: Context, sellerId: Long, longitude: Double, latitude: Double, page: Int, soldStatus: String, onSuccess: (List<OtherProfileContent>) -> Unit){
+    fun getOtherProfile(
+        context: Context,
+        sellerId: Long,
+        longitude: Double,
+        latitude: Double,
+        page: Int,
+        soldStatus: String,
+        onSuccess: (List<OtherProfileContent>) -> Unit,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val getCall = api.getOtherProfile(Authorization = authorization, userId = sellerId, longitude = longitude, latitude = latitude, page = page, size = 30, soldStatus = soldStatus)
+        val getCall = api.getOtherProfile(Authorization = authorization,
+            userId = sellerId,
+            longitude = longitude,
+            latitude = latitude,
+            page = page,
+            size = 30,
+            soldStatus = soldStatus)
 
-        getCall.enqueue(object : retrofit2.Callback<OtherProfileResponse>{
+        getCall.enqueue(object : retrofit2.Callback<OtherProfileResponse> {
             override fun onResponse(
                 call: Call<OtherProfileResponse>,
                 response: Response<OtherProfileResponse>,
@@ -110,7 +124,11 @@ class RetrofitManager() : Application() {
 
 
     // 상대방 프로필 간단조회
-    fun getOtherProfileSimple(context: Context, sellerId: Long, onSuccess: (OtherProfileSimpleData) -> Unit) {
+    fun getOtherProfileSimple(
+        context: Context,
+        sellerId: Long,
+        onSuccess: (OtherProfileSimpleData) -> Unit,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
@@ -366,7 +384,7 @@ class RetrofitManager() : Application() {
             longitude = longitude,
             latitude = latitude)
         //userId.value?:0
-        getCall.enqueue(object : retrofit2.Callback<GetProductsResponse> {
+        getCall.enqueue(object : Callback<GetProductsResponse> {
             override fun onResponse(
                 call: Call<GetProductsResponse>,
                 response: Response<GetProductsResponse>,
@@ -1069,9 +1087,9 @@ class RetrofitManager() : Application() {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = api.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
+        val call = retrofitInterface?.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
 
-        call.enqueue(object : retrofit2.Callback<GetChatRoomResponse> {
+        call?.enqueue(object : retrofit2.Callback<GetChatRoomResponse> {
             override fun onResponse(
                 call: Call<GetChatRoomResponse>,
                 response: Response<GetChatRoomResponse>,
@@ -1285,18 +1303,15 @@ class RetrofitManager() : Application() {
     fun putProductRequest(
         context: Context,
         productsId: Long,
-        onSuccess: (Boolean) -> Unit
+        chatRoomId: Long,
+        onSuccess: (Boolean) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
-//        val retrofit = initRetrofit(context)
-//        val api = retrofit.create(RestAPI::class.java)
-//        val call = api.putProductRequest(
-//            Authorization = authorization,
-//            productId = productsId
-//        )
         val call = retrofitInterface?.putProductRequest(Authorization = authorization,
-            productId = productsId)
+            productId = productsId,
+            chatRoomId
+            )
 
         call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
@@ -1306,7 +1321,7 @@ class RetrofitManager() : Application() {
                     Log.e("putProductRequest", "success ${response.body()?.success}")
                     Log.e("putProductRequest", "message ${response.body()?.message}")
                     Log.e("putProductRequest", "code ${response.body()?.code}")
-                    val data = response.body()?.success?:return
+                    val data = response.body()?.success ?: return
                     onSuccess(data)
                 } else {
                     Log.e("putProductRequest", "succes, but ${response.errorBody()}")
@@ -1316,6 +1331,119 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
                 Log.e("putProductRequest", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 상품 공유 요청 거절
+    fun putProductReject(
+        context: Context,
+        productsId: Long,
+        buyerId: Long,
+        chatRoomId: Long,
+        onSuccess: (Int,String,String) -> Unit,
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val buyerIdData = BuyerIdData(buyerId)
+        val call = retrofitInterface?.putProductReject(Authorization = authorization,
+            productId = productsId, buyerId = buyerIdData, chatRoomId = chatRoomId)
+
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("putProductReject", "data ${response.body()?.data}")
+                    Log.e("putProductReject", "success ${response.body()?.success}")
+                    Log.e("putProductReject", "message ${response.body()?.message}")
+                    Log.e("putProductReject", "code ${response.body()?.code}")
+                    val code = response.body()?.code ?: return
+                    val message = response.body()?.message ?: return
+                    val data = response.body()?.data ?: return
+                    onSuccess(code,message,data)
+                } else {
+                    Log.e("putProductReject", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("putProductReject", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 상품 공유 후기 쓰기
+    fun postProductReview(
+        context: Context,
+        productsId: Long,
+        content: String,
+        goodCount: Long,
+        onSuccess: (Int,String,String) -> Unit,
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val postReviewData = PostReviewData(content,goodCount)
+        val call = api.postProductReview(Authorization = authorization, productId = productsId, postReviewData = postReviewData)
+
+        call.enqueue(object :Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("postProductReview", "data ${response.body()?.data}")
+                    Log.e("postProductReview", "success ${response.body()?.success}")
+                    Log.e("postProductReview", "message ${response.body()?.message}")
+                    Log.e("postProductReview", "code ${response.body()?.code}")
+                    val code = response.body()?.code ?: return
+                    val message = response.body()?.message ?: return
+                    val data = response.body()?.data ?: return
+                    onSuccess(code,message,data)
+
+                } else {
+                    Log.e("postProductReview", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postProductReview", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 상품 공유 요청 승인
+    fun putProductApprove(
+        context: Context,
+        productsId: Long,
+        buyerId: Long,
+        chatRoomId: Long,
+        onSuccess: (Int,String,String) -> Unit,
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val buyerIdData = BuyerIdData(buyerId)
+        val call = retrofitInterface?.putProductApprove(Authorization = authorization,
+            productId = productsId, buyerId = buyerIdData, chatRoomId = chatRoomId)
+
+        call?.enqueue(object : retrofit2.Callback<EmailResponse> {
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("putProductApprove", "data ${response.body()?.data}")
+                    Log.e("putProductApprove", "success ${response.body()?.success}")
+                    Log.e("putProductApprove", "message ${response.body()?.message}")
+                    Log.e("putProductApprove", "code ${response.body()?.code}")
+                    val code = response.body()?.code ?: return
+                    val message = response.body()?.message ?: return
+                    val data = response.body()?.data ?: return
+                    onSuccess(code,message,data)
+                } else {
+                    Log.e("putProductApprove", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("putProductApprove", "fail ${t} $call")
             }
         })
     }

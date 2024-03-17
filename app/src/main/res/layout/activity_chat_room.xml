@@ -82,7 +82,7 @@
         android:id="@+id/buyPriceTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="0,000"
+        android:text="00"
         android:textColor="#FF0000"
         android:textSize="14sp"
         android:textStyle="bold"

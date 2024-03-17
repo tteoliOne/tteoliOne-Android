@@ -128,7 +128,7 @@ object API {
     const val CHANGE_MY_INFO : String="/api/users"
 
     // 공유 요청
-    const val PRODUCT_REQUEST : String="/api/products/{productId}/request"
+    const val PRODUCT_REQUEST : String="/api/products/{productId}/chatRoom/{chatRoomId}/request"
 
     // 로그아웃
     const val LOGOUT : String="/api/users/logout"
@@ -141,6 +141,15 @@ object API {
 
     // 상대방 프로필 조회
     const val GET_OTHER_PROFILE : String=" /api/products/users/{userId}"
+
+    // 상품 공유 요청 거절
+    const val PUT_PRODUCT_REJECT : String="/api/products/{productId}/chatRoom/{chatRoomId}/reject"
+
+    // 상품 공유 요청 승인
+    const val PUT_PRODUCT_APPROVE : String="/api/products/{productId}/chatRoom/{chatRoomId}/approve"
+
+    // 상품 공유 후기 쓰기
+    const val POST_PRODUCT_REVIEW : String="/api/products/{productId}/review"
 
 
 

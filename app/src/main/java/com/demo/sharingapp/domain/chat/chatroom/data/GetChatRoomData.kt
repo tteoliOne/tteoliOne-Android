@@ -11,5 +11,7 @@ data class GetChatRoomData(
     val checkSeller : Boolean,                  // 자신이 판매자인지 아닌지
     val chatList: List<GetChatRoomInfoData>,    // 채팅 내역
     val opponentProfile: String,                // 상대방 프로필
-
+    val checkReservation: Boolean,              // 예약된 유저가 일치하는지 판단
+    val checkReview: Boolean,                   // 리뷰 썻는지 유무
+    val opponentId: Long,                       // 상대방 Id
 )

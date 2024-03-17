@@ -150,6 +150,33 @@ interface RestAPI {
     fun putProductRequest(
         @Header("Authorization") Authorization: String,
         @Path("productId") productId: Long,
+        @Path("chatRoomId") chatRoomId: Long,
+    ): Call<EmailResponse>
+
+    // 상품 공유 요청 거절
+    @PUT(API.PUT_PRODUCT_REJECT)
+    fun putProductReject(
+        @Header("Authorization") Authorization: String,
+        @Path("productId") productId: Long,
+        @Path("chatRoomId") chatRoomId: Long,
+        @Body buyerId: BuyerIdData,
+    ): Call<EmailResponse>
+
+    // 상품 공유 요청 승인
+    @PUT(API.PUT_PRODUCT_APPROVE)
+    fun putProductApprove(
+        @Header("Authorization") Authorization: String,
+        @Path("productId") productId: Long,
+        @Path("chatRoomId") chatRoomId: Long,
+        @Body buyerId: BuyerIdData,
+    ): Call<EmailResponse>
+
+    // 상품 공유 후기 쓰기
+    @POST(API.POST_PRODUCT_REVIEW)
+    fun postProductReview(
+        @Header("Authorization") Authorization: String,
+        @Path("productId") productId: Long,
+        @Body postReviewData: PostReviewData,
     ): Call<EmailResponse>
 
 
