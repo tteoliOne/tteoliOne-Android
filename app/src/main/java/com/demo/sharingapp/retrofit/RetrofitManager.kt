@@ -1372,6 +1372,37 @@ class RetrofitManager() : Application() {
         })
     }
 
+    // 신고하기
+    fun postReport(
+        context: Context,
+        reportType: String,
+        id: Long,
+        reportCategory: String
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val data = PostReportBody(null, null)
+        val call = retrofitInterface?.postReport(Authorization = authorization, reportType = reportType, id = id, reportCategory = reportCategory, postReportBody =data )
+        call?.enqueue(object : Callback<EmailResponse>{
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("postReport", "data ${response.body()?.data}")
+                    Log.e("postReport", "success ${response.body()?.success}")
+                    Log.e("postReport", "message ${response.body()?.message}")
+                    Log.e("postReport", "code ${response.body()?.code}")
+
+                } else {
+                    Log.e("postReport", "succes, but ${response.errorBody()}")
+
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("postReport", "fail ${t} $call")
+            }
+        })
+    }
+
     // 상품 공유 후기 쓰기
     fun postProductReview(
         context: Context,
@@ -1385,7 +1416,8 @@ class RetrofitManager() : Application() {
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val postReviewData = PostReviewData(content,goodCount)
-        val call = api.postProductReview(Authorization = authorization, productId = productsId, postReviewData = postReviewData)
+        val call = api.
+        postProductReview(Authorization = authorization, productId = productsId, postReviewData = postReviewData)
 
         call.enqueue(object :Callback<EmailResponse>{
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {

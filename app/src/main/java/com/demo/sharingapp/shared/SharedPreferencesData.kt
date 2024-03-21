@@ -25,20 +25,20 @@ object SharedPreferencesData {
         )
     }
 
-    // set 데이터 저장
-    fun saveSetData(context: Context, setTitle: String, setData: MutableSet<String>){
+    // MutableList 데이터 저장
+    fun saveMutableListData(context: Context, setTitle: String, setData: MutableList<String>){
         val sharedPreferences = getSharedPreferences(context)
         with(sharedPreferences.edit()) {
-            putStringSet(setTitle, setData)
+            putString(setTitle, setData.joinToString(separator = ","))
 
             commit()
         }
     }
 
-    // set 데어터 불러오기
-    fun getSetData(context: Context, getTitle: String): Set<String>? {
+    // MutableList 데어터 불러오기
+    fun getMutableListData(context: Context, getTitle: String): MutableList<String>? {
         val sharedPreferences = getSharedPreferences(context)
-        return sharedPreferences.getStringSet(getTitle, null)
+        return sharedPreferences.getString(getTitle, "")?.split(",")?.toMutableList()
     }
 
 

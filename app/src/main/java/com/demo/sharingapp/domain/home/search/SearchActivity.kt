@@ -17,7 +17,6 @@ import com.demo.sharingapp.databinding.ActivitySearchBinding
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
-import com.demo.sharingapp.utils.Constants.SEARCH_RECODE
 import com.demo.sharingapp.utils.ViewUtil.hideKeyboard
 import kotlinx.coroutines.delay
 

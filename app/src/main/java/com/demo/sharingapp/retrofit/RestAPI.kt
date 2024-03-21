@@ -179,6 +179,16 @@ interface RestAPI {
         @Body postReviewData: PostReviewData,
     ): Call<EmailResponse>
 
+    // 신고하기
+    @POST(API.POST_REPORT)
+    fun postReport(
+        @Header("Authorization") Authorization: String,
+        @Path("reportType") reportType: String,
+        @Path("id") id: Long,
+        @Query("reportCategory") reportCategory: String,
+        @Body postReportBody:PostReportBody
+    ): Call<EmailResponse>
+
 
 
     // 등록 상품 정보 보내기

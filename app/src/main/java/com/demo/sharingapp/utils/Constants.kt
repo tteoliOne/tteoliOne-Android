@@ -151,6 +151,9 @@ object API {
     // 상품 공유 후기 쓰기
     const val POST_PRODUCT_REVIEW : String="/api/products/{productId}/review"
 
+    // 신고하기
+    const val POST_REPORT : String="/api/reports/{reportType}/{id}"
+
 
 
     // 채팅 _ 방 떠나기

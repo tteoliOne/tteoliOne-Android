@@ -21,6 +21,8 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityChatRoomBinding
 import com.demo.sharingapp.domain.chat.chatroom.data.*
+import com.demo.sharingapp.domain.product.ProductBottomSheet
+import com.demo.sharingapp.domain.report.ReportBottomSheet
 import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -132,6 +134,9 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                         return@setOnMenuItemClickListener true
                     }
                     R.id.reportMenu -> { // 신고하기
+                        // 바텀시트 설정
+                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong())
+                        bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                         Log.e("chatMenu", "신고하기")
                         return@setOnMenuItemClickListener true
                     }

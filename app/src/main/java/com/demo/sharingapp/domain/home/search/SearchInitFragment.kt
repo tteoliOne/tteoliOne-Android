@@ -20,7 +20,8 @@ class SearchInitFragment : Fragment(R.layout.fragment_search_init) {
     private var searchInitInterface: SearchInitInterface? = null
 
     private var data: String? = null
-    private var getData = mutableSetOf<String>()
+    private var getData = mutableListOf<String>()
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -43,10 +44,11 @@ class SearchInitFragment : Fragment(R.layout.fragment_search_init) {
 
         if (SharedPreferencesData.containsData(this.requireContext(), Constants.SEARCH_RECODE)) {
             // 데이터가 있는지 확인
-            val i = SharedPreferencesData.getSetData(this@SearchInitFragment.requireContext(),
+            val i = SharedPreferencesData.getMutableListData(this@SearchInitFragment.requireContext(),
                 SEARCH_RECODE)
             if(i != null){
-                getData = i as MutableSet<String>
+                getData = i
+
             }
 
         }
@@ -55,6 +57,7 @@ class SearchInitFragment : Fragment(R.layout.fragment_search_init) {
         if (receivedBundle != null) {
             data = receivedBundle.getString("key")
             if (data != null){
+                data = data?.trim()
                 getData.add(data!!)
                 sharedSaveData()
             }
@@ -79,7 +82,7 @@ class SearchInitFragment : Fragment(R.layout.fragment_search_init) {
     }
 
     private fun sharedSaveData() {
-        SharedPreferencesData.saveSetData(this@SearchInitFragment.requireContext(),
+        SharedPreferencesData.saveMutableListData(this@SearchInitFragment.requireContext(),
             SEARCH_RECODE, getData)
     }
 
