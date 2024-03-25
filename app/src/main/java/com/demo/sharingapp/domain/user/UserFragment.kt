@@ -38,7 +38,8 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         var profileImage = ""
 
         RetrofitManager.instance.getMyInfo(this.requireContext()){
-            binding.nicknameTextView.text = it.nickname
+            binding.nicknameTextView.text = "아아아아아아아아"
+//                it.nickname
             nickname = it.nickname
             binding.goodCountTextView.text = ((it.thumbsUpScore*10).roundToInt()/10.0).toString()
             if(it.intro != null && it.intro != ""){

@@ -3,8 +3,8 @@
     <solid android:color="#D9D9D9"/>
 
     <corners
-        android:topLeftRadius="30dp"
-        android:topRightRadius="30dp"
+        android:topLeftRadius="15dp"
+        android:topRightRadius="15dp"
 
         />
     <stroke

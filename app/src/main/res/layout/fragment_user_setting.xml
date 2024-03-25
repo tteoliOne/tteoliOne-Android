@@ -155,10 +155,14 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/userMenuLayout"
-        android:layout_width="353dp"
-        android:layout_height="313dp"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="55dp"
+        android:paddingBottom="55dp"
         android:background="@drawable/user_menu_round"
         android:elevation="10dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginEnd="28dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal">

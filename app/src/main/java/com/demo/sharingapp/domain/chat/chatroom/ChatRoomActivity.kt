@@ -15,6 +15,7 @@ import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import androidx.navigation.fragment.NavHostFragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
@@ -23,6 +24,7 @@ import com.demo.sharingapp.databinding.ActivityChatRoomBinding
 import com.demo.sharingapp.domain.chat.chatroom.data.*
 import com.demo.sharingapp.domain.product.ProductBottomSheet
 import com.demo.sharingapp.domain.report.ReportBottomSheet
+import com.demo.sharingapp.domain.report.ReportCompleteBottomSheet
 import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -135,7 +137,11 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                     }
                     R.id.reportMenu -> { // 신고하기
                         // 바텀시트 설정
-                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong())
+                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong(),opponentId){
+                            val bottomSheetFragment = ReportCompleteBottomSheet()
+                            bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
+                            Log.e("chatMenu", "123")
+                        }
                         bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                         Log.e("chatMenu", "신고하기")
                         return@setOnMenuItemClickListener true
