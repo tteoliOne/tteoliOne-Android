@@ -4,6 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,7 @@ import com.demo.sharingapp.databinding.ItemShareProductListBinding
 import com.demo.sharingapp.domain.home.data.PartProductContent
 import com.demo.sharingapp.retrofit.RetrofitManager
 
-class ShareProductListAdepter(val onDelete:(Long)->Unit) :
+class ShareProductListAdepter(private val type: Int, private val onDelete:(Long)->Unit) :
     ListAdapter<PartProductContent, ShareProductListAdepter.ShareProductListViewHolder>(object :
         DiffUtil.ItemCallback<PartProductContent>() {
         override fun areItemsTheSame(
@@ -33,9 +34,8 @@ class ShareProductListAdepter(val onDelete:(Long)->Unit) :
     inner class ShareProductListViewHolder(private val binding: ItemShareProductListBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(item: PartProductContent) {
-//            binding.root.setOnClickListener {
-//                onViewClick(item.productId)
-//            }
+
+            binding.soldOutBackground.isVisible = type == 1 // 판매완료일 때 판매완료 표시
 
             binding.deleteButton.setOnClickListener {
                 val newList = currentList.toMutableList()

@@ -1,48 +1,43 @@
-package com.demo.sharingapp.domain.user.shareProductList
+package com.demo.sharingapp.domain.user.soldOutProduct
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
-import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.demo.sharingapp.R
-import com.demo.sharingapp.databinding.ActivityShareProductListBinding
+import com.demo.sharingapp.databinding.ActivitySoldOutProductBinding
+import com.demo.sharingapp.domain.user.shareProductList.ShareProductListAdepter
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
-import com.demo.sharingapp.utils.Constants.LATITUDE
-import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants
 
-class ShareProductListActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityShareProductListBinding
+class SoldOutProductActivity : AppCompatActivity() {
+    private lateinit var binding: ActivitySoldOutProductBinding
 
     private var page = 0
     private var last = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityShareProductListBinding.inflate(layoutInflater)
+        binding = ActivitySoldOutProductBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val shareProductListAdepter = ShareProductListAdepter(0){
+        val shareProductListAdepter = ShareProductListAdepter(1){
             RetrofitManager.instance.getRemoveProduct(context = this, productsId = it)
         }
+        val linearLayoutManager = LinearLayoutManager(this@SoldOutProductActivity)
+        val latitude = SharedPreferencesData.getData(this, Constants.LATITUDE).toDouble()
+        val longitude = SharedPreferencesData.getData(this, Constants.LONGITUDE).toDouble()
 
-        val linearLayoutManager = LinearLayoutManager(this@ShareProductListActivity)
-        val latitude = SharedPreferencesData.getData(this, LATITUDE).toDouble()
-        val longitude = SharedPreferencesData.getData(this, LONGITUDE).toDouble()
 
-        // ItemTouchHelper.Callback 을 리사이클러뷰와 연결
-        val swipeHelper = SwipeHelper()  // ItemTouchHelper.Callback 구현 클래스
-        val itemTouchHelper = ItemTouchHelper(swipeHelper)
-        itemTouchHelper.attachToRecyclerView(binding.ShareProductRecyclerView) // rvData = 리사이클러뷰 id
 
-        binding.ShareProductRecyclerView.apply {
+        binding.soldOutProductRecyclerView.apply {
             adapter = shareProductListAdepter
             layoutManager = linearLayoutManager
         }
 
-        binding.ShareProductRecyclerView.addOnScrollListener(object :
+        binding.soldOutProductRecyclerView.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -69,7 +64,6 @@ class ShareProductListActivity : AppCompatActivity() {
             finish()
         }
 
-
     }
 
     private fun getShareProduct(
@@ -84,7 +78,7 @@ class ShareProductListActivity : AppCompatActivity() {
             longitude = longitude,
             sort = "createAt-desc",
             page = page,
-            status = "eNew"
+            status = "eSoldOut"
         ) {
             shareProductListAdepter.submitList(it.content)
 
@@ -93,7 +87,7 @@ class ShareProductListActivity : AppCompatActivity() {
                 shareProductListAdepter.submitList(shareProductListAdepter.currentList + it.content.orEmpty())
             } else {
                 shareProductListAdepter.submitList(it.content) {
-                    binding.ShareProductRecyclerView.scrollToPosition(0)
+                    binding.soldOutProductRecyclerView.scrollToPosition(0)
                 }
 
             }

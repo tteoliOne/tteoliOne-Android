@@ -16,6 +16,7 @@ import com.demo.sharingapp.databinding.FragmentUserBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.user.saveProductList.SaveProductListActivity
 import com.demo.sharingapp.domain.user.shareProductList.ShareProductListActivity
+import com.demo.sharingapp.domain.user.soldOutProduct.SoldOutProductActivity
 import com.demo.sharingapp.login.LoginView
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -38,8 +39,7 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         var profileImage = ""
 
         RetrofitManager.instance.getMyInfo(this.requireContext()){
-            binding.nicknameTextView.text = "아아아아아아아아"
-//                it.nickname
+            binding.nicknameTextView.text = it.nickname
             nickname = it.nickname
             binding.goodCountTextView.text = ((it.thumbsUpScore*10).roundToInt()/10.0).toString()
             if(it.intro != null && it.intro != ""){
@@ -59,6 +59,15 @@ class UserFragment: Fragment(R.layout.fragment_user) {
             val intent = Intent(context, ShareProductListActivity::class.java)
             startActivity(intent)
         }
+
+        // 내 공유글 목록 클륵
+        binding.soldOutListButton.setOnClickListener {
+            Log.e("button","버튼 클릭 내공유글")
+            val intent = Intent(context, SoldOutProductActivity::class.java)
+            startActivity(intent)
+        }
+
+
 
 
         // 저장글 목록 클릭
