@@ -6,8 +6,8 @@ import com.demo.sharingapp.domain.chat.data.GetChatList
 import com.demo.sharingapp.domain.home.data.PartProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileResponse
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileSimpleResponse
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileResponse
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleResponse
 import com.demo.sharingapp.domain.user.data.DeleteAccountData
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoResponse
@@ -214,6 +214,17 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
         @Path("userId") userId: Long,
     ): Call<OtherProfileSimpleResponse>
+
+    // 내정보 - 저장글 목록
+    @GET(API.GET_MY_SAVE_PRODUCT)
+    fun getMySaveProduct(
+        @Header("Authorization") Authorization: String,
+        @Query("longitude") longitude: Double,
+        @Query("latitude") latitude: Double,
+        @Query("page") page: Int,
+        @Query("size") size: Int,
+        @Query("sort") sort: String,
+    ) : Call<PartProductData>
 
     // 상대방 프로필 조회
     @GET(API.GET_OTHER_PROFILE)

@@ -22,6 +22,7 @@ class SearchInitAdepter(private val onTitle:(String)->Unit, private val onRemove
 }) {
     inner class SearchInitViewHolder(private val binding: ItemSearchInitBinding) : RecyclerView.ViewHolder(binding.root){
         fun bind(item: SearchInitData){
+
             binding.searchRecodeTextView.text = item.searchData
             binding.removeButton.setOnClickListener {
                 onRemove(item.searchData)

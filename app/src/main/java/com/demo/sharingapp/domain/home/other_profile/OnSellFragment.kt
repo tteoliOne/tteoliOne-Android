@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.other_profile
+package com.demo.sharingapp.domain.home.other_profile
 
 import android.os.Bundle
 import android.util.Log

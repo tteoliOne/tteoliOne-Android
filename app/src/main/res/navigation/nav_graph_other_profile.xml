@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/onSellFragment"
-        android:name="com.demo.sharingapp.domain.other_profile.OnSellFragment"
+        android:name="com.demo.sharingapp.domain.home.other_profile.OnSellFragment"
         android:label="OnSellFragment"
         tools:layout="@layout/fragment_other_onsell"
         >
@@ -17,12 +17,12 @@
     </fragment>
     <fragment
         android:id="@+id/salesCompleteFragment"
-        android:name="com.demo.sharingapp.domain.other_profile.SoldOutFragment"
+        android:name="com.demo.sharingapp.domain.home.other_profile.SoldOutFragment"
         android:label="SalesCompleteFragment"
         tools:layout="@layout/fragment_other_sold_out"/>
     <fragment
         android:id="@+id/reviewFragment"
-        android:name="com.demo.sharingapp.domain.other_profile.ReviewFragment"
+        android:name="com.demo.sharingapp.domain.home.other_profile.ReviewFragment"
         android:label="ReviewFragment"
         tools:layout="@layout/fragment_other_profile_review"/>
 </navigation>

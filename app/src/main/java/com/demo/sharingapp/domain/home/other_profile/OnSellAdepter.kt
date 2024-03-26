@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.other_profile
+package com.demo.sharingapp.domain.home.other_profile
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -11,7 +11,7 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemHomeProductBinding
 import com.demo.sharingapp.databinding.ItemOtherOnsellBinding
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileContent
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileContent
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
 

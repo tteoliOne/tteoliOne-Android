@@ -5,6 +5,6 @@ data class PartProductPageable(
     val offset: Int,
     val pageNumber: Int,
     val pageSize: Int,
-    val unpaged: Boolean,
+    //val unpaged: Boolean,
     val paged: Boolean
 )

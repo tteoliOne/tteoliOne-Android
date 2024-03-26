@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.other_profile
+package com.demo.sharingapp.domain.home.other_profile
 
 import android.content.res.ColorStateList
 import android.graphics.Color

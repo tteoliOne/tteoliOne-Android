@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.other_profile
+package com.demo.sharingapp.domain.home.other_profile
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,7 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemOtherSoldOutBinding
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileContent
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileContent
 
 class SoldOutAdepter:ListAdapter<OtherProfileContent, SoldOutAdepter.SoldOutViewHolder>(object :DiffUtil.ItemCallback<OtherProfileContent>(){
     override fun areItemsTheSame(

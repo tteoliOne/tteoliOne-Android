@@ -18,10 +18,10 @@ import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
 import com.demo.sharingapp.domain.home.search.data.SearchData
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileContent
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileResponse
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileSimpleData
-import com.demo.sharingapp.domain.other_profile.data.OtherProfileSimpleResponse
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileContent
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileResponse
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleData
+import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleResponse
 import com.demo.sharingapp.domain.user.data.*
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
@@ -119,7 +119,45 @@ class RetrofitManager() : Application() {
             }
         })
 
+    }
 
+    // 내정보 - 저장글 목록
+    fun getMySaveProduct(
+        context: Context,
+        longitude: Double,
+        latitude: Double,
+        page: Int,
+        onSuccess: (PartProductListData) -> Unit
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getMySaveProduct(Authorization = authorization, longitude = longitude, latitude = latitude, page = page, size = 30, sort = "createAt-desc")
+
+        getCall.enqueue(object : Callback<PartProductData>{
+            override fun onResponse(
+                call: Call<PartProductData>,
+                response: Response<PartProductData>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getMySaveProduct", "success getChatList data ${response.body()?.data}")
+                    Log.e("getMySaveProduct",
+                        "success getChatList success ${response.body()?.success}")
+                    Log.e("getMySaveProduct",
+                        "success getChatList message ${response.body()?.message}")
+                    Log.e("getMySaveProduct", "success getChatList code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onSuccess(data)
+                } else {
+                    Log.e("getMySaveProduct", "succes, getChatList but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<PartProductData>, t: Throwable) {
+                Log.e("getMySaveProduct", "fail ${t} $call")
+            }
+        })
     }
 
 

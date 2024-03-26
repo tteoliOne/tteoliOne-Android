@@ -22,7 +22,7 @@ import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityChatRoomBinding
 import com.demo.sharingapp.domain.chat.chatroom.data.*
-import com.demo.sharingapp.domain.product.ProductBottomSheet
+import com.demo.sharingapp.domain.home.product.ProductBottomSheet
 import com.demo.sharingapp.domain.report.ReportBottomSheet
 import com.demo.sharingapp.domain.report.ReportCompleteBottomSheet
 import com.demo.sharingapp.login.signup.basic.SignupDialog

@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.product
+package com.demo.sharingapp.domain.home.product
 
 import android.app.Application
 import android.content.Context

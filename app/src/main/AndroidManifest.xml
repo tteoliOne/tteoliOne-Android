@@ -26,7 +26,7 @@
                 android:value="" />
         </activity>
         <activity
-            android:name=".domain.other_profile.OtherProfileActivity"
+            android:name=".domain.home.other_profile.OtherProfileActivity"
             android:exported="false">
             <meta-data
                 android:name="android.app.lib_name"

@@ -154,6 +154,10 @@ object API {
     // 신고하기
     const val POST_REPORT : String="/api/reports/{reportType}/{id}"
 
+    // 내정보-저장글 목록
+    const val GET_MY_SAVE_PRODUCT : String="/api/products/me/saved"
+
+
 
 
     // 채팅 _ 방 떠나기

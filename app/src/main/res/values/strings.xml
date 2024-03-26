@@ -2,10 +2,11 @@
     <string name="app_name">떠리원</string>
     <string name="nickname">닉네임</string>
     <string name="goodPoint">따봉</string>
-    <string name="share_list">내 공유글 목록</string>
+    <string name="share_list">공유글 목록</string>
     <string name="share_complete_list">공유완료 목록</string>
     <string name="save_list">저장글 목록</string>
-    <string name="my_info_setting">내정보 수정</string>
+    <string name="review_list">후기 목록</string>
+    <string name="my_info_setting">프로필 수정</string>
     <string name="logout">로그아웃</string>
     <string name="unregister">회원탈퇴</string>
     <string name="divide_line">|</string>

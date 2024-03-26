@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.product
+package com.demo.sharingapp.domain.home.product
 
 import android.Manifest
 import android.app.Activity

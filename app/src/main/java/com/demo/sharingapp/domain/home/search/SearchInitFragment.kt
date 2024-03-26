@@ -42,27 +42,30 @@ class SearchInitFragment : Fragment(R.layout.fragment_search_init) {
             layoutManager = LinearLayoutManager(this@SearchInitFragment.requireContext())
         }
 
+        val receivedBundle = arguments
+        if (receivedBundle != null) {
+            data = receivedBundle.getString("key")
+            Log.e("searchR",data.toString())
+            if (data != null){
+                data = data?.trim()
+                getData.add(data!!)
+
+            }
+        }
+
         if (SharedPreferencesData.containsData(this.requireContext(), Constants.SEARCH_RECODE)) {
             // 데이터가 있는지 확인
             val i = SharedPreferencesData.getMutableListData(this@SearchInitFragment.requireContext(),
                 SEARCH_RECODE)
             if(i != null){
-                getData = i
+                getData += i
 
             }
 
         }
-
-        val receivedBundle = arguments
-        if (receivedBundle != null) {
-            data = receivedBundle.getString("key")
-            if (data != null){
-                data = data?.trim()
-                getData.add(data!!)
-                sharedSaveData()
-            }
+        if (data != null){
+            sharedSaveData()
         }
-
 
 
         submitListAdepter()

@@ -1,4 +1,4 @@
-package com.demo.sharingapp.domain.other_profile.data
+package com.demo.sharingapp.domain.home.other_profile.data
 
 data class OtherProfileSimpleData(
     val profile: String,                // 상대방 프로필url

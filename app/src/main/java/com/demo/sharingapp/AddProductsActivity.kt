@@ -36,8 +36,8 @@ import com.demo.sharingapp.addproduct.AddProductImageData
 import com.demo.sharingapp.addproduct.ProductImageAdapter
 import com.demo.sharingapp.databinding.ActivityAddProductsBinding
 import com.demo.sharingapp.domain.MainViewModel
-import com.demo.sharingapp.domain.product.ProductBottomSheet
-import com.demo.sharingapp.domain.product.ProductViewModel
+import com.demo.sharingapp.domain.home.product.ProductBottomSheet
+import com.demo.sharingapp.domain.home.product.ProductViewModel
 import com.demo.sharingapp.login.data.AccessTokenRequest
 import com.demo.sharingapp.login.data.Products
 import com.demo.sharingapp.retrofit.RetrofitManager
