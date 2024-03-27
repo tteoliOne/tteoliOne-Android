@@ -15,7 +15,7 @@ import com.demo.sharingapp.retrofit.RetrofitManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.tabs.TabLayoutMediator
 
-class ReportBottomSheet( val chatNo: Long, private val opponentId: Long, private val onSuccess:()->Unit) : BottomSheetDialogFragment() {
+class ReportBottomSheet( val chatNo: Long, private val opponentId: Long, private val onSuccess:()->Unit, private val onClickEtcBtn:()->Unit) : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,7 +45,7 @@ class ReportBottomSheet( val chatNo: Long, private val opponentId: Long, private
         spamBtn?.setOnClickListener{
             Log.e("aa","spam")
             dismiss()
-            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"spam", opponentId = opponentId){
+            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"spam", opponentId = opponentId, content = null){
                 if(it == 0){
                     onSuccess()
                 }
@@ -53,7 +53,7 @@ class ReportBottomSheet( val chatNo: Long, private val opponentId: Long, private
         }
         imageViolenceBtn?.setOnClickListener{
             dismiss()
-            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"image-violence", opponentId = opponentId){
+            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"image-violence", opponentId = opponentId, content = null){
                 if(it == 0){
                     onSuccess()
                 }
@@ -64,13 +64,15 @@ class ReportBottomSheet( val chatNo: Long, private val opponentId: Long, private
         informationBtn?.setOnClickListener{
             Log.e("aa","informationBtn")
             dismiss()
-            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"information", opponentId = opponentId){
+            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"information", opponentId = opponentId, content = null){
                 if(it == 0){
                     onSuccess()
                 }
             }
         }
         ectButton?.setOnClickListener{
+            dismiss()
+            onClickEtcBtn()
             Log.e("aa","ectButton")
         }
 

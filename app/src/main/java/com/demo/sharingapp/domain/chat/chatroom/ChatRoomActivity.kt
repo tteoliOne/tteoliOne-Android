@@ -25,6 +25,7 @@ import com.demo.sharingapp.domain.chat.chatroom.data.*
 import com.demo.sharingapp.domain.home.product.ProductBottomSheet
 import com.demo.sharingapp.domain.report.ReportBottomSheet
 import com.demo.sharingapp.domain.report.ReportCompleteBottomSheet
+import com.demo.sharingapp.domain.report.ReportEtcBottomSheet
 import com.demo.sharingapp.login.signup.basic.SignupDialog
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -137,11 +138,24 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                     }
                     R.id.reportMenu -> { // 신고하기
                         // 바텀시트 설정
-                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong(),opponentId){
-                            val bottomSheetFragment = ReportCompleteBottomSheet()
-                            bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
-                            Log.e("chatMenu", "123")
-                        }
+                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong(),
+                            opponentId,
+                            onClickEtcBtn = {
+                                val bottomSheetFragment = ReportEtcBottomSheet(chatRoomNum.toLong(),
+                                    opponentId,onSuccess = {
+                                    val bottomSheetFragment = ReportCompleteBottomSheet()
+                                    bottomSheetFragment.show(supportFragmentManager,
+                                        bottomSheetFragment.tag)
+                                })
+                                bottomSheetFragment.show(supportFragmentManager,
+                                    bottomSheetFragment.tag)
+                            },
+                            onSuccess = {
+                                val bottomSheetFragment = ReportCompleteBottomSheet()
+                                bottomSheetFragment.show(supportFragmentManager,
+                                    bottomSheetFragment.tag)
+                                Log.e("chatMenu", "123")
+                            })
                         bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                         Log.e("chatMenu", "신고하기")
                         return@setOnMenuItemClickListener true
@@ -187,7 +201,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
             // 개당 가격
             val sharePrice = changePrice(it)
-            Log.e("sharePrice",sharePrice)
+            Log.e("sharePrice", sharePrice)
             binding.buyPriceTextView.text = sharePrice
 
             if (it.checkSeller) { // 판매자일때
@@ -679,7 +693,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                     ColorStateList.valueOf(resources.getColor(R.color.gray, theme))
                 binding.noApproveButton.backgroundTintList = newTintColor
                 binding.noApproveButton.text = "공유 완료"
-                binding.noApproveButton.isClickable=false
+                binding.noApproveButton.isClickable = false
                 Toast.makeText(this, responseData, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -701,7 +715,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 val newTintColor =
                     ColorStateList.valueOf(resources.getColor(R.color.gray, theme))
                 binding.noApproveButton.backgroundTintList = newTintColor
-                binding.noApproveButton.isClickable=false
+                binding.noApproveButton.isClickable = false
                 Toast.makeText(this, responseData, Toast.LENGTH_SHORT).show()
             } else {
                 Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
@@ -713,7 +727,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         RetrofitManager.instance.postProductReview(context = this,
             productsId = productId,
             content = description,
-            goodCount = goodCount.toLong()){ code, message, responseData ->
+            goodCount = goodCount.toLong()) { code, message, responseData ->
             if (code == 0) {
                 val newTintColor =
                     ColorStateList.valueOf(resources.getColor(R.color.gray, theme))
