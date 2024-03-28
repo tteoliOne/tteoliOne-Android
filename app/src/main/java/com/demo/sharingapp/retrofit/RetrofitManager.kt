@@ -22,6 +22,8 @@ import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileContent
 import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileResponse
 import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleData
 import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleResponse
+import com.demo.sharingapp.domain.review.data.ReviewResponse
+import com.demo.sharingapp.domain.review.data.ReviewResponseData
 import com.demo.sharingapp.domain.user.data.*
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
@@ -70,6 +72,45 @@ class RetrofitManager() : Application() {
     // 레트로핏 인터페이스 가져오기
     private val retrofitInterface: RestAPI? =
         RetrofitClient.getClient(API.BASE_URL)?.create(RestAPI::class.java)
+
+    // 후기 조회
+    fun getReview(
+        context: Context,
+        userId: Long,
+        onSuccess: (List<ReviewResponseData>) -> Unit
+
+    ){
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val retrofit = initRetrofit(context)
+        val api = retrofit.create(RestAPI::class.java)
+        val getCall = api.getReview(Authorization = authorization, userId = userId)
+
+        getCall.enqueue(object : Callback<ReviewResponse>{
+            override fun onResponse(
+                call: Call<ReviewResponse>,
+                response: Response<ReviewResponse>,
+            ) {
+                if (response.isSuccessful) {
+                    Log.e("getReview", "success getChatList data ${response.body()?.data}")
+                    Log.e("getReview",
+                        "success getChatList success ${response.body()?.success}")
+                    Log.e("getReview",
+                        "success getChatList message ${response.body()?.message}")
+                    Log.e("getReview", "success getChatList code ${response.body()?.code}")
+                    val data = response.body()?.data ?: return
+                    onSuccess(data)
+
+                } else {
+                    Log.e("getReview", "succes, getChatList but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ReviewResponse>, t: Throwable) {
+                Log.e("getReview", "fail ${t} $call")
+            }
+        })
+    }
 
     // 상대방 프로필 조회
     fun getOtherProfile(

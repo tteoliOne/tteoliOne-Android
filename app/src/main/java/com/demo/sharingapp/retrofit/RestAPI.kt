@@ -8,6 +8,7 @@ import com.demo.sharingapp.domain.home.part.data.DetailedProductResponseData
 import com.demo.sharingapp.domain.home.search.data.GetSearchData
 import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileResponse
 import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleResponse
+import com.demo.sharingapp.domain.review.data.ReviewResponse
 import com.demo.sharingapp.domain.user.data.DeleteAccountData
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoResponse
@@ -225,6 +226,13 @@ interface RestAPI {
         @Query("size") size: Int,
         @Query("sort") sort: String,
     ) : Call<PartProductData>
+
+    // 후기 정보 조회
+    @GET(API.GET_REVIEW)
+    fun getReview(
+        @Header("Authorization") Authorization: String,
+        @Path("userId") userId: Long,
+    ) : Call<ReviewResponse>
 
     // 상대방 프로필 조회
     @GET(API.GET_OTHER_PROFILE)

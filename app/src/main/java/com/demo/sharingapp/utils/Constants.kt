@@ -157,6 +157,9 @@ object API {
     // 내정보-저장글 목록
     const val GET_MY_SAVE_PRODUCT : String="/api/products/me/saved"
 
+    // 후기 정보 가져오기
+    const val GET_REVIEW : String="/api/reviews/{userId}"
+
 
 
 

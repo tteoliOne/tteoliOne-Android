@@ -14,6 +14,7 @@ import com.demo.sharingapp.MyApplication.Companion.mainViewModel
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentUserBinding
 import com.demo.sharingapp.domain.MainViewModel
+import com.demo.sharingapp.domain.user.review.ReviewActivity
 import com.demo.sharingapp.domain.user.saveProductList.SaveProductListActivity
 import com.demo.sharingapp.domain.user.shareProductList.ShareProductListActivity
 import com.demo.sharingapp.domain.user.soldOutProduct.SoldOutProductActivity
@@ -64,6 +65,12 @@ class UserFragment: Fragment(R.layout.fragment_user) {
         binding.soldOutListButton.setOnClickListener {
             Log.e("button","버튼 클릭 내공유글")
             val intent = Intent(context, SoldOutProductActivity::class.java)
+            startActivity(intent)
+        }
+
+        // 후기 목록 클릭
+        binding.reviewListButton.setOnClickListener {
+            val intent = Intent(context, ReviewActivity::class.java)
             startActivity(intent)
         }
 
