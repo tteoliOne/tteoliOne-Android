@@ -1459,13 +1459,13 @@ class RetrofitManager() : Application() {
         reportType: String,
         id: Long,
         reportCategory: String,
-        opponentId: Long,
+        opponentId: String?,
         content: String?,
         onSuccess: (Int) -> Unit
     ){
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
-        val data = PostReportBody(content, opponentId.toString())
+        val data = PostReportBody(content, opponentId)
         val call = retrofitInterface?.postReport(Authorization = authorization, reportType = reportType, id = id, reportCategory = reportCategory, postReportBody =data )
         call?.enqueue(object : Callback<EmailResponse>{
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {

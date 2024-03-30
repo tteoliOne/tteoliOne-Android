@@ -12,7 +12,7 @@ import com.demo.sharingapp.retrofit.RetrofitManager
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.textfield.TextInputEditText
 
-class ReportEtcBottomSheet(val chatNo: Long, private val opponentId: Long,private val onSuccess:()->Unit): BottomSheetDialogFragment() {
+class ReportEtcBottomSheet(private val chatNo: Long, private val reportType: String, private val opponentId: String?, private val onSuccess:()->Unit): BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -47,7 +47,7 @@ class ReportEtcBottomSheet(val chatNo: Long, private val opponentId: Long,privat
         completeBtn?.setOnClickListener {
             val data = descriptionEditText?.text.toString()
             dismiss()
-            RetrofitManager.instance.postReport(this.requireContext(), "chat",chatNo,"etc", opponentId = opponentId, content = data){
+            RetrofitManager.instance.postReport(this.requireContext(), reportType, chatNo,"etc", opponentId = opponentId, content = data){
                 if(it == 0){
                     onSuccess()
                 }

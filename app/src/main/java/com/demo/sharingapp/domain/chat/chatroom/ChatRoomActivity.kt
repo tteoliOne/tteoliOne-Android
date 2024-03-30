@@ -59,7 +59,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     private lateinit var binding: ActivityChatRoomBinding
     private var outType = 0
 
-    private var opponentId = 0L
+    private var opponentId = "0"
 
     private var serverState = false
 
@@ -141,10 +141,10 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                     }
                     R.id.reportMenu -> { // 신고하기
                         // 바텀시트 설정
-                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong(),
+                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong(), reportType = "chat",
                             opponentId,
                             onClickEtcBtn = {
-                                val bottomSheetFragment = ReportEtcBottomSheet(chatRoomNum.toLong(),
+                                val bottomSheetFragment = ReportEtcBottomSheet(chatRoomNum.toLong(), reportType = "chat",
                                     opponentId,onSuccess = {
                                     val bottomSheetFragment = ReportCompleteBottomSheet()
                                     bottomSheetFragment.show(supportFragmentManager,
@@ -189,7 +189,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         RetrofitManager.instance.getChatRoomData(this, chatRoomNum.toLong()) {
 
             // 상대방 id
-            opponentId = it.opponentId
+            opponentId = it.opponentId.toString()
 
             // 채팅 제목
             binding.nicknameTextView.text = getString(R.string.nickname_input, it.opponentNickname)
@@ -696,7 +696,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     ) {
         RetrofitManager.instance.putProductApprove(this,
             productsId = productId,
-            buyerId = opponentId,
+            buyerId = opponentId.toLong(),
             chatRoomId = chatRoomNum.toLong()) { code, message, responseData ->
             if (code == 0) {
                 val newTintColor =
@@ -719,7 +719,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     ) {
         RetrofitManager.instance.putProductReject(this,
             productsId = productId,
-            buyerId = opponentId,
+            buyerId = opponentId.toLong(),
             chatRoomId = chatRoomNum.toLong()) { code, message, responseData ->
             if (code == 0) {
                 val newTintColor =

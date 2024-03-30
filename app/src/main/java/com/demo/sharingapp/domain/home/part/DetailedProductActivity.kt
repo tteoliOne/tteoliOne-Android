@@ -16,6 +16,9 @@ import com.demo.sharingapp.domain.chat.chatroom.ChatRoomActivity
 import com.demo.sharingapp.domain.home.part.data.DetailedImageData
 import com.demo.sharingapp.domain.home.part.data.DetailedProductData
 import com.demo.sharingapp.domain.home.other_profile.OtherProfileActivity
+import com.demo.sharingapp.domain.report.ReportBottomSheet
+import com.demo.sharingapp.domain.report.ReportCompleteBottomSheet
+import com.demo.sharingapp.domain.report.ReportEtcBottomSheet
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
@@ -109,9 +112,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
 
         binding.callButton.setOnClickListener {
-            RetrofitManager.instance.postChatRoom(this,productId){
-                val intent = Intent(this,ChatRoomActivity::class.java)
-                    .putExtra(CHATROOM_NUMBER,it.chatId.toString())
+            RetrofitManager.instance.postChatRoom(this, productId) {
+                val intent = Intent(this, ChatRoomActivity::class.java)
+                    .putExtra(CHATROOM_NUMBER, it.chatId.toString())
                     .putExtra(PRODUCT_ID, productId)
                     .putExtra(USER_PROFILE, profile)
                 startActivity(intent)
@@ -137,7 +140,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
         binding.profileImageView.setOnClickListener {
             val intent = Intent(this, OtherProfileActivity::class.java)
-                .putExtra(SELLER_ID,sellerId)
+                .putExtra(SELLER_ID, sellerId)
             startActivity(intent)
 
         }
@@ -161,6 +164,28 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
                         return@setOnMenuItemClickListener true
                     }
                     R.id.reportMenu -> { // 신고하기
+                        val bottomSheetFragment =
+                            ReportBottomSheet(productId, reportType = "products",
+                                null,
+                                onClickEtcBtn = {
+                                    val bottomSheetFragment =
+                                        ReportEtcBottomSheet(productId, reportType = "products",
+                                            null, onSuccess = {
+                                                val bottomSheetFragment =
+                                                    ReportCompleteBottomSheet()
+                                                bottomSheetFragment.show(supportFragmentManager,
+                                                    bottomSheetFragment.tag)
+                                            })
+                                    bottomSheetFragment.show(supportFragmentManager,
+                                        bottomSheetFragment.tag)
+                                },
+                                onSuccess = {
+                                    val bottomSheetFragment = ReportCompleteBottomSheet()
+                                    bottomSheetFragment.show(supportFragmentManager,
+                                        bottomSheetFragment.tag)
+                                    Log.e("chatMenu", "123")
+                                })
+                        bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                         return@setOnMenuItemClickListener true
                     }
                     else -> {
@@ -274,7 +299,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun settingData(it: DetailedProductData) {
 
         checkOwner = it.checkOwner // 작성자 확인
-        if (!checkOwner){
+        if (!checkOwner) {
             binding.callButton.isVisible = true
         }
 
