@@ -13,16 +13,17 @@ import okhttp3.Request
 import okhttp3.Response
 import okhttp3.Route
 
-class TokenAuthenticator(val context: Context) : Authenticator {
+class TokenAuthenticator(val context: Context, var count: Int) : Authenticator {
 
     private var tokenCheck = true
     override fun authenticate(route: Route?, response: Response): Request? {
-        if (isTokenExpired(response) && tokenCheck) {
+        if (isTokenExpired(response) && tokenCheck && count == 0) {
             Log.e("Authenticator", response.toString())
             Log.e("Authenticator", "토큰 재발급 시도")
             val reissueData = runBlocking {RetrofitManager.instance.postReissue(context)}
             val newAccessToken = reissueData?.data?.accessToken
             Log.e("Authorization Token", newAccessToken.toString())
+            count +=1
 
             if (reissueData?.code != 0){
                 tokenCheck = false

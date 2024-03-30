@@ -57,6 +57,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     private lateinit var chatRoomAdepter: ChatRoomAdepter
     private lateinit var linearLayoutManger: LinearLayoutManager
     private lateinit var binding: ActivityChatRoomBinding
+    private var outType = 0
 
     private var opponentId = 0L
 
@@ -88,7 +89,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         clickBackButton(sockClient, chatRoomNum.toLong())
 
         // 메뉴 버튼 클릭
-        clickMenuButton(chatRoomNum)
+        clickMenuButton(sockClient, chatRoomNum)
 
         chatRoomAdepter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -123,7 +124,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     }
 
     // 메뉴 버튼 클릭 함수
-    private fun clickMenuButton(chatRoomNum: String) {
+    private fun clickMenuButton(sockClient: StompClient, chatRoomNum: String) {
         binding.menuButton.setOnClickListener {
             val popup = PopupMenu(this@ChatRoomActivity, it)
             popup.menuInflater.inflate(R.menu.menu_chat, popup.menu)
@@ -131,8 +132,10 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 when (menuItem.itemId) {
                     R.id.leaveMenu -> { // 나가기
                         Log.e("chatMenu", "나가기")
+                        outType = 1
                         RetrofitManager.instance.deleteChatRoomLeave(this,
                             chatRoomId = chatRoomNum.toLong())
+                        sockClient.disconnect()
                         finish()
                         return@setOnMenuItemClickListener true
                     }
@@ -214,7 +217,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                         binding.noApproveButton.backgroundTintList = newTintColor
                         binding.noApproveButton.isClickable = true
                     }
-                } else if (it.soldStatus == "eSolodOut") {
+                } else if (it.soldStatus == "eSoldOut") {
                     val newTintColor =
                         ColorStateList.valueOf(resources.getColor(R.color.gray, theme))
                     binding.noApproveButton.backgroundTintList = newTintColor
@@ -329,7 +332,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         errorSubscribe(sockClient, headerList, chatRoomNum, userId, productId)
 
         // stomp 생명주기
-        stompLifecycle(sockClient)
+        stompLifecycle(sockClient, chatRoomNum)
 
         // 메시지 보내기
         sendMessage(chatRoomNum, productId, sockClient, sendHeaderList, "chat", userId)
@@ -342,7 +345,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
     // stomp 생명주기 함수
     @SuppressLint("CheckResult")
-    private fun stompLifecycle(sockClient: StompClient) {
+    private fun stompLifecycle(sockClient: StompClient, chatRoomNum: String) {
         sockClient.lifecycle().subscribe {
             when (it.type) {
                 LifecycleEvent.Type.OPENED -> {
@@ -357,6 +360,12 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 }
                 LifecycleEvent.Type.CLOSED -> {
                     Log.e("Stomp", "서버 닫음")
+
+                    if (outType != 1){
+                        RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum.toLong())
+                    }
+
+
                     serverState = false
 
                 }
@@ -531,8 +540,9 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     private fun clickBackButton(sockClient: StompClient, chatRoomNum: Long) {
         binding.backButton.setOnClickListener {
 
+            outType = 0
             if (serverState) {
-                RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum)
+//                RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum)
                 sockClient.disconnect()
             }
             val resultIntent = Intent()

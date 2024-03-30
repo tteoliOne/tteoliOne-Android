@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class DeleteAccountData(
     @SerializedName("authorizationCode")
-    val authorizationCode : String
+    val authorizationCode : String?
 )

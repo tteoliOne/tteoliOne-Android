@@ -107,10 +107,12 @@ interface RestAPI {
         @Header("Authorization") Authorization: String,
     ): Call<EmailResponse>
 
-    @HTTP(method = "DELETE", path = API.DELETE_ACCOUNT, hasBody = true)
+    // 회원 탈퇴
+//    @HTTP(method = "DELETE", path = API.DELETE_ACCOUNT, hasBody = true)
+    @POST(API.DELETE_ACCOUNT)
     fun deleteAccount(
         @Header("Authorization") Authorization: String,
-        @Body authorizationCode: String,
+        @Body authorizationCode: DeleteAccountData,
         @Path("userId") userId: Long,
     ): Call<EmailResponse>
 

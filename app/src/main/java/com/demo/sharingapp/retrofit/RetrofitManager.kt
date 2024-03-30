@@ -736,24 +736,26 @@ class RetrofitManager() : Application() {
     fun deleteAccount(
         context: Context,
         userId: Long,
+        onSuccess: (Int) -> Unit
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val data = DeleteAccountData("")
+        val data = DeleteAccountData(null)
         val call = api.deleteAccount(Authorization = authorization,
             userId = userId,
-            authorizationCode = " ")
+            authorizationCode = data)
 
         call.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
                     Log.e("deleteAccount", "data ${response.body()?.data}")
                     Log.e("deleteAccount", "success ${response.body()?.success}")
                     Log.e("deleteAccount", "message ${response.body()?.message}")
                     Log.e("deleteAccount", "code ${response.body()?.code}")
+                    val data = response.body()?.code ?: return
+                    onSuccess(data)
                 } else {
                     Log.e("deleteAccount", "succes, but ${response.errorBody()}")
 
@@ -1646,6 +1648,7 @@ class RetrofitManager() : Application() {
 
     private fun initRetrofit(context: Context): Retrofit {
         val client = OkHttpClient.Builder()
+        var count =0
         val loggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 Log.e("Post", "log: message ${message}")
@@ -1654,7 +1657,7 @@ class RetrofitManager() : Application() {
 
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         client.addInterceptor(loggingInterceptor)
-        client.authenticator(TokenAuthenticator(context))
+        client.authenticator(TokenAuthenticator(context,count))
 
 
         val retrofit = Retrofit.Builder()
