@@ -151,6 +151,7 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/soldOutBackground"
+            android:visibility="gone"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:clickable="true"

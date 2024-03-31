@@ -12,7 +12,7 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemHomePartProductBinding
 import com.demo.sharingapp.domain.home.data.PartProductContent
 
-class SaveProductListAdapter :
+class SaveProductListAdapter(private val onViewClick:(Long)->Unit) :
     ListAdapter<PartProductContent, SaveProductListAdapter.SaveProductListViewHolder>(object :
         DiffUtil.ItemCallback<PartProductContent>() {
         override fun areItemsTheSame(
@@ -32,7 +32,7 @@ class SaveProductListAdapter :
     inner class SaveProductListViewHolder(private val binding: ItemHomePartProductBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(item:PartProductContent){
             binding.root.setOnClickListener {
-//                onViewClick(item.productId)
+                onViewClick(item.productId)
             }
 
 
