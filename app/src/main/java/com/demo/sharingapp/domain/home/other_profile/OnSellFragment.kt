@@ -1,5 +1,7 @@
 package com.demo.sharingapp.domain.home.other_profile
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -7,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentOtherOnsellBinding
+import com.demo.sharingapp.domain.home.part.DetailedProductActivity
 import com.demo.sharingapp.login.data.ProductsData
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
@@ -21,25 +24,18 @@ class OnSellFragment: Fragment(R.layout.fragment_other_onsell) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentOtherOnsellBinding.bind(view)
 
-        onSellAdepter = OnSellAdepter()
+        onSellAdepter = OnSellAdepter(){
+            val intent = Intent(this@OnSellFragment.requireActivity(),
+                DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID,it)
+            startActivityForResult(intent, Constants.MOVE_DETAILED_CODE)
+        }
 
         binding.onSellRecyclerView.apply {
             adapter = onSellAdepter
             layoutManager = GridLayoutManager(context, 2)
         }
 
-        val receivedBundle = arguments
-        if (receivedBundle != null) {
-            val sellerId = receivedBundle.getLong("sellerId")
-            val longitude = receivedBundle.getDouble("longitude")
-            val latitude = receivedBundle.getDouble("latitude")
-            if(sellerId != 0L && longitude != 0.0 && latitude != 0.0){
-                RetrofitManager.instance.getOtherProfile(this@OnSellFragment.requireContext(), sellerId = sellerId, longitude = longitude, latitude = latitude, page = 0, soldStatus = "eNew"){
-                    onSellAdepter.submitList(it)
-                }
-            }
-
-        }
+        initProduct()
 
 
 //        val itemList = listOf(
@@ -48,6 +44,35 @@ class OnSellFragment: Fragment(R.layout.fragment_other_onsell) {
 //
 //        onSellAdepter.submitList(itemList)
 
+    }
+
+    private fun initProduct() {
+        val receivedBundle = arguments
+        if (receivedBundle != null) {
+            val sellerId = receivedBundle.getLong("sellerId")
+            val longitude = receivedBundle.getDouble("longitude")
+            val latitude = receivedBundle.getDouble("latitude")
+            if (sellerId != 0L && longitude != 0.0 && latitude != 0.0) {
+                RetrofitManager.instance.getOtherProfile(this@OnSellFragment.requireContext(),
+                    sellerId = sellerId,
+                    longitude = longitude,
+                    latitude = latitude,
+                    page = 0,
+                    soldStatus = "eNew") {
+                    onSellAdepter.submitList(it)
+                }
+            }
+
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.MOVE_DETAILED_CODE && resultCode == Activity.RESULT_OK) {
+
+            initProduct()
+
+        }
     }
 
 }

@@ -15,7 +15,7 @@ import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileContent
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
 
-class OnSellAdepter: ListAdapter<OtherProfileContent, OnSellAdepter.OnSellViewHolder>(object :DiffUtil.ItemCallback<OtherProfileContent>(){
+class OnSellAdepter(private val onViewClick:(Long)->Unit): ListAdapter<OtherProfileContent, OnSellAdepter.OnSellViewHolder>(object :DiffUtil.ItemCallback<OtherProfileContent>(){
     override fun areItemsTheSame(oldItem: OtherProfileContent, newItem: OtherProfileContent): Boolean {
         return oldItem.productId == newItem.productId
     }
@@ -29,6 +29,13 @@ class OnSellAdepter: ListAdapter<OtherProfileContent, OnSellAdepter.OnSellViewHo
             Glide.with(binding.imageView)
                 .load(item.imageUrl)
                 .into(binding.imageView)
+
+            // 상품 클릭
+            binding.root.setOnClickListener {
+                Log.e("click",item.productId.toString())
+                onViewClick(item.productId)
+
+            }
 
             binding.titleTextView.text = item.title
 
