@@ -50,14 +50,17 @@ import java.text.NumberFormat
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import kotlin.collections.ArrayList
 
 
 class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDialogInterface,
     ReviewDialogInterface {
     private lateinit var chatRoomAdepter: ChatRoomAdepter
     private lateinit var linearLayoutManger: LinearLayoutManager
+    private lateinit var sockClient: StompClient
     private lateinit var binding: ActivityChatRoomBinding
     private var outType = 0
+    private var errorType = 0
 
     private var opponentId = "0"
 
@@ -83,10 +86,11 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         // 채팅예외처리
         chattingException()
 
-        val sockClient = initMessage(chatRoomNum, userId, productId)
+        sockClient = initMessage(chatRoomNum, userId)
+        Log.e("sockClient",sockClient.toString())
 
         // 이전 버튼 클릭
-        clickBackButton(sockClient, chatRoomNum.toLong())
+        clickBackButton()
 
         // 메뉴 버튼 클릭
         clickMenuButton(sockClient, chatRoomNum)
@@ -118,8 +122,11 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         }
         binding.noApproveButton.setOnClickListener {
             Log.e("button", "승인")
-            approveShowDialog(productId, chatRoomNum, sockClient, sendHeaderList)
+            approveShowDialog(productId, chatRoomNum)
         }
+
+        // 메시지 보내기
+        sendMessage(chatRoomNum, productId, sendHeaderList, "chat", userId)
 
     }
 
@@ -141,24 +148,29 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                     }
                     R.id.reportMenu -> { // 신고하기
                         // 바텀시트 설정
-                        val bottomSheetFragment = ReportBottomSheet(chatRoomNum.toLong(), reportType = "chat",
-                            opponentId,
-                            onClickEtcBtn = {
-                                val bottomSheetFragment = ReportEtcBottomSheet(chatRoomNum.toLong(), reportType = "chat",
-                                    opponentId,onSuccess = {
+                        val bottomSheetFragment =
+                            ReportBottomSheet(chatRoomNum.toLong(), reportType = "chat",
+                                opponentId,
+                                onClickEtcBtn = {
+                                    val bottomSheetFragment =
+                                        ReportEtcBottomSheet(chatRoomNum.toLong(),
+                                            reportType = "chat",
+                                            opponentId,
+                                            onSuccess = {
+                                                val bottomSheetFragment =
+                                                    ReportCompleteBottomSheet()
+                                                bottomSheetFragment.show(supportFragmentManager,
+                                                    bottomSheetFragment.tag)
+                                            })
+                                    bottomSheetFragment.show(supportFragmentManager,
+                                        bottomSheetFragment.tag)
+                                },
+                                onSuccess = {
                                     val bottomSheetFragment = ReportCompleteBottomSheet()
                                     bottomSheetFragment.show(supportFragmentManager,
                                         bottomSheetFragment.tag)
+                                    Log.e("chatMenu", "123")
                                 })
-                                bottomSheetFragment.show(supportFragmentManager,
-                                    bottomSheetFragment.tag)
-                            },
-                            onSuccess = {
-                                val bottomSheetFragment = ReportCompleteBottomSheet()
-                                bottomSheetFragment.show(supportFragmentManager,
-                                    bottomSheetFragment.tag)
-                                Log.e("chatMenu", "123")
-                            })
                         bottomSheetFragment.show(supportFragmentManager, bottomSheetFragment.tag)
                         Log.e("chatMenu", "신고하기")
                         return@setOnMenuItemClickListener true
@@ -298,12 +310,12 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     private fun initMessage(
         chatRoomNum: String,
         userId: Long,
-        productId: Long,
     ): StompClient {
 
 
 //        runBlocking { RetrofitManager.instance.postReissueMain(this@ChatRoomActivity) } // 채팅서버에 연결하기 전에 토큰 재발급
 
+        errorType = 0
         val token = SharedPreferencesData.getData(this, ACCESS_TOKEN)
         val headerToken = StompHeader("Authorization", token)
         val headerList = arrayListOf<StompHeader>()
@@ -329,13 +341,13 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         chatSubscribe(sockClient, headerList, chatRoomNum, userId)
 
         // 에러 메시지 구독
-        errorSubscribe(sockClient, headerList, chatRoomNum, userId, productId)
+        errorSubscribe(sockClient, headerList)
 
         // stomp 생명주기
-        stompLifecycle(sockClient, chatRoomNum)
+        stompLifecycle(
+            sockClient, chatRoomNum, headerList,userId
+        )
 
-        // 메시지 보내기
-        sendMessage(chatRoomNum, productId, sockClient, sendHeaderList, "chat", userId)
 
 
         return sockClient
@@ -345,7 +357,9 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
     // stomp 생명주기 함수
     @SuppressLint("CheckResult")
-    private fun stompLifecycle(sockClient: StompClient, chatRoomNum: String) {
+    private fun stompLifecycle(
+        sockClient: StompClient, chatRoomNum: String, headerList: ArrayList<StompHeader>,userId: Long,
+    ) {
         sockClient.lifecycle().subscribe {
             when (it.type) {
                 LifecycleEvent.Type.OPENED -> {
@@ -354,6 +368,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 }
                 LifecycleEvent.Type.ERROR -> {
                     Log.e("Stomp", "에러")
+                    errorType = 1
                     Log.e("Stomp", it.exception.toString())
                     serverState = false
 
@@ -361,8 +376,13 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 LifecycleEvent.Type.CLOSED -> {
                     Log.e("Stomp", "서버 닫음")
 
-                    if (outType != 1){
-                        RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum.toLong())
+                    if (outType != 1) {
+                        RetrofitManager.instance.putLeaveChatRoom(this,
+                            chatRoomId = chatRoomNum.toLong())
+                    }
+                    if (errorType == 1) {
+                        this.sockClient = initMessage(chatRoomNum, userId)
+                        Log.e("sockClient",this.sockClient.toString())
                     }
 
 
@@ -382,9 +402,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     @SuppressLint("CheckResult")
     private fun errorSubscribe(
         sockClient: StompClient,
-        headerList: ArrayList<StompHeader>, chatRoomNum: String,
-        userId: Long,
-        productId: Long,
+        headerList: ArrayList<StompHeader>
     ) {
         sockClient.topic("/pub/message", headerList).subscribe({ topicMessage ->
             if (topicMessage is StompMessage) {
@@ -505,7 +523,6 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     private fun sendMessage(
         chatRoomNum: String,
         productId: Long,
-        sockClient: StompClient,
         sendHeaderList: ArrayList<StompHeader>,
         contentType: String,
         userId: Long,
@@ -537,12 +554,13 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     }
 
     // 이전 버튼 클릭 함수
-    private fun clickBackButton(sockClient: StompClient, chatRoomNum: Long) {
+    private fun clickBackButton() {
         binding.backButton.setOnClickListener {
 
             outType = 0
             if (serverState) {
 //                RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum)
+                Log.e("sockClient",sockClient.toString())
                 sockClient.disconnect()
             }
             val resultIntent = Intent()
@@ -649,10 +667,9 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     private fun approveShowDialog(
         productId: Long,
         chatRoomNum: String,
-        sockClient: StompClient,
-        sendHeaderList: ArrayList<StompHeader>,
+
     ) {
-        val dialog = ApproveDialog(this, productId, chatRoomNum, sockClient, sendHeaderList)
+        val dialog = ApproveDialog(this, productId, chatRoomNum)
         // 알림창이 띄워져있는 동안 배경 클릭 막기
         dialog.isCancelable = false
         dialog.show(this.supportFragmentManager,

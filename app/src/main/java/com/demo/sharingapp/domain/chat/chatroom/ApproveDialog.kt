@@ -16,8 +16,6 @@ class ApproveDialog(
     approveDialogInterface: ApproveDialogInterface,
     productId: Long,
     chatRoomNum: String,
-    sockClient: StompClient,
-    sendHeaderList: ArrayList<StompHeader>,
 ) : DialogFragment() {
 
 
@@ -34,9 +32,7 @@ class ApproveDialog(
     init {
         this.approveDialogInterface = approveDialogInterface
         this.productId = productId
-        this.sockClient = sockClient
         this.chatRoomNum = chatRoomNum
-        this.sendHeaderList = sendHeaderList
     }
 
     override fun onCreateView(
