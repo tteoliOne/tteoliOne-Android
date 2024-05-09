@@ -35,6 +35,8 @@ class SoldOutProductActivity : AppCompatActivity() {
             val intent = Intent(this@SoldOutProductActivity,
                 DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID,it)
             startActivityForResult(intent, Constants.MOVE_DETAILED_CODE)
+        }, onLikeClick = {
+            likeClick(it)
         })
         val linearLayoutManager = LinearLayoutManager(this@SoldOutProductActivity)
         latitude = SharedPreferencesData.getData(this, Constants.LATITUDE).toDouble()
@@ -102,6 +104,11 @@ class SoldOutProductActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    // 좋아요 클릭 시 함수
+    private fun likeClick(it: Long) {
+        RetrofitManager.instance.postProductLike(this, it)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

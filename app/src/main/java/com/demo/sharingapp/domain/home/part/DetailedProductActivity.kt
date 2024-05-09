@@ -39,6 +39,7 @@ import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_IMAGE
 import com.demo.sharingapp.utils.Constants.PRODUCT_LATITUDE
 import com.demo.sharingapp.utils.Constants.PRODUCT_LONGITUDE
+import com.demo.sharingapp.utils.Constants.PRODUCT_PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.PRODUCT_RECEIPT_IMAGE
 import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_COUNT
 import com.demo.sharingapp.utils.Constants.PRODUCT_SHARE_PRICE
@@ -215,8 +216,10 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
             putExtra(PRODUCT_IMAGE, productImageArray)
             putExtra(PRODUCT_RECEIPT_IMAGE, receiptUri)
             putExtra(PRODUCT_TYPE, 1)
-            putExtra(PRODUCT_ID, productId)
+            putExtra(PRODUCT_PRODUCT_ID, productId)
             putExtra(PRODUCT_CATEGORY_ID, categoryId)
+            Log.e("productId",productId.toString())
+
         }
         startActivityForResult(intent, MOVE_MODIFY_CODE)
     }
@@ -303,6 +306,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
             binding.callButton.isVisible = true
         }
 
+
         //가격 변환
         val currencyFormat = NumberFormat.getInstance(Locale.KOREA)
         val buyPrice = currencyFormat.format(it.buyPrice)
@@ -385,7 +389,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
         // 공유 가격
         binding.sharePriceTextView.text = getString(R.string.buy_price, sharePrice)
-        productSharePrice = sharePrice
+        productSharePrice = it.sharePrice.toString()
 
         // 공유 수량
         binding.shareCountTextView.text = getString(R.string.product_count, it.shareCount)
@@ -426,7 +430,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(initialLocation, 12f))
         val uiSettings: UiSettings = googleMap.uiSettings
         uiSettings.setScrollGesturesEnabled(false)
-
 
         // 맵에 터치 리스너 설정
         googleMap.setOnMapClickListener(this)

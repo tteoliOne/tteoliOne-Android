@@ -66,6 +66,8 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
     private var serverState = false
 
+    private var exitOpponent = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChatRoomBinding.inflate(layoutInflater)
@@ -141,9 +143,15 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                         Log.e("chatMenu", "나가기")
                         outType = 1
                         RetrofitManager.instance.deleteChatRoomLeave(this,
-                            chatRoomId = chatRoomNum.toLong())
-                        sockClient.disconnect()
-                        finish()
+                            chatRoomId = chatRoomNum.toLong()){
+                            if (it == 0){
+                                sockClient.disconnect()
+                                val resultIntent = Intent()
+                                setResult(RESULT_OK, resultIntent)
+                                finish()
+                            }
+                        }
+
                         return@setOnMenuItemClickListener true
                     }
                     R.id.reportMenu -> { // 신고하기
@@ -205,6 +213,9 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
             // 채팅 제목
             binding.nicknameTextView.text = getString(R.string.nickname_input, it.opponentNickname)
+
+            // 상대방 나감 여부
+            exitOpponent = it.exitOpponent
 
             // 상품 이미지
             Glide.with(binding.productImageView)
@@ -270,7 +281,6 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
             }
 
-            val productId = it.productId
 
 
             val chatList = it.chatList.reversed()
@@ -334,6 +344,8 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         val sockClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP,
             "wss://tteolione.store" + "/ws-stomp/websocket", null, client)
 //43.200.94.118:8081
+        sockClient.withClientHeartbeat(0) // 클라이언트가 서버에 하트비트를 보낼 주기 (밀리초)
+        sockClient.withServerHeartbeat(0)
         sockClient.connect(headerList)
 
 
@@ -464,17 +476,17 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                         readCount = data.readCount,
                         senderLoginId = data.senderLoginId)
                     RetrofitManager.instance.postChatSendCallBack(this, chatSendCallBack) {
-                        val a = listOf(GetChatRoomInfoData("",
-                            0,
-                            0,
-                            it.data.senderName,
-                            "",
-                            it.data.content,
-                            it.data.sendTime,
-                            it.data.readCount.toLong(),
-                            true))
-
-                        chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+//                        val a = listOf(GetChatRoomInfoData("",
+//                            0,
+//                            0,
+//                            it.data.senderName,
+//                            "",
+//                            it.data.content,
+//                            it.data.sendTime,
+//                            it.data.readCount.toLong(),
+//                            true))
+//
+//                        chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
                     }
 
 //                Log.e("Asad", chatSendCallBack.toString())
@@ -498,6 +510,23 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
             } else if (data.contentType == "notice") {
                 if (data.content.contains("돌아오셨습니다")) {
                     getChatRoomData(chatRoomNum)
+                    exitOpponent = false
+                }else if(data.content.contains("상대방이 채팅방을 나갔습니다")){
+                    val content = data.content
+                    val currentMillis = LocalDateTime.now()
+                        .atZone(ZoneId.systemDefault())
+                        .toInstant()?.toEpochMilli() ?: 0
+                    val a = listOf(GetChatRoomInfoData("",
+                        0,
+                        0,
+                        "",
+                        "notice",
+                        content,
+                        currentMillis,
+                        0,
+                        false))
+
+                    chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
                 }
             } else if (data.contentType == "request") {
                 val newTintColor =
@@ -506,6 +535,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 binding.noApproveButton.isClickable = true
             } else if (data.contentType == "reject") {
                 binding.requestButton.text = "요청하기"
+                binding.requestButton.isClickable = true
             } else if (data.contentType == "approve") {
                 binding.requestButton.text = "후기 쓰기"
                 binding.requestButton.isClickable = true
@@ -542,9 +572,16 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                 sockClient.send(StompMessage(StompCommand.SEND, sendHeaderList, data.toString()))
                     .subscribe()
                 binding.chatEditText.text.clear()
-//                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "", sendData, currentMillis, 0, true))
-//
-//                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
+
+                val readCount = if (exitOpponent){
+                    0L
+                }else{
+                    1L
+                }
+
+                val a = listOf(GetChatRoomInfoData("", 0, 0, "", "chat", sendData, currentMillis, readCount, true))
+
+                chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
 
             } else {
                 Toast.makeText(this, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
@@ -695,11 +732,13 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     ) {
         RetrofitManager.instance.putProductRequest(this,
             productsId = productId,
-            chatRoomId = chatRoomNum.toLong()) {
-            if (it) {
+            chatRoomId = chatRoomNum.toLong()) { code, message ->
+            if (code == 0) {
                 binding.requestButton.text = "요청 중..."
                 binding.requestButton.isClickable = false
 
+            }else{
+                Toast.makeText(this,message,Toast.LENGTH_SHORT).show()
             }
         }
 
@@ -708,8 +747,6 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     override fun onApproveButtonClick(
         productId: Long,
         chatRoomNum: String,
-        sockClient: StompClient,
-        sendHeaderList: ArrayList<StompHeader>,
     ) {
         RetrofitManager.instance.putProductApprove(this,
             productsId = productId,
@@ -731,8 +768,6 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
     override fun onRejectButtonClick(
         productId: Long,
         chatRoomNum: String,
-        sockClient: StompClient,
-        sendHeaderList: ArrayList<StompHeader>,
     ) {
         RetrofitManager.instance.putProductReject(this,
             productsId = productId,

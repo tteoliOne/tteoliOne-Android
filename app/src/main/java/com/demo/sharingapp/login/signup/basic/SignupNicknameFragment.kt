@@ -23,7 +23,6 @@ import com.demo.sharingapp.utils.Constants.SIGNUP_ID
 import com.demo.sharingapp.utils.Constants.SIGNUP_NAME
 import com.demo.sharingapp.utils.Constants.SIGNUP_NICKNAME
 import com.demo.sharingapp.utils.Constants.SIGNUP_PASSWORD
-import com.demo.sharingapp.utils.Constants.SIGNUP_TYPE
 
 class SignupNicknameFragment: Fragment(R.layout.fragment_signup_nickname), ConfirmDialogInterface {
 

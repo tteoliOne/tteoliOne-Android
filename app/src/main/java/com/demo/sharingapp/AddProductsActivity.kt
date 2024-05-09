@@ -6,6 +6,7 @@ import android.app.DatePickerDialog
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.database.Cursor
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -16,6 +17,7 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
+import android.provider.Settings
 import android.util.Log
 import android.view.MenuItem
 import android.view.MotionEvent
@@ -27,8 +29,11 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.MenuRes
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -69,8 +74,10 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.collections.ArrayList
 
-class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
-    GoogleMap.OnCameraMoveListener {
+class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    // 현제 카메라 권한 여부 확인 변수
+    private var cameraPermissionGranted = false
 
     // 뷰모델
     private lateinit var productViewModel: ProductViewModel
@@ -105,6 +112,9 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private var receiptImage = ""
     private var productType = 0
     private var productId = 0L
+
+    private val cameraPermissionType = "카메라"
+    private val cameraFunction = "사진 찍기"
 
 
     private var realUri: Uri? = null
@@ -218,7 +228,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
             buyDate = getString(R.string.buy_date_local, year, month, day)
         )
         if (productType ==1){
-            productViewModel.updateId(productId)
+            productViewModel.updateId(productId.toLong())
         }
 
 
@@ -496,22 +506,52 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     }
 
     // 카메라 이동하는 함수
-    private fun openCamera() {
-        val cameraPermission = arrayOf(Manifest.permission.CAMERA)
-        if (PermissionUtil.checkPermission(this, cameraPermission)) {
+    private fun checkCameraPermission() {
+//        val cameraPermission = arrayOf(Manifest.permission.CAMERA)
+//        if (PermissionUtil.checkPermission(this, cameraPermission)) {
+//
+//            moveCamera()
+//
+//        } else {
+//            PermissionUtil.requestPermission(this, cameraPermission)
+//        }
 
-            val intent: Intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-            createImageUri(generateFileName(), "image/jpg")?.let { uri ->
-                realUri = uri
-                // MediaStore.EXTRA_OUTPUT을 Key로 하여 Uri를 넘겨주면
-                // 일반적인 Camera App은 이를 받아 내가 지정한 경로에 사진을 찍어서 저장시킨다.
-                intent.putExtra(MediaStore.EXTRA_OUTPUT, realUri)
+        when {
+            // 권한이 있는지 확인
+
+            // 권한이 있을 때
+            ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.CAMERA
+            ) == PackageManager.PERMISSION_GRANTED -> {
+                // 권한이 있으므로 액션 실행
+                moveCamera()
             }
-            startActivityForResult(intent, Constants.FLAG_REQ_CAMERA)
-        } else {
-            PermissionUtil.requestPermission(this, cameraPermission)
+
+            // 왜 필요한지 한번도 설명
+            ActivityCompat.shouldShowRequestPermissionRationale(this,
+                Manifest.permission.CAMERA) -> {
+                showPermissionRationalDialog(cameraPermissionType, cameraFunction)
+            }
+            else -> {
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    Constants.ACCESS_FINE_CAMERA_CODE)
+            }
+
         }
 
+    }
+
+    private fun moveCamera() {
+        val intent: Intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        createImageUri(generateFileName(), "image/jpg")?.let { uri ->
+            realUri = uri
+            // MediaStore.EXTRA_OUTPUT을 Key로 하여 Uri를 넘겨주면
+            // 일반적인 Camera App은 이를 받아 내가 지정한 경로에 사진을 찍어서 저장시킨다.
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, realUri)
+        }
+        startActivityForResult(intent, Constants.FLAG_REQ_CAMERA)
     }
 
 
@@ -593,7 +633,7 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
                 R.id.option_camera -> {
 
                     // 카메라로 이동 함수 호출
-                    openCamera()
+                    checkCameraPermission()
                     return@setOnMenuItemClickListener true
                 }
 
@@ -663,24 +703,29 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun movePrevious() {
         binding.movePreviousButton.setOnClickListener {
             removeFindPlace()
+            val resultIntent = Intent()
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
     }
 
     // 불러온 데이터 넣기 함수
     private fun puttingData() {
+
         title = intent.getStringExtra(Constants.PRODUCT_TITLE) ?: title
         buyPrice = intent.getStringExtra(Constants.PRODUCT_BUY_PRICE) ?: buyPrice
         buyCount = intent.getStringExtra(Constants.PRODUCT_BUY_COUNT) ?: buyCount
         sharePrice = intent.getStringExtra(Constants.PRODUCT_SHARE_PRICE) ?: sharePrice
         shareCount = intent.getStringExtra(Constants.PRODUCT_SHARE_COUNT) ?: shareCount
+        productId = intent.getLongExtra(Constants.PRODUCT_PRODUCT_ID,0L)
+
         year = intent.getIntExtra(Constants.PRODUCT_BUY_YEAR,year)
         month = intent.getIntExtra(Constants.PRODUCT_BUY_MONTH,month)
         day = intent.getIntExtra(Constants.PRODUCT_BUY_DAY,day)
         description = intent.getStringExtra(Constants.PRODUCT_DESCRIPTION) ?: description
 
         productType = intent.getIntExtra(PRODUCT_TYPE, productType)
-        productId = intent.getLongExtra(PRODUCT_ID, productId)
+
         categoryId = intent.getIntExtra(PRODUCT_CATEGORY_ID, categoryId)
 
         binding.titleEditText.setText(title)
@@ -752,18 +797,13 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
         val zoomLevel = 16.0f
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(sydney, zoomLevel))
 
+        val uiSettings: UiSettings = googleMap.uiSettings
+        uiSettings.setAllGesturesEnabled(false)
+
         marker = mMap.addMarker(markerOptions) ?: return
-        mMap.setOnCameraMoveListener(this)
 
     }
 
-    // 맵 화면 이동할때 마다 좌표 알려주는 함수
-    override fun onCameraMove() {
-        val newLatLng = mMap.cameraPosition.target
-        marker.position = newLatLng
-        latitude = marker.position.latitude
-        longitude = marker.position.longitude
-    }
 
     // 갤러리
     private val activityResult: ActivityResultLauncher<Intent> = registerForActivityResult(
@@ -832,6 +872,62 @@ class AddProductsActivity : AppCompatActivity(), OnMapReadyCallback,
     private fun removeFindPlace() {
         SharedPreferencesData.removeData(this, FIND_LATITUDE)
         SharedPreferencesData.removeData(this, FIND_LONGITUDE)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        // 권한이 있는지 확인
+        cameraPermissionGranted = requestCode == Constants.ACCESS_FINE_CAMERA_CODE &&
+                grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED
+
+        // 카메라 권한 있을 시
+        if (cameraPermissionGranted) {
+            moveCamera()
+        } else{
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.CAMERA)
+            ) {
+                showPermissionRationalDialog(cameraPermissionType, cameraFunction)
+            } else {
+                showPermissionSettingDialog(cameraPermissionType, cameraFunction)
+            }
+        }
+    }
+
+    // 권한이 필요한지 알려주는 다이얼로그 함수
+    private fun showPermissionSettingDialog(permission: String, function: String) {
+        AlertDialog.Builder(this)
+            .setMessage("$permission 권한을 켜주셔야지 ${function}가 가능합니다.")
+            .setPositiveButton("권한 허용하기") { _, _ ->
+                ActivityCompat.requestPermissions(this,
+                    arrayOf(Manifest.permission.CAMERA),
+                    Constants.ACCESS_FINE_CAMERA_CODE)
+            }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
+            .show()
+    }
+
+    // 권한이 필요한지 알려주고 권한 설정으로 이동 여부 다이얼로그 함수
+    private fun showPermissionRationalDialog(permission: String, function: String) {
+        AlertDialog.Builder(this)
+            .setMessage("$permission 권한을 켜주셔야지 ${function}가 가능합니다. 앱 설정 화면으로 진입하셔 권한을 켜주세요")
+            .setPositiveButton("권한 변경하러 가기") { _, _ ->
+                // 권한 설정 화면으로 이동하는 함수 호출
+                navigateToAppSetting()
+            }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
+            .show()
+    }
+
+    // 권한 설정 화면으로 이동하는 함수
+    private fun navigateToAppSetting() {
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", packageName, null)
+        }
+        startActivity(intent)
     }
 
 

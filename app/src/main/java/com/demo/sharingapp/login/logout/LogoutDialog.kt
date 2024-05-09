@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import com.demo.sharingapp.databinding.DialogDeleteAccountBinding
+import com.demo.sharingapp.databinding.DialogLogoutBinding
 
 class LogoutDialog(
     logoutDialogInterface: LogoutDialogInterface,
@@ -15,7 +16,7 @@ class LogoutDialog(
 ) : DialogFragment() {
 
     // 뷰 바인딩 정의
-    private var _binding: DialogDeleteAccountBinding? = null
+    private var _binding: DialogLogoutBinding? = null
     private val binding get() = _binding!!
     private var logoutDialogInterface: LogoutDialogInterface? = null
 
@@ -30,7 +31,7 @@ class LogoutDialog(
         savedInstanceState: Bundle?,
     ): View? {
 
-        _binding = DialogDeleteAccountBinding.inflate(inflater, container, false)
+        _binding = DialogLogoutBinding.inflate(inflater, container, false)
         val view = binding.root
 
         // 레이아웃 배경을 투명하게 해줌, 필수 아님

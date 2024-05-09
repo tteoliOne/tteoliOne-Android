@@ -22,11 +22,14 @@ class SaveProductListActivity : AppCompatActivity() {
         binding = ActivitySaveProductListBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        saveProductListAdapter = SaveProductListAdapter(){
-            val intent = Intent(this@SaveProductListActivity,
-                DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID,it)
-            startActivityForResult(intent, Constants.MOVE_DETAILED_CODE)
-        }
+        saveProductListAdapter = SaveProductListAdapter(
+            onLikeClick = {
+                likeClick(it)
+            }, onViewClick = {
+                val intent = Intent(this@SaveProductListActivity,
+                    DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID, it)
+                startActivityForResult(intent, Constants.MOVE_DETAILED_CODE)
+            })
 
 
         binding.backButton.setOnClickListener {
@@ -52,6 +55,11 @@ class SaveProductListActivity : AppCompatActivity() {
             page = page) {
             saveProductListAdapter.submitList(it.content)
         }
+    }
+
+    // 좋아요 클릭 시 함수
+    private fun likeClick(it: Long) {
+        RetrofitManager.instance.postProductLike(this, it)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

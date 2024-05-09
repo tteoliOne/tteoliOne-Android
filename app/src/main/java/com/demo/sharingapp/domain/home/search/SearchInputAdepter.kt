@@ -25,8 +25,16 @@ class SearchInputAdepter(private val onClick:(String)-> Unit): ListAdapter<PartP
     }
 }) {
     inner class SearchInputViewHolder(private val binding: ItemSearchInputBinding) : RecyclerView.ViewHolder(binding.root){
-        fun bind(item: PartProductContent){
+        fun bind(item: PartProductContent, position: Int){
+
+            binding.searchLayout.visibility=View.VISIBLE
             binding.searchTextView.text = item.title
+            if (position >0){
+                if (currentList[position-1].title.equals(currentList[position].title)){
+                    binding.searchLayout.visibility=View.GONE
+                }
+            }
+
             binding.root.setOnClickListener {
                 onClick(item.title)
             }
@@ -38,6 +46,6 @@ class SearchInputAdepter(private val onClick:(String)-> Unit): ListAdapter<PartP
     }
 
     override fun onBindViewHolder(holder: SearchInputViewHolder, position: Int) {
-        holder.bind(currentList[position])
+        holder.bind(currentList[position],position)
     }
 }

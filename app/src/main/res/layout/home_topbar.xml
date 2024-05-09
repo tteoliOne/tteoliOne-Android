@@ -23,7 +23,6 @@
         />
 
     <androidx.appcompat.widget.LinearLayoutCompat
-
         android:id="@+id/nicknameSettingButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -69,18 +68,5 @@
         android:tint="@drawable/color_click_nickname"
         android:layout_marginEnd="22dp"
         />
-
-    <androidx.appcompat.widget.AppCompatImageView
-        android:id="@+id/notify_btn"
-        android:layout_width="34dp"
-        android:layout_height="30dp"
-        android:src="@drawable/notify"
-        android:layout_gravity="end"
-        android:tint="@drawable/color_click_nickname"
-        android:layout_marginEnd="10dp"
-        />
-
-
-
 
 </androidx.appcompat.widget.Toolbar>

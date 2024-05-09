@@ -19,14 +19,7 @@
             android:text="채팅 목록"
             android:textColor="@color/app_main"
             android:textSize="20sp" />
-
-        <ImageView
-            android:id="@+id/notify_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:layout_marginEnd="18dp"
-            android:src="@drawable/notify" />
+        
     </Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView

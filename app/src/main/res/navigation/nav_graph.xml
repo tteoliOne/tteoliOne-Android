@@ -23,6 +23,9 @@
         <action
             android:id="@+id/action_homeFragment_to_selectProductFragment"
             app:destination="@id/selectProductFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_settingPlaceFragment"
+            app:destination="@id/settingPlaceFragment" />
     </fragment>
 
     <fragment
@@ -37,7 +40,33 @@
             app:exitAnim="@anim/slide_out_down"
             app:popEnterAnim="@anim/slide_pop_in_down"
             app:popExitAnim="@anim/slide_pop_out_up" />
+        <action
+            android:id="@+id/action_userFragment_to_settingMainFragment"
+            app:destination="@id/settingMainFragment" />
     </fragment>
+
+    <fragment
+        android:id="@+id/settingMainFragment"
+        android:name="com.demo.sharingapp.domain.user.setting.SettingMainFragment"
+        android:label="SettingMainFragment"
+        tools:layout="@layout/fragment_setting_main">
+
+        <action
+            android:id="@+id/action_settingMainFragment_to_settingProfileFragment"
+            app:destination="@id/settingProfileFragment" />
+        <action
+            android:id="@+id/action_settingMainFragment_to_settingPlaceFragment"
+            app:destination="@id/settingPlaceFragment" />
+        <action
+            android:id="@+id/action_settingMainFragment_to_settingPasswordFragment"
+            app:destination="@id/settingPasswordFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/settingProfileFragment"
+        android:name="com.demo.sharingapp.domain.user.setting.account.SettingProfileFragment"
+        android:label="SettingProfileFragment"
+        tools:layout="@layout/fragment_setting_profile"/>
 
     <fragment
         android:id="@+id/userSettingFragment"
@@ -78,4 +107,18 @@
         android:name="com.demo.sharingapp.domain.home.part.SelectProductFragment"
         android:label="SelectProductFragment"
         tools:layout="@layout/fragment_home_select_product"/>
+    <fragment
+        android:id="@+id/settingPlaceFragment"
+        android:name="com.demo.sharingapp.domain.user.setting.account.SettingPlaceFragment"
+        android:label="SettingPlaceFragment"
+        tools:layout="@layout/activity_user_place"/>
+    <fragment
+        android:id="@+id/settingPasswordFragment"
+        android:name="com.demo.sharingapp.domain.user.setting.account.SettingPasswordFragment"
+        android:label="SettingPasswordFragment"
+        tools:layout="@layout/fragment_setting_password"/>
+
+
+
+
 </navigation>

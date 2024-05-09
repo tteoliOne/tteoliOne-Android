@@ -19,6 +19,10 @@ import com.demo.sharingapp.databinding.FragmentHomeBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.part.DetailedProductActivity
 import com.demo.sharingapp.domain.home.search.SearchActivity
+import com.demo.sharingapp.domain.user.setting.SettingMainFragmentDirections
+import com.demo.sharingapp.login.LoginView
+import com.demo.sharingapp.login.logout.LogoutDialog
+import com.demo.sharingapp.login.logout.LogoutDialogInterface
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
@@ -30,7 +34,7 @@ import com.demo.sharingapp.utils.Constants.PRODUCT_ID
 import com.demo.sharingapp.utils.Constants.USER_ID
 
 
-class HomeFragment : Fragment(R.layout.fragment_home) {
+class HomeFragment : Fragment(R.layout.fragment_home), LogoutDialogInterface {
 
     private lateinit var mainViewModel: MainViewModel
 
@@ -81,7 +85,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         // 검색 버튼 클릭
         binding.topBar.searchBtn.setOnClickListener {
-            Log.e("this","검색")
             val intent = Intent(this.requireContext(), SearchActivity::class.java)
             startActivity(intent)
        }
@@ -109,8 +112,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         (activity as? MyFragmentListener)?.onButtonClicked()
                         return@setOnMenuItemClickListener true
                     }
+                    R.id.settingPlaceMenu -> {
+//                        val action = SettingMainFragmentDirections.actionSettingMainFragmentToSettingPlaceFragment()
+                        val action = HomeFragmentDirections.actionHomeFragmentToSettingPlaceFragment()
+                        findNavController().navigate(action)
+                        return@setOnMenuItemClickListener true
+                    }
                     R.id.logoutMenu -> {
-
+                        logoutDialog()
                         return@setOnMenuItemClickListener true
                     }
                     else -> {
@@ -209,50 +218,53 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                 longitude,
                 latitude,
                 accessToken,
-              ) {
+                onFile = {loadingFinish()},
+                onProducts = {
 
-                val productData = it.groupBy {
-                    it.categoryId
+
+                    val productData = it.groupBy {
+                        it.categoryId
+                    }
+
+                    // 채소 리사이클러뷰에 데이터 추가
+                    productData[1]?.forEach {
+                        homeVegetableAdepter.submitList(it.products)
+                    }
+
+                    // 과일 리사이클러뷰에 데이터 추가
+                    productData[2]?.forEach {
+                        homeFruitsAdepter.submitList(it.products)
+                    }
+
+                    // 간편식 리사이클러뷰에 데이터 추가
+                    productData[3]?.forEach {
+                        homeFastFoodAdepter.submitList(it.products)
+                    }
+
+                    // 정육 리사이클러뷰에 데이터 추가
+                    productData[4]?.forEach {
+                        homeMeatAdepter.submitList(it.products)
+                    }
+
+                    // 수산물 리사이클러뷰에 데이터 추가
+                    productData[5]?.forEach {
+                        homeSeafoodAdepter.submitList(it.products)
+                    }
+
+                    // 기타 리사이클러뷰에 데이터 추가
+                    productData[6]?.forEach {
+                        homeEtcAdepter.submitList(it.products)
+                    }
+
+                    loadingFinish()
+
                 }
-
-                // 채소 리사이클러뷰에 데이터 추가
-                productData[1]?.forEach {
-                    homeVegetableAdepter.submitList(it.products)
-                }
-
-                // 과일 리사이클러뷰에 데이터 추가
-                productData[2]?.forEach {
-                    homeFruitsAdepter.submitList(it.products)
-                }
-
-                // 간편식 리사이클러뷰에 데이터 추가
-                productData[3]?.forEach {
-                    homeFastFoodAdepter.submitList(it.products)
-                }
-
-                // 정육 리사이클러뷰에 데이터 추가
-                productData[4]?.forEach {
-                    homeMeatAdepter.submitList(it.products)
-                }
-
-                // 수산물 리사이클러뷰에 데이터 추가
-                productData[5]?.forEach {
-                    homeSeafoodAdepter.submitList(it.products)
-                }
-
-                // 기타 리사이클러뷰에 데이터 추가
-                productData[6]?.forEach {
-                    homeEtcAdepter.submitList(it.products)
-                }
-
-                (activity as? MyFragmentListener)?.onLoading()
-                Log.e("mao", productData[1].toString())
-                Log.e("mao", productData[2].toString())
-                Log.e("mao", productData[3].toString())
-                Log.e("mao", productData[4].toString())
-                Log.e("mao", productData[5].toString())
-            }
+              )
         }
+    }
+
+    private fun loadingFinish() {
+        (activity as? MyFragmentListener)?.onLoading()
     }
 
     // 상품 등록 버튼 클릭 함수
@@ -271,6 +283,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 //            this@HomeFragment.requireActivity().finish()
 //            startActivity(intent)
         }
+    }
+
+    // 로그아웃 알림창 띄우기
+    private fun logoutDialog() {
+        val dialog =
+            LogoutDialog(this)
+        // 알림창이 띄워져있는 동안 배경 클릭 막기
+        dialog.isCancelable = false
+        dialog.show(this.requireActivity().supportFragmentManager,
+            "DeleteAccountDialog")
     }
 
     // 초기 nickname 설정 함수
@@ -304,6 +326,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     interface MyFragmentListener {
         fun onButtonClicked()
         fun onLoading()
+    }
+
+    override fun logoutButtonClick() {
+        RetrofitManager.instance.postLogout(this.requireContext())
+        SharedPreferencesData.removeAllData(this.requireContext())
+        val intent = Intent(context, LoginView::class.java)
+        startActivity(intent)
+        this.requireActivity().finish()
     }
 
 

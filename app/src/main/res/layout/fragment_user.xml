@@ -33,7 +33,6 @@
             app:layout_constraintGuide_percent="0.35" />
 
 
-
         <!-- 수직 가이드라인 -->
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guidelineVertical5"
@@ -43,11 +42,13 @@
             app:layout_constraintGuide_percent="0.965" />
 
         <ImageView
-            android:id="@+id/imageView2"
+            android:id="@+id/SettingButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginEnd="20dp"
+            android:paddingTop="18dp"
+            android:paddingEnd="20dp"
+            android:paddingBottom="10dp"
+            android:paddingStart="18dp"
             android:src="@drawable/setting"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -57,10 +58,10 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="20dp"
-            app:layout_constraintDimensionRatio="1"
             android:background="@drawable/user_image_background"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
             app:layout_constraintEnd_toEndOf="@id/guidelineVertical1"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -105,30 +106,30 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:maxLines="1"
-                android:fontFamily="@font/main_font"
-                android:paddingStart="12dp"
-                android:autoSizeTextType="uniform"
                 android:autoSizeMaxTextSize="100sp"
                 android:autoSizeMinTextSize="12sp"
                 android:autoSizeStepGranularity="2sp"
+                android:autoSizeTextType="uniform"
+                android:fontFamily="@font/main_font"
                 android:gravity="center"
+                android:maxLines="1"
+                android:paddingStart="12dp"
                 android:paddingEnd="12dp"
                 android:paddingBottom="10dp"
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 tools:text="아아" />
 
-    </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/goodCountLayout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
             android:background="@drawable/user_round"
             android:elevation="50dp"
             android:orientation="vertical"
-            android:layout_marginTop="18dp"
             app:layout_constraintEnd_toEndOf="@id/guidelineVertical5"
             app:layout_constraintTop_toTopOf="@id/userImageLayout">
 
@@ -163,19 +164,18 @@
             android:id="@+id/descriptionTextView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:paddingStart="18dp"
-            android:paddingEnd="18dp"
-            android:layout_marginStart="-18dp"
             android:layout_marginBottom="40dp"
-            android:autoSizeTextType="uniform"
             android:autoSizeMaxTextSize="18sp"
             android:autoSizeMinTextSize="12sp"
             android:autoSizeStepGranularity="2sp"
+            android:autoSizeTextType="uniform"
+            android:gravity="center_vertical"
+            android:paddingStart="18dp"
+            android:paddingEnd="18dp"
             android:text="@string/no_introduction"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:gravity="center"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@id/goodCountLayout"
             app:layout_constraintStart_toEndOf="@+id/userImageLayout"
@@ -195,12 +195,12 @@
         android:id="@+id/userMenuLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="55dp"
-        android:paddingBottom="55dp"
-        android:background="@drawable/user_menu_round"
-        android:elevation="10dp"
         android:layout_marginStart="28dp"
         android:layout_marginEnd="28dp"
+        android:background="@drawable/user_menu_round"
+        android:elevation="10dp"
+        android:paddingTop="55dp"
+        android:paddingBottom="55dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal">
@@ -208,8 +208,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="30dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -219,8 +217,11 @@
                 android:id="@+id/myShareListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -245,8 +246,11 @@
                 android:id="@+id/soldOutListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -271,8 +275,11 @@
                 android:id="@+id/saveProductListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:id="@+id/saveListTextView"
@@ -298,8 +305,11 @@
                 android:id="@+id/reviewListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:id="@+id/reviewListTextView"
@@ -326,8 +336,11 @@
                 android:id="@+id/userSettingButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -381,8 +394,8 @@
             android:layout_height="wrap_content"
             android:paddingStart="10dp"
             android:text="@string/unregister"
-            android:textSize="13sp"
             android:textColor="@drawable/color_click_nickname"
+            android:textSize="13sp"
             tools:ignore="RtlSymmetry" />
 
 

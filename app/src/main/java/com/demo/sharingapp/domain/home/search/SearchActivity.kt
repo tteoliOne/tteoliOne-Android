@@ -18,6 +18,7 @@ import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
 import com.demo.sharingapp.utils.ViewUtil.hideKeyboard
+import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.delay
 
 class SearchActivity : AppCompatActivity(),SearchInitInterface {
@@ -40,6 +41,16 @@ class SearchActivity : AppCompatActivity(),SearchInitInterface {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // 내부저장소에 데이터가 있는지 확인
+        if (checkSharedPreferencesData(Constants.LONGITUDE) && checkSharedPreferencesData(
+                Constants.LATITUDE)
+        ) {
+            longitude =
+                SharedPreferencesData.getData(this@SearchActivity, Constants.LONGITUDE).toDouble()
+            latitude =
+                SharedPreferencesData.getData(this@SearchActivity, Constants.LATITUDE).toDouble()
+        }
+
         navHostSearchFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_search_fragment) as NavHostFragment
 
@@ -61,8 +72,13 @@ class SearchActivity : AppCompatActivity(),SearchInitInterface {
         // 키보드에 검색 버튼 클릭
         clickKeyboardEnter()
 
+        val runnable = Runnable {
+            // 검색 데이터 정보 가져오기
+            getSearchData()
+        }
+
         // 키보드 변경 이벤트
-        changeKeyboardValue()
+        changeKeyboardValue(runnable)
 
         binding.editTextAllRemove.setOnClickListener {
             binding.searchEditText.setText("")
@@ -71,7 +87,7 @@ class SearchActivity : AppCompatActivity(),SearchInitInterface {
     }
 
     // 키보드 변경 이벤트 함수
-    private fun changeKeyboardValue() {
+    private fun changeKeyboardValue(runnable: Runnable) {
         binding.searchEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
@@ -95,14 +111,10 @@ class SearchActivity : AppCompatActivity(),SearchInitInterface {
                     binding.navHostSearchFragment.isVisible = false
 
 
-                    val runnable = Runnable {
-                        // 검색 데이터 정보 가져오기
-                        getSearchData()
-                    }
                     handler.removeCallbacks(runnable)
                     handler.postDelayed(
                         runnable,
-                        500
+                        300
                     )
 
                 } else {
@@ -156,15 +168,7 @@ class SearchActivity : AppCompatActivity(),SearchInitInterface {
 
     // 검색 데이터 정보 가져오기 함수
     private fun getSearchData() {
-        // 내부저장소에 데이터가 있는지 확인
-        if (checkSharedPreferencesData(Constants.LONGITUDE) && checkSharedPreferencesData(
-                Constants.LATITUDE)
-        ) {
-            longitude =
-                SharedPreferencesData.getData(this@SearchActivity, Constants.LONGITUDE).toDouble()
-            latitude =
-                SharedPreferencesData.getData(this@SearchActivity, Constants.LATITUDE).toDouble()
-        }
+
         val data = binding.searchEditText.text.toString()
         RetrofitManager.instance.getSearch(this@SearchActivity,
             longitude = longitude,

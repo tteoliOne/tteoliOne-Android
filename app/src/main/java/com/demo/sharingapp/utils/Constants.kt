@@ -6,6 +6,7 @@ import retrofit2.http.DELETE
 object Constants{
     const val TAG : String = "로그"
     const val ACCESS_TOKEN = "accessToken"
+    const val LOGIN_TYPE = "loginType"
     const val REFRESH_TOKEN = "refreshToken"
     const val NICKNAME = "nickname"
     const val USER_ID = "userId"
@@ -21,17 +22,16 @@ object Constants{
     const val PRODUCT_ID = "productId"
     const val USER_PROFILE = "profile"
     const val PRODUCT_CATEGORY_ID = "productId"
-    const val DETAILED_LIKED = "detailedLiked"
-    const val DETAILED_LIKED_POINT = "detailedLikedPoint"
     const val KAKAO_TOKEN = "kaKaoToken"
-    const val SIGNUP_TYPE = "signupType"
     const val SELLER_ID = "sellerId"
+    const val NOTIFY_STATE = "notify_state"
 
     const val PRODUCT_TITLE = "productTitle"
     const val PRODUCT_BUY_PRICE = "productBuyPrice"
     const val PRODUCT_BUY_COUNT = "productBuyCount"
     const val PRODUCT_SHARE_PRICE = "productSharePrice"
     const val PRODUCT_SHARE_COUNT = "productShareCount"
+    const val PRODUCT_PRODUCT_ID = "productProductId"
     const val PRODUCT_BUY_YEAR = "productBuyYear"
     const val PRODUCT_BUY_MONTH = "productBuyMonth"
     const val PRODUCT_BUY_DAY = "productBuyDay"
@@ -48,19 +48,16 @@ object Constants{
 
     const val ACCESS_FINE_LOCATION_CODE = 200
 
+    const val ACCESS_FINE_CAMERA_CODE = 204
+
     const val MOVE_DETAILED_CODE = 201
 
     const val MOVE_MODIFY_CODE = 202
 
     const val MOVE_CHAT_CODE = 203
 
-
-
-
-
-
     //카메라를 호출하는 플래그
-    const val FLAG_REQ_CAMERA = 101
+    const val FLAG_REQ_CAMERA = 104
 }
 
 object API {
@@ -110,6 +107,8 @@ object API {
     const val FIND_PASSWORD_EMAIL_VERIFY : String="/api/users/verify/password"
 
     const val FIND_PASSWORD_RESET : String="/api/users/reset/password"
+
+    const val CHANGE_PASSWORD_RESET : String="/api/users/change/password"
 
     const val SAVE_PRODUCTS : String="/api/products/saved"
 

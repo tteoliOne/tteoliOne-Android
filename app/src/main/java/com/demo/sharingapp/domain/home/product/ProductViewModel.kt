@@ -28,7 +28,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
     private var accessToken = SharedPreferencesData.getData(getApplication(), Constants.ACCESS_TOKEN)
     private var refreshToken = SharedPreferencesData.getData(getApplication(), Constants.REFRESH_TOKEN)
 
-    // 경도
+    // id
     private val _currentId = MutableLiveData<Long>()
     val currentId: LiveData<Long>
         get() = _currentId
@@ -160,8 +160,8 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
 
     }
     // 상품 등록하는 데이터 받기
-    fun putProductModify() {
-
+    fun putProductModify(onSuccess: (Int) -> Unit) {
+        Log.e("productId",currentId.value.toString())
         val products = Products(userId = userId,
             categoryId = currentCategoryId.value ?: return,
             title = currentImageTitle.value ?: return,
@@ -178,7 +178,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         if (currentReceipt.value != null && currentImageList.value != null) {
             RetrofitManager.instance.putProductModify(context = getApplication(),accessToken = accessToken, productsId = currentId.value!! ,request = products,
                 receipt = currentReceipt.value!!,
-                photos = currentImageList.value!!)
+                photos = currentImageList.value!!){
+                onSuccess(it)
+            }
 
         }
 

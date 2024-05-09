@@ -12,7 +12,7 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ItemHomePartProductBinding
 import com.demo.sharingapp.domain.home.data.PartProductContent
 
-class SaveProductListAdapter(private val onViewClick:(Long)->Unit) :
+class SaveProductListAdapter(private val onViewClick:(Long)->Unit, private val onLikeClick:(Long)->Unit) :
     ListAdapter<PartProductContent, SaveProductListAdapter.SaveProductListViewHolder>(object :
         DiffUtil.ItemCallback<PartProductContent>() {
         override fun areItemsTheSame(
@@ -64,6 +64,9 @@ class SaveProductListAdapter(private val onViewClick:(Long)->Unit) :
             binding.pickImageView.setOnClickListener {
                 Log.e("liked",liked.toString())
                 if (liked){
+                    val newList = currentList.toMutableList()
+                    newList.removeAt(position)
+                    submitList(newList.toList())
                     binding.pickImageView.setImageResource(R.drawable.heart)
                     likePoint -= 1
                     binding.likeTextView.text = likePoint.toString()
@@ -74,8 +77,8 @@ class SaveProductListAdapter(private val onViewClick:(Long)->Unit) :
                     binding.likeTextView.text = likePoint.toString()
                     liked = !liked
                 }
-//                onLikeClick(item.productId)
-//                updateItem(position = position, liked, likePoint)
+                onLikeClick(item.productId)
+
             }
         }
     }

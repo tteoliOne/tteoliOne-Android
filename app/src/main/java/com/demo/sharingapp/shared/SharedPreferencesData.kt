@@ -48,7 +48,15 @@ object SharedPreferencesData {
         val sharedPreferences = getSharedPreferences(context)
         with(sharedPreferences.edit()) {
             putString(sendTitle, sendValue)
+            commit()
+        }
+    }
 
+    // boolean 데이터 저장하기
+    fun saveBooleanData(context: Context, sendTitle: String ,sendValue: Boolean) {
+        val sharedPreferences = getSharedPreferences(context)
+        with(sharedPreferences.edit()) {
+            putBoolean(sendTitle, sendValue)
             commit()
         }
     }
@@ -103,6 +111,12 @@ object SharedPreferencesData {
     fun getData(context: Context, getTitle: String): String {
         val sharedPreferences = getSharedPreferences(context)
         return sharedPreferences.getString(getTitle, "") ?: ""
+    }
+
+    // 데이터 가져오기
+    fun getBooleanData(context: Context, getTitle: String): Boolean {
+        val sharedPreferences = getSharedPreferences(context)
+        return sharedPreferences.getBoolean(getTitle, true)
     }
 
     // 데이터 가져오기

@@ -1,13 +1,11 @@
 package com.demo.sharingapp.domain.user
 
 import android.content.Intent
-import android.content.res.ColorStateList
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
@@ -15,7 +13,6 @@ import com.demo.sharingapp.MyApplication.Companion.mainViewModel
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentUserBinding
 import com.demo.sharingapp.domain.MainViewModel
-import com.demo.sharingapp.domain.chat.chatroom.RequestDialog
 import com.demo.sharingapp.domain.user.review.ReviewActivity
 import com.demo.sharingapp.domain.user.saveProductList.SaveProductListActivity
 import com.demo.sharingapp.domain.user.shareProductList.ShareProductListActivity
@@ -28,10 +25,8 @@ import com.demo.sharingapp.login.signout.DeleteAccountDialogInterface
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
-import com.demo.sharingapp.utils.Constants.REFRESH_TOKEN
 import com.demo.sharingapp.utils.Constants.USER_ID
 import com.kakao.sdk.user.UserApiClient
-import ua.naiksoftware.stomp.StompClient
 import kotlin.math.roundToInt
 
 class UserFragment: Fragment(R.layout.fragment_user), DeleteAccountDialogInterface, LogoutDialogInterface {
@@ -58,6 +53,15 @@ class UserFragment: Fragment(R.layout.fragment_user), DeleteAccountDialogInterfa
                 .circleCrop()
                 .into(binding.userImageView)
             profileImage = it.profile
+        }
+
+        binding.SettingButton.setOnClickListener {
+//            val intent = Intent(context, SettingActivity::class.java)
+//            startActivity(intent)
+
+            val action = UserFragmentDirections.actionUserFragmentToSettingMainFragment()
+            findNavController().navigate(action)
+
         }
 
         // 내 공유글 목록 클륵
@@ -145,7 +149,7 @@ class UserFragment: Fragment(R.layout.fragment_user), DeleteAccountDialogInterfa
         }
     }
 
-    // 회원탈퇴 알림창 띄우기
+    // 로그아웃 알림창 띄우기
     private fun logoutDialog() {
         val dialog =
             LogoutDialog(this)
@@ -186,7 +190,7 @@ class UserFragment: Fragment(R.layout.fragment_user), DeleteAccountDialogInterfa
 
     }
 
-    // 다이얼로그에서 로그아웃 클릭시
+    // 다이얼로그에서 로그아웃 클릭 시
     override fun logoutButtonClick() {
         RetrofitManager.instance.postLogout(this.requireContext())
         SharedPreferencesData.removeAllData(this.requireContext())

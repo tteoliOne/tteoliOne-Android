@@ -25,6 +25,7 @@ import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileSimpleResp
 import com.demo.sharingapp.domain.review.data.ReviewResponse
 import com.demo.sharingapp.domain.review.data.ReviewResponseData
 import com.demo.sharingapp.domain.user.data.*
+import com.demo.sharingapp.domain.user.setting.account.data.SettingPasswordData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -77,16 +78,16 @@ class RetrofitManager() : Application() {
     fun getReview(
         context: Context,
         userId: Long,
-        onSuccess: (List<ReviewResponseData>) -> Unit
+        onSuccess: (List<ReviewResponseData>) -> Unit,
 
-    ){
+        ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
         val getCall = api.getReview(Authorization = authorization, userId = userId)
 
-        getCall.enqueue(object : Callback<ReviewResponse>{
+        getCall.enqueue(object : Callback<ReviewResponse> {
             override fun onResponse(
                 call: Call<ReviewResponse>,
                 response: Response<ReviewResponse>,
@@ -168,15 +169,20 @@ class RetrofitManager() : Application() {
         longitude: Double,
         latitude: Double,
         page: Int,
-        onSuccess: (PartProductListData) -> Unit
-    ){
+        onSuccess: (PartProductListData) -> Unit,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val getCall = api.getMySaveProduct(Authorization = authorization, longitude = longitude, latitude = latitude, page = page, size = 30, sort = "createAt-desc")
+        val getCall = api.getMySaveProduct(Authorization = authorization,
+            longitude = longitude,
+            latitude = latitude,
+            page = page,
+            size = 30,
+            sort = "createAt-desc")
 
-        getCall.enqueue(object : Callback<PartProductData>{
+        getCall.enqueue(object : Callback<PartProductData> {
             override fun onResponse(
                 call: Call<PartProductData>,
                 response: Response<PartProductData>,
@@ -454,6 +460,7 @@ class RetrofitManager() : Application() {
         latitude: Double,
         oldAccessToken: String,
         onProducts: (List<DataGetProducts>) -> Unit,
+        onFile: () -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -488,13 +495,15 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<GetProductsResponse>, t: Throwable) {
                 Log.e("Get", "fail ${t} $call")
+                onFile()
+
             }
 
 
         })
     }
 
-    // 메이화면 토큰 재발행
+    // 메인화면 토큰 재발행
     suspend fun postReissueMain(context: Context): Boolean {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val refreshToken = SharedPreferencesData.getData(context, REFRESH_TOKEN)
@@ -571,7 +580,7 @@ class RetrofitManager() : Application() {
 
 
     // 로그인 정보 보내기
-    fun postLogin(context: Context, loginData: LoginData, loginCheck: (Boolean) -> Unit) {
+    fun postLogin(context: Context, loginData: LoginData, loginCheck: (Int, String) -> Unit) {
         val call = retrofitInterface?.postLoginData(loginData)
         call?.enqueue(object : retrofit2.Callback<TokenResponse> {
             override fun onResponse(call: Call<TokenResponse>, response: Response<TokenResponse>) {
@@ -580,8 +589,9 @@ class RetrofitManager() : Application() {
                     Log.e("PostLogin", "success Login success ${response.body()?.success}")
                     Log.e("PostLogin", "success Login message ${response.body()?.message}")
                     Log.e("PostLogin", "success Login code ${response.body()?.code}")
-                    val loginBoolean = response.body()!!.success
-                    loginCheck(loginBoolean)
+                    val code = response.body()?.code ?: return
+                    val message = response.body()?.message ?: return
+                    loginCheck(code, message)
                     saveDate(context, response)
                 } else {
                     Log.e("PostLogin", "succes, Login but ${response.errorBody()}")
@@ -736,7 +746,7 @@ class RetrofitManager() : Application() {
     fun deleteAccount(
         context: Context,
         userId: Long,
-        onSuccess: (Int) -> Unit
+        onSuccess: (Int) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -781,7 +791,6 @@ class RetrofitManager() : Application() {
         call.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
                     Log.e("postLogout", "data ${response.body()?.data}")
                     Log.e("postLogout", "success ${response.body()?.success}")
                     Log.e("postLogout", "message ${response.body()?.message}")
@@ -868,6 +877,42 @@ class RetrofitManager() : Application() {
 
             override fun onFailure(call: Call<ChangeMyInfoResponse>, t: Throwable) {
                 Log.e("patchChangeNickname", "fail ${t} $call")
+            }
+        })
+    }
+
+    // 비밀번호 변경
+    fun patchChangePassword(
+        context: Context,
+        oldPassword: String,
+        newPassword: String,
+        checkPassword: String,
+        onSuccess: (Int,String) -> Unit
+    ) {
+        val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
+        val authorization = "Bearer $accessToken"
+        val data = SettingPasswordData(oldPassword, newPassword, checkPassword)
+        val call = retrofitInterface?.patchChangePassword(Authorization = authorization,
+            settingPasswordData = data)
+        call?.enqueue(object : Callback<EmailResponse> {
+            override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
+                if (response.isSuccessful) {
+                    Log.e("patchChangePassword", "data ${response.body()?.data}")
+                    Log.e("patchChangePassword",
+                        "success ${response.body()?.success}")
+                    Log.e("patchChangePassword",
+                        "message ${response.body()?.message}")
+                    Log.e("patchChangePassword", "code ${response.body()?.code}")
+                    val code = response.body()?.code ?: return
+                    val message = response.body()?.message ?: return
+                    onSuccess(code,message)
+                } else {
+                    Log.e("patchChangePassword", "succes, Signup but ${response.errorBody()}")
+                }
+            }
+
+            override fun onFailure(call: Call<EmailResponse>, t: Throwable) {
+                Log.e("patchChangePassword", "fail ${t} $call")
             }
         })
     }
@@ -1105,7 +1150,7 @@ class RetrofitManager() : Application() {
     }
 
     // 채팅 방 떠나기
-    fun deleteChatRoomLeave(context: Context, chatRoomId: Long) {
+    fun deleteChatRoomLeave(context: Context, chatRoomId: Long, onSuccess: (Int) -> Unit) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
@@ -1119,9 +1164,8 @@ class RetrofitManager() : Application() {
                     Log.e("deleteChatRoomLeave", "data ${response.body()?.data}")
                     Log.e("deleteChatRoomLeave", "message ${response.body()?.message}")
                     Log.e("deleteChatRoomLeave", "code ${response.body()?.code}")
-                    if (response.body()?.success == true) {
-                        Toast.makeText(context, response.body()?.data, Toast.LENGTH_SHORT).show()
-                    }
+                    val data = response.body()?.code ?: return
+                    onSuccess(data)
                 } else {
                     Log.e("deleteChatRoomLeave", "succes, but ${response.errorBody()}")
 
@@ -1168,7 +1212,8 @@ class RetrofitManager() : Application() {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val call = retrofitInterface?.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
+        val call =
+            retrofitInterface?.getChatRoomData(Authorization = "Bearer $accessToken", roomNum)
 
         call?.enqueue(object : retrofit2.Callback<GetChatRoomResponse> {
             override fun onResponse(
@@ -1365,8 +1410,8 @@ class RetrofitManager() : Application() {
             ) {
                 if (response.isSuccessful) {
                     Toast.makeText(context, "상품이 등록 되었습니다.", Toast.LENGTH_SHORT).show()
-                    Log.e("Post", "success ${response.body()?.userId}")
-                    Log.e("Post", "success ${response.body()?.productId}")
+                    Log.e("Post", "success ${response.body()?.code}")
+                    Log.e("Post", "success ${response.body()?.success}")
                 } else {
                     Log.e("Post", "succes, but ${response.errorBody()}")
 
@@ -1385,25 +1430,25 @@ class RetrofitManager() : Application() {
         context: Context,
         productsId: Long,
         chatRoomId: Long,
-        onSuccess: (Boolean) -> Unit,
+        onSuccess: (Int, String) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val call = retrofitInterface?.putProductRequest(Authorization = authorization,
             productId = productsId,
             chatRoomId
-            )
+        )
 
         call?.enqueue(object : retrofit2.Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
                     Log.e("putProductRequest", "data ${response.body()?.data}")
                     Log.e("putProductRequest", "success ${response.body()?.success}")
                     Log.e("putProductRequest", "message ${response.body()?.message}")
                     Log.e("putProductRequest", "code ${response.body()?.code}")
-                    val data = response.body()?.success ?: return
-                    onSuccess(data)
+                    val code = response.body()?.code ?: return
+                    val message = response.body()?.message ?: return
+                    onSuccess(code, message)
                 } else {
                     Log.e("putProductRequest", "succes, but ${response.errorBody()}")
 
@@ -1422,7 +1467,7 @@ class RetrofitManager() : Application() {
         productsId: Long,
         buyerId: Long,
         chatRoomId: Long,
-        onSuccess: (Int,String,String) -> Unit,
+        onSuccess: (Int, String, String) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -1440,7 +1485,7 @@ class RetrofitManager() : Application() {
                     val code = response.body()?.code ?: return
                     val message = response.body()?.message ?: return
                     val data = response.body()?.data ?: return
-                    onSuccess(code,message,data)
+                    onSuccess(code, message, data)
                 } else {
                     Log.e("putProductReject", "succes, but ${response.errorBody()}")
 
@@ -1461,20 +1506,24 @@ class RetrofitManager() : Application() {
         reportCategory: String,
         opponentId: String?,
         content: String?,
-        onSuccess: (Int) -> Unit
-    ){
+        onSuccess: (Int) -> Unit,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val data = PostReportBody(content, opponentId)
-        val call = retrofitInterface?.postReport(Authorization = authorization, reportType = reportType, id = id, reportCategory = reportCategory, postReportBody =data )
-        call?.enqueue(object : Callback<EmailResponse>{
+        val call = retrofitInterface?.postReport(Authorization = authorization,
+            reportType = reportType,
+            id = id,
+            reportCategory = reportCategory,
+            postReportBody = data)
+        call?.enqueue(object : Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
                     Log.e("postReport", "data ${response.body()?.data}")
                     Log.e("postReport", "success ${response.body()?.success}")
                     Log.e("postReport", "message ${response.body()?.message}")
                     Log.e("postReport", "code ${response.body()?.code}")
-                    val code = response.body()?.code?: return
+                    val code = response.body()?.code ?: return
                     onSuccess(code)
 
                 } else {
@@ -1495,17 +1544,18 @@ class RetrofitManager() : Application() {
         productsId: Long,
         content: String,
         goodCount: Long,
-        onSuccess: (Int,String,String) -> Unit,
-    ){
+        onSuccess: (Int, String, String) -> Unit,
+    ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
         val retrofit = initRetrofit(context)
         val api = retrofit.create(RestAPI::class.java)
-        val postReviewData = PostReviewData(content,goodCount)
-        val call = api.
-        postProductReview(Authorization = authorization, productId = productsId, postReviewData = postReviewData)
+        val postReviewData = PostReviewData(content, goodCount)
+        val call = api.postProductReview(Authorization = authorization,
+            productId = productsId,
+            postReviewData = postReviewData)
 
-        call.enqueue(object :Callback<EmailResponse>{
+        call.enqueue(object : Callback<EmailResponse> {
             override fun onResponse(call: Call<EmailResponse>, response: Response<EmailResponse>) {
                 if (response.isSuccessful) {
                     Log.e("postProductReview", "data ${response.body()?.data}")
@@ -1515,7 +1565,7 @@ class RetrofitManager() : Application() {
                     val code = response.body()?.code ?: return
                     val message = response.body()?.message ?: return
                     val data = response.body()?.data ?: return
-                    onSuccess(code,message,data)
+                    onSuccess(code, message, data)
 
                 } else {
                     Log.e("postProductReview", "succes, but ${response.errorBody()}")
@@ -1535,7 +1585,7 @@ class RetrofitManager() : Application() {
         productsId: Long,
         buyerId: Long,
         chatRoomId: Long,
-        onSuccess: (Int,String,String) -> Unit,
+        onSuccess: (Int, String, String) -> Unit,
     ) {
         val accessToken = SharedPreferencesData.getData(context, ACCESS_TOKEN)
         val authorization = "Bearer $accessToken"
@@ -1553,7 +1603,7 @@ class RetrofitManager() : Application() {
                     val code = response.body()?.code ?: return
                     val message = response.body()?.message ?: return
                     val data = response.body()?.data ?: return
-                    onSuccess(code,message,data)
+                    onSuccess(code, message, data)
                 } else {
                     Log.e("putProductApprove", "succes, but ${response.errorBody()}")
 
@@ -1586,7 +1636,6 @@ class RetrofitManager() : Application() {
                 response: Response<EmailResponse>,
             ) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "정상적으로 채팅방을 나갔습니다.", Toast.LENGTH_SHORT).show()
                     Log.e("Post", "success ${response.body()?.data}")
                     Log.e("Post", "success ${response.body()?.success}")
                     Log.e("Post", "success ${response.body()?.message}")
@@ -1612,6 +1661,7 @@ class RetrofitManager() : Application() {
         request: Products,
         receipt: MultipartBody.Part,
         photos: List<MultipartBody.Part>,
+        onSuccess: (Int) -> Unit,
     ) {
         val token = accessToken
         val retrofit = initRetrofit(context)
@@ -1631,8 +1681,10 @@ class RetrofitManager() : Application() {
             ) {
                 if (response.isSuccessful) {
                     Toast.makeText(context, "상품이 등록 되었습니다.", Toast.LENGTH_SHORT).show()
-                    Log.e("Post", "success ${response.body()?.userId}")
-                    Log.e("Post", "success ${response.body()?.productId}")
+                    Log.e("Post", "success ${response.body()?.code}")
+                    Log.e("Post", "success ${response.body()?.success}")
+                    val data = response.body()?.code ?: return
+                    onSuccess(data)
                 } else {
                     Log.e("Post", "succes, but ${response.errorBody()}")
 
@@ -1648,7 +1700,7 @@ class RetrofitManager() : Application() {
 
     private fun initRetrofit(context: Context): Retrofit {
         val client = OkHttpClient.Builder()
-        var count =0
+        var count = 0
         val loggingInterceptor = HttpLoggingInterceptor(object : HttpLoggingInterceptor.Logger {
             override fun log(message: String) {
                 Log.e("Post", "log: message ${message}")
@@ -1657,7 +1709,7 @@ class RetrofitManager() : Application() {
 
         loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY)
         client.addInterceptor(loggingInterceptor)
-        client.authenticator(TokenAuthenticator(context,count))
+        client.authenticator(TokenAuthenticator(context, count))
 
 
         val retrofit = Retrofit.Builder()

@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.demo.sharingapp.domain.chat.chatroom.ChatRoomActivity
 import com.demo.sharingapp.shared.SharedPreferencesData
+import com.demo.sharingapp.utils.Constants.NOTIFY_STATE
 import com.demo.sharingapp.utils.Constants.PUSH_MESSAGE
 import com.google.android.material.internal.ManufacturerUtils
 import com.google.firebase.messaging.FirebaseMessagingService
@@ -28,46 +29,52 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
 
-        val name = "채팅 알림"
-        val descriptionText = "채팅 알림 입니다." //채널에 대한 설명
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val mChannel = NotificationChannel(getString(R.string.default_notification_channel_id), name, importance)
-        mChannel.description = descriptionText
-        mChannel.enableLights(true)
-        mChannel.lightColor = Color.RED
+        val notifyState = SharedPreferencesData.getBooleanData(this, NOTIFY_STATE)
 
-        val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(mChannel)
+        if(notifyState){
+            val name = "채팅 알림"
+            val descriptionText = "채팅 알림 입니다." //채널에 대한 설명
+            val importance = NotificationManager.IMPORTANCE_DEFAULT
+            val mChannel = NotificationChannel(getString(R.string.default_notification_channel_id), name, importance)
+            mChannel.description = descriptionText
+            mChannel.enableLights(true)
+            mChannel.lightColor = Color.RED
 
-        val title = message.notification?.title ?: ""
-        val body = message.notification?.body ?: ""
+            val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(mChannel)
 
-        val intent = Intent(this, MainActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            .putExtra(PUSH_MESSAGE, "gkdl")
+            val title = message.notification?.title ?: ""
+            val body = message.notification?.body ?: ""
 
-
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent, 0
-        )
+            val intent = Intent(this, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                .putExtra(PUSH_MESSAGE, "gkdl")
 
 
-        val parts = body.split(" : ")
-        val boldText = parts.firstOrNull() ?: ""  // " : " 이 없을 경우 기본값으로 처리
+            val pendingIntent = PendingIntent.getActivity(
+                this, 0, intent, 0
+            )
 
-// 굵게 표시할 부분을 만듭니다.
-        val spannableString = SpannableString(body)
-        spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, boldText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
 
-        val notificationBuilder = NotificationCompat.Builder(applicationContext,getString(R.string.default_notification_channel_id))
-            .setSmallIcon(R.drawable.app_logo)
-            .setColor(Color.parseColor("#588F11"))
-            .setContentTitle(title)
-            .setContentText(spannableString)
-            .setContentIntent(pendingIntent)  // 클릭 액션 지정
-            .setAutoCancel(true)  // 알림을 클릭하면 자동으로 알림이 사라지도록 설정
+            val parts = body.split(" : ")
+            val boldText = parts.firstOrNull() ?: ""  // " : " 이 없을 경우 기본값으로 처리
 
-        notificationManager.notify(0, notificationBuilder.build())
+            // 굵게 표시할 부분을 만듭니다.
+            val spannableString = SpannableString(body)
+            spannableString.setSpan(StyleSpan(Typeface.BOLD), 0, boldText.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+
+            val notificationBuilder = NotificationCompat.Builder(applicationContext,getString(R.string.default_notification_channel_id))
+                .setSmallIcon(R.drawable.app_logo)
+                .setColor(Color.parseColor("#588F11"))
+                .setContentTitle(title)
+                .setContentText(spannableString)
+                .setContentIntent(pendingIntent)  // 클릭 액션 지정
+                .setAutoCancel(true)  // 알림을 클릭하면 자동으로 알림이 사라지도록 설정
+
+            notificationManager.notify(0, notificationBuilder.build())
+
+        }
+
 
 
     }

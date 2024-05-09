@@ -13,6 +13,7 @@ import com.demo.sharingapp.domain.user.data.DeleteAccountData
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoData
 import com.demo.sharingapp.domain.user.data.MyInfoResponse
 import com.demo.sharingapp.domain.user.data.ChangeMyInfoResponse
+import com.demo.sharingapp.domain.user.setting.account.data.SettingPasswordData
 import com.demo.sharingapp.login.data.*
 import com.demo.sharingapp.login.find_id.data.FindIdData
 import com.demo.sharingapp.login.find_id.data.FindIdEmailVerifyData
@@ -95,6 +96,13 @@ interface RestAPI {
     // 비밀번호 찾기 - 바꾼 비밀번호 보내기
     @PATCH(API.FIND_PASSWORD_RESET) // Replace with your API endpoint
     fun patchFindPasswordReset(@Body findPasswordEmailVerify: FindPasswordResetData): Call<EmailResponse>
+
+    // 비밀번호 변경
+    @PATCH(API.CHANGE_PASSWORD_RESET) // Replace with your API endpoint
+    fun patchChangePassword(
+        @Header("Authorization") Authorization: String,
+        @Body settingPasswordData: SettingPasswordData
+    ): Call<EmailResponse>
 
 
     // 카카오 토큰 보내기

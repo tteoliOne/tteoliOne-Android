@@ -15,7 +15,7 @@ import com.demo.sharingapp.domain.home.other_profile.data.OtherProfileContent
 import com.demo.sharingapp.login.data.ProductsData
 import okhttp3.internal.format
 
-class OnSellAdepter(private val onViewClick:(Long)->Unit): ListAdapter<OtherProfileContent, OnSellAdepter.OnSellViewHolder>(object :DiffUtil.ItemCallback<OtherProfileContent>(){
+class OnSellAdepter(private val onViewClick:(Long)->Unit, private val onLikeClick:(Long)->Unit): ListAdapter<OtherProfileContent, OnSellAdepter.OnSellViewHolder>(object :DiffUtil.ItemCallback<OtherProfileContent>(){
     override fun areItemsTheSame(oldItem: OtherProfileContent, newItem: OtherProfileContent): Boolean {
         return oldItem.productId == newItem.productId
     }
@@ -26,6 +26,10 @@ class OnSellAdepter(private val onViewClick:(Long)->Unit): ListAdapter<OtherProf
 }) {
     inner class OnSellViewHolder(val binding: ItemOtherOnsellBinding): RecyclerView.ViewHolder(binding.root) {
         fun bind(item: OtherProfileContent){
+
+            var liked = item.liked
+            var likePoint = item.totalLikes
+
             Glide.with(binding.imageView)
                 .load(item.imageUrl)
                 .into(binding.imageView)
@@ -37,12 +41,29 @@ class OnSellAdepter(private val onViewClick:(Long)->Unit): ListAdapter<OtherProf
 
             }
 
+            binding.pickImageView.setOnClickListener {
+                Log.e("liked", liked.toString())
+                if (liked) {
+                    binding.pickImageView.setImageResource(R.drawable.heart)
+                    likePoint -= 1
+                    binding.likeTextView.text = likePoint.toString()
+                    liked = !liked
+                } else {
+                    binding.pickImageView.setImageResource(R.drawable.heart_fill)
+                    likePoint += 1
+                    binding.likeTextView.text = likePoint.toString()
+                    liked = !liked
+                }
+                onLikeClick(item.productId)
+
+            }
+
             binding.titleTextView.text = item.title
 
             binding.priceTextView.text = String.format("개당 %d원", item.unitPrice)
 
             // 좋아요 개수
-            binding.heartScoreTextView.text = item.totalLikes.toString()
+            binding.likeTextView.text = item.totalLikes.toString()
 
             // 거리
             if (item.walkingDistance > 1000) {

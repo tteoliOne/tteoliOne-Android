@@ -8,8 +8,10 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
+import com.demo.sharingapp.BuildConfig.KAKAO_API_KEY
 import com.demo.sharingapp.databinding.ActivityLoginViewBinding
 import com.demo.sharingapp.login.data.LoginData
 import com.demo.sharingapp.login.data.LoginTokenData
@@ -18,7 +20,9 @@ import com.demo.sharingapp.login.find_password.FindPasswordActivity
 import com.demo.sharingapp.login.signup.SignupProfileActivity
 import com.demo.sharingapp.login.signup.basic.SignUpActivity
 import com.demo.sharingapp.retrofit.RetrofitManager
+import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.KAKAO_TOKEN
+import com.demo.sharingapp.utils.Constants.LOGIN_TYPE
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -61,23 +65,6 @@ class LoginView : AppCompatActivity() {
         // 아이디 찾기 버튼 클릭 함수 호출
         clickFindIdButton()
 
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestEmail()
-            .requestIdToken("401559191984-o21q6qsehagmffuaubjun3nrtkorklgj.apps.googleusercontent.com")
-            .requestServerAuthCode("401559191984-o21q6qsehagmffuaubjun3nrtkorklgj.apps.googleusercontent.com")
-            .build()
-        val client = GoogleSignIn.getClient(this, gso)
-
-        binding.googleLoginButton.setOnClickListener {
-            val signInClient = client.signInIntent
-            startActivityForResult(signInClient, 10001)
-//            onLogin(signInClient)
-        }
-
-        binding.naverLoginButton.setOnClickListener {
-            client.signOut()
-        }
-
     }
 
     // 아이디 찾기 버튼 클릭 함수
@@ -111,16 +98,26 @@ class LoginView : AppCompatActivity() {
                 val fmcToken = it.result
                 Log.e("fmcToken", fmcToken)
                 val loginData = LoginData(id, password,fmcToken)
-                RetrofitManager.instance.postLogin(this, loginData) {
-                    if (it) {
+                RetrofitManager.instance.postLogin(this, loginData) { code, message ->
+                    if (code == 0) {
                         val intent = Intent(this, UserPlace::class.java)
                         startActivity(intent)
-                    } else {
-                        // todo 실패 알림창 표시
+                        finish()
+                        // 일반 로그인 타입 설정
+                        settingLoginType(0)
+
+                    } else if(code == 1001){
+                        Toast.makeText(this, "비밀번호를 다시 확인해주세요",Toast.LENGTH_SHORT).show()
+                    }else {
+                        Toast.makeText(this, message,Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
+    }
+
+    private fun settingLoginType(type: Int) { // 일반 로그인: 0, 카카오 로그인: 1
+        SharedPreferencesData.saveIntData(this, LOGIN_TYPE, type)
     }
 
     // editText 포커스 clear 함수
@@ -163,7 +160,7 @@ class LoginView : AppCompatActivity() {
         binding.idEditText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                Log.e("aa", "$p0, $p1, $p2, $p3")
+
                 if (p0.toString().trim().isNotEmpty() && binding.passwordEditText.text.toString()
                         .isNotEmpty()
                 ) {
@@ -185,7 +182,7 @@ class LoginView : AppCompatActivity() {
             binding.loadingView.isVisible=true
             binding.loginButton.isVisible=false
 
-            KakaoSdk.init(this, "b7724ccdfc3f8f5fef039b767bdd06d3")
+            KakaoSdk.init(this, "${KAKAO_API_KEY}")
             //카카오로그인 함수 호출
             kakaoLogin()
 
@@ -195,18 +192,13 @@ class LoginView : AppCompatActivity() {
     //카카오로그인 함수
     private fun kakaoLogin() {
 
-
         // 카카오계정으로 로그인 공통 callback 구성
-// 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
+        // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우 사용됨
         val callback: (OAuthToken?, Throwable?) -> Unit = { token, error ->
-            if (error != null) {
-                Log.e("kakaoLogin", "카카오계정으로 로그인 실패", error)
-            } else if (token != null) {
-                Log.i("kakaoLogin", "카카오계정으로 로그인 성공 ${token.accessToken}")
+            if (error != null) { } else if (token != null) {
 
                 Firebase.messaging.token.addOnCompleteListener {
                     val fmcToken = it.result
-                    Log.e("fmcToken",fmcToken)
                     // 레트로핏에 토큰 보내는 함수 호출
                     postKaKaoAccessToken(token.accessToken, fmcToken)
                 }
@@ -219,7 +211,6 @@ class LoginView : AppCompatActivity() {
         if (UserApiClient.instance.isKakaoTalkLoginAvailable(this)) {
             UserApiClient.instance.loginWithKakaoTalk(this) { token, error ->
                 if (error != null) {
-                    Log.e("kakaoLogin", "카카오톡으로 로그인 실패", error)
 
                     // 사용자가 카카오톡 설치 후 디바이스 권한 요청 화면에서 로그인을 취소한 경우,
                     // 의도적인 로그인 취소로 보고 카카오계정으로 로그인 시도 없이 로그인 취소로 처리 (예: 뒤로 가기)
@@ -230,7 +221,6 @@ class LoginView : AppCompatActivity() {
                     // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인 시도
                     UserApiClient.instance.loginWithKakaoAccount(this, callback = callback)
                 } else if (token != null) {
-                    Log.i("kakaoLogin", "카카오톡으로 로그인 성공 ${token.accessToken}")
 
                     // post 에서 데이터 받아서 쉐어드프리퍼런스에 저장 함수 호출
                     Firebase.messaging.token.addOnCompleteListener {
@@ -254,6 +244,7 @@ class LoginView : AppCompatActivity() {
 
         RetrofitManager.instance.postKaKaoToken(this, token = accessTokenRequest){
             if(it){
+                settingLoginType(1)
                 // 위치 설정 화면 이동 함수 호출
                 moveUserPlaceActivity()
 
@@ -261,7 +252,11 @@ class LoginView : AppCompatActivity() {
                 val intent = Intent(this, SignupProfileActivity::class.java)
                     .putExtra(KAKAO_TOKEN,token)
                 startActivity(intent)
+                // 카카오 로그인 타입 설정
+
                 finish()
+
+
 
             }
         }

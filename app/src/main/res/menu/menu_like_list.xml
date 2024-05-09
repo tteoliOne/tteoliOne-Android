@@ -5,6 +5,11 @@
         android:id="@+id/showLikeListMenu"
         android:title="찜목록"
         />
+
+    <item
+        android:id="@+id/settingPlaceMenu"
+        android:title="주소설정"/>
+
     <item
         android:id="@+id/logoutMenu"
         android:title="로그아웃"/>

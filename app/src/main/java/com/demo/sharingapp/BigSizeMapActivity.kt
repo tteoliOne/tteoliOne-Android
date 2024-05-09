@@ -42,8 +42,6 @@ class BigSizeMapActivity : AppCompatActivity(), OnMapReadyCallback, GoogleMap.On
     var latitude: Double = 42.0
     var longitude: Double = 127.5
 
-
-
     private var locationPermissionGranted = false
 
 

@@ -50,7 +50,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/main_font"
             android:text="@string/change_profile"
-            android:textColor="@color/app_main"
+            android:textColor="@color/black"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -157,12 +157,12 @@
         android:id="@+id/userMenuLayout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:paddingTop="55dp"
-        android:paddingBottom="55dp"
-        android:background="@drawable/user_menu_round"
-        android:elevation="10dp"
         android:layout_marginStart="28dp"
         android:layout_marginEnd="28dp"
+        android:background="@drawable/user_menu_round"
+        android:elevation="10dp"
+        android:paddingTop="55dp"
+        android:paddingBottom="55dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/guidelineHorizontal">
@@ -170,8 +170,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="30dp"
             android:orientation="vertical"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -181,8 +179,11 @@
                 android:id="@+id/myShareListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -204,10 +205,14 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/soldOutListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -232,8 +237,11 @@
                 android:id="@+id/saveProductListButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:id="@+id/saveListTextView"
@@ -255,13 +263,46 @@
                     app:layout_constraintTop_toTopOf="parent" />
             </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/reviewListButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
+
+                <TextView
+                    android:id="@+id/reviewListTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_marginBottom="28dp"
+                    android:fontFamily="@font/main_font"
+                    android:text="@string/review_list"
+                    android:textColor="@color/white"
+                    android:textSize="25sp"
+                    app:layout_constraintStart_toStartOf="parent" />
+
+                <ImageView
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/arrow_right"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/userSettingButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="28dp"
-                android:orientation="horizontal">
+                android:paddingTop="14dp"
+                android:paddingBottom="14dp"
+                android:orientation="horizontal"
+                android:paddingStart="50dp"
+                android:paddingEnd="30dp">
 
                 <TextView
                     android:layout_width="wrap_content"

@@ -14,7 +14,7 @@ import com.demo.sharingapp.databinding.ItemShareProductListBinding
 import com.demo.sharingapp.domain.home.data.PartProductContent
 import com.demo.sharingapp.retrofit.RetrofitManager
 
-class ShareProductListAdepter(private val type: Int, private val onDelete:(Long)->Unit, private val onViewClick:(Long)->Unit) :
+class ShareProductListAdepter(private val type: Int, private val onDelete:(Long)->Unit, private val onViewClick:(Long)->Unit, private val onLikeClick:(Long)->Unit) :
     ListAdapter<PartProductContent, ShareProductListAdepter.ShareProductListViewHolder>(object :
         DiffUtil.ItemCallback<PartProductContent>() {
         override fun areItemsTheSame(
@@ -97,8 +97,8 @@ class ShareProductListAdepter(private val type: Int, private val onDelete:(Long)
                     binding.likeTextView.text = likePoint.toString()
                     liked = !liked
                 }
-//                onLikeClick(item.productId)
-//                updateItem(position = position, liked, likePoint)
+                onLikeClick(item.productId)
+
             }
         }
 

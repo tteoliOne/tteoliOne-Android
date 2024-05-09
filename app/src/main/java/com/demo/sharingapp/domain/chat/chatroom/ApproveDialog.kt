@@ -25,8 +25,6 @@ class ApproveDialog(
     private var approveDialogInterface: ApproveDialogInterface? = null
     private var productId: Long? = null
     private var chatRoomNum: String? = null
-    private var sockClient: StompClient? = null
-    private var sendHeaderList: ArrayList<StompHeader>? = null
 
 
     init {
@@ -55,9 +53,7 @@ class ApproveDialog(
         // 요청하기 버튼 클릭
         binding.confirmButton.setOnClickListener {
             this.approveDialogInterface?.onApproveButtonClick(productId!!,
-                chatRoomNum!!,
-                sockClient!!,
-                sendHeaderList!!)
+                chatRoomNum!!,)
             dismiss()
         }
 
@@ -65,9 +61,7 @@ class ApproveDialog(
         // 취소 버튼 클릭
         binding.cancelButton.setOnClickListener {
             this.approveDialogInterface?.onRejectButtonClick(productId!!,
-                chatRoomNum!!,
-                sockClient!!,
-                sendHeaderList!!)
+                chatRoomNum!!,)
             dismiss()
         }
 
@@ -87,14 +81,10 @@ interface ApproveDialogInterface {
     fun onApproveButtonClick(
         productId: Long,
         chatRoomNum: String,
-        sockClient: StompClient,
-        sendHeaderList: ArrayList<StompHeader>,
     )
 
     fun onRejectButtonClick(
         productId: Long,
         chatRoomNum: String,
-        sockClient: StompClient,
-        sendHeaderList: ArrayList<StompHeader>
     )
 }

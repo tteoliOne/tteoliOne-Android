@@ -37,6 +37,8 @@ class ShareProductListActivity : AppCompatActivity() {
             val intent = Intent(this@ShareProductListActivity,
                 DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID,it)
             startActivityForResult(intent, Constants.MOVE_DETAILED_CODE)
+        }, onLikeClick = {
+            likeClick(it)
         })
 
         val linearLayoutManager = LinearLayoutManager(this@ShareProductListActivity)
@@ -109,6 +111,11 @@ class ShareProductListActivity : AppCompatActivity() {
 
             }
         }
+    }
+
+    // 좋아요 클릭 시 함수
+    private fun likeClick(it: Long) {
+        RetrofitManager.instance.postProductLike(this, it)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -1,4 +1,4 @@
-package com.demo.sharingapp.login
+package com.demo.sharingapp.domain.user.setting.account
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -7,39 +7,30 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.Location
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.demo.sharingapp.BuildConfig.ADDRESS_API_KEY
+import com.demo.sharingapp.BuildConfig
 import com.demo.sharingapp.MainActivity
-import com.demo.sharingapp.PermissionUtil
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.ActivityUserPlaceBinding
-import com.demo.sharingapp.login.address.AddressAPIClient
-import com.demo.sharingapp.login.address.AddressService
-import com.demo.sharingapp.login.address.UserDto
+import com.demo.sharingapp.login.LoginView
+import com.demo.sharingapp.login.UserPlaceAdepter
 import com.demo.sharingapp.login.data.AddressRequest
 import com.demo.sharingapp.retrofit.RestAPI
-import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
-import com.demo.sharingapp.utils.Constants.LATITUDE
-import com.demo.sharingapp.utils.Constants.LONGITUDE
-import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.LatLng
-import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -47,25 +38,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.*
 
-class UserPlace : AppCompatActivity() {
+class SettingPlaceFragment: Fragment(R.layout.activity_user_place) {
 
-    // 현제 위치 권한 여부 확인 변수
-    private var locationPermissionGranted = false
+    private lateinit var binding: ActivityUserPlaceBinding
+
     private lateinit var addressAdepter: UserPlaceAdepter
     // 검색창 입력 단어
     private var searchFor: String = ""
     // 핸들러
     private val handler = Handler(Looper.getMainLooper())
+    // 현제 위치 권한 여부 확인 변수
+    private var locationPermissionGranted = false
 
-
-    private lateinit var binding: ActivityUserPlaceBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityUserPlaceBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        checkPermissionLocation()
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding = ActivityUserPlaceBinding.bind(view)
         // 리사이클러뷰 초기 설정
         initRecyclerView()
 
@@ -77,9 +64,7 @@ class UserPlace : AppCompatActivity() {
         }
 
         binding.cancelButton.setOnClickListener {
-            val intent = Intent(this, LoginView::class.java)
-            startActivity(intent)
-            finish()
+            moveBack()
         }
 
         binding.addressEditText.addTextChangedListener {
@@ -94,6 +79,10 @@ class UserPlace : AppCompatActivity() {
         // 현 위치 찾기 버튼 클릭
         clickMyPlaceButton()
 
+    }
+
+    private fun moveBack() {
+        findNavController().popBackStack()
     }
 
     // 현 위치 찾기 버튼 클릭 함수
@@ -111,7 +100,7 @@ class UserPlace : AppCompatActivity() {
 
         binding.addressListRecyclerView.apply {
             adapter = addressAdepter
-            layoutManager = LinearLayoutManager(this@UserPlace)
+            layoutManager = LinearLayoutManager(this@SettingPlaceFragment.requireContext())
         }
     }
 
@@ -133,7 +122,7 @@ class UserPlace : AppCompatActivity() {
         val retrofit = Retrofit.Builder().baseUrl("https://business.juso.go.kr/")
             .addConverterFactory(GsonConverterFactory.create()).build();
         val service = retrofit.create(RestAPI::class.java)
-        service.getAddress("${ADDRESS_API_KEY}",
+        service.getAddress("${BuildConfig.ADDRESS_API_KEY}",
             searchValue.toString(),
             "json").enqueue(object : Callback<AddressRequest> {
             override fun onResponse(
@@ -166,7 +155,7 @@ class UserPlace : AppCompatActivity() {
 
             // 권한이 있을 때
             ContextCompat.checkSelfPermission(
-                this,
+                this.requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
                 // 권한이 있으므로 액션 실행
@@ -174,12 +163,12 @@ class UserPlace : AppCompatActivity() {
             }
 
             // 왜 필요한지 한번도 설명
-            ActivityCompat.shouldShowRequestPermissionRationale(this,
+            ActivityCompat.shouldShowRequestPermissionRationale(this.requireActivity(),
                 Manifest.permission.ACCESS_FINE_LOCATION) -> {
                 showPermissionRationalDialog()
             }
             else -> {
-                ActivityCompat.requestPermissions(this,
+                ActivityCompat.requestPermissions(this.requireActivity(),
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                     Constants.ACCESS_FINE_LOCATION_CODE)
             }
@@ -189,7 +178,7 @@ class UserPlace : AppCompatActivity() {
 
     // 권한이 필요한지 알려주고 권한 설정으로 이동 여부 다이얼로그 함수
     private fun showPermissionRationalDialog() {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this.requireContext())
             .setMessage("위치 권한을 켜주셔야지 내 위치 불러오기가 가능합니다. 앱 설정 화면으로 진입하셔 권한을 켜주세요")
             .setPositiveButton("권한 변경하러 가기") { _, _ ->
                 // 권한 설정 화면으로 이동하는 함수 호출
@@ -201,7 +190,7 @@ class UserPlace : AppCompatActivity() {
     // 권한 설정 화면으로 이동하는 함수
     private fun navigateToAppSetting() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", packageName, null)
+            data = Uri.fromParts("package", this@SettingPlaceFragment.requireContext().packageName, null)
         }
         startActivity(intent)
     }
@@ -224,7 +213,7 @@ class UserPlace : AppCompatActivity() {
             getCurrentPlace()
 
         } else {
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this.requireActivity(),
                     Manifest.permission.ACCESS_FINE_LOCATION)
             ) {
                 showPermissionRationalDialog()
@@ -236,13 +225,12 @@ class UserPlace : AppCompatActivity() {
 
     // 권한이 필요한지 알려주는 다이얼로그 함수
     private fun showPermissionSettingDialog() {
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this.requireContext())
             .setMessage("위치 권한을 켜주셔야지 내 위치 불러오기가 가능합니다.")
-            .setPositiveButton("권한 허용하러 가기") { _, _ ->
-//                ActivityCompat.requestPermissions(this,
-//                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-//                    Constants.ACCESS_FINE_LOCATION_CODE)
-                navigateToAppSetting()
+            .setPositiveButton("권한 허용하기") { _, _ ->
+                ActivityCompat.requestPermissions(this.requireActivity(),
+                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                    Constants.ACCESS_FINE_LOCATION_CODE)
             }.setNegativeButton("취소") { dialogInterface, _ -> dialogInterface.cancel() }
             .show()
     }
@@ -251,15 +239,16 @@ class UserPlace : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private fun getCurrentPlace() {
         // 안드로이드 위치 api
-        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this.requireActivity())
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
 
             location?.let {
                 Log.e("place",it.toString())
 
                 savePlace(it.longitude,it.latitude)
-                // mainActivity 로 위치정보와 함께 이동하는 함수 호출
-                moveMainActivity(it.latitude, it.longitude)
+
+                moveBack()
+
             } ?: kotlin.run {
                 Log.e("place", "Location is null")
             }
@@ -269,25 +258,18 @@ class UserPlace : AppCompatActivity() {
         }
     }
 
-    // mainActivity 로 위치정보와 함께 이동하는 함수
-    private fun moveMainActivity(latitude: Double, longitude: Double) {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            putExtra(LATITUDE, latitude)
-            putExtra(LONGITUDE, longitude)
-        }
-        startActivity(intent)
-        finish()
-    }
+
 
     // 주소에서 좌표바꾸는 함수
     private fun geoCoding(address: String) {
         try {
-            Geocoder(this, Locale.KOREA).getFromLocationName(address, 1)?.let {
+            Geocoder(this.requireContext(), Locale.KOREA).getFromLocationName(address, 1)?.let {
                 Location("").apply {
                     latitude = it[0].latitude
                     longitude = it[0].longitude
                     savePlace(longitude,latitude)
-                    moveMainActivity(latitude,longitude)
+
+                    moveBack()
                 }
             } ?: Location("").apply {
                 latitude = 0.0
@@ -301,7 +283,7 @@ class UserPlace : AppCompatActivity() {
 
     // 내부 저장소에 위치 값 저장
     private fun savePlace(longitude: Double,latitude: Double){
-        SharedPreferencesData.saveData(this, LONGITUDE,longitude.toString())
-        SharedPreferencesData.saveData(this, LATITUDE,latitude.toString())
+        SharedPreferencesData.saveData(this.requireContext(), Constants.LONGITUDE,longitude.toString())
+        SharedPreferencesData.saveData(this.requireContext(), Constants.LATITUDE,latitude.toString())
     }
 }

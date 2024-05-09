@@ -16,6 +16,7 @@ class SignupFinishActivity : AppCompatActivity() {
         binding.finishButton.setOnClickListener {
             val intent = Intent(this, LoginView::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }

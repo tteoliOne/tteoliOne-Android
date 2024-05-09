@@ -15,7 +15,7 @@ import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
 
-class OnSellFragment: Fragment(R.layout.fragment_other_onsell) {
+class OnSellFragment : Fragment(R.layout.fragment_other_onsell) {
 
     private lateinit var binding: FragmentOtherOnsellBinding
     private lateinit var onSellAdepter: OnSellAdepter
@@ -24,11 +24,15 @@ class OnSellFragment: Fragment(R.layout.fragment_other_onsell) {
         super.onViewCreated(view, savedInstanceState)
         binding = FragmentOtherOnsellBinding.bind(view)
 
-        onSellAdepter = OnSellAdepter(){
+        onSellAdepter = OnSellAdepter(
+            onLikeClick = {
+                likeClick(it)
+            },
+            onViewClick = {
             val intent = Intent(this@OnSellFragment.requireActivity(),
-                DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID,it)
+                DetailedProductActivity::class.java).putExtra(Constants.PRODUCT_ID, it)
             startActivityForResult(intent, Constants.MOVE_DETAILED_CODE)
-        }
+        })
 
         binding.onSellRecyclerView.apply {
             adapter = onSellAdepter
@@ -64,6 +68,11 @@ class OnSellFragment: Fragment(R.layout.fragment_other_onsell) {
             }
 
         }
+    }
+
+    // 좋아요 클릭 시 함수
+    private fun likeClick(it: Long) {
+        RetrofitManager.instance.postProductLike(this.requireContext(), it)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

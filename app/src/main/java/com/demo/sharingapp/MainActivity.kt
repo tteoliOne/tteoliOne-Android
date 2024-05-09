@@ -10,8 +10,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
+import android.view.MotionEvent
 import android.view.View
 import android.view.WindowManager
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
@@ -66,6 +68,9 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         // 찜 목록 닫기 버튼 클릭
         clickLikeListCloseButton()
 
+        // 왼쪽에 위치한 드로어의 스와이프 제스처를 비활성화합니다.
+        binding.drawerView.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+
         //
         binding.drawerView.addDrawerListener(object : DrawerLayout.DrawerListener {
             override fun onDrawerSlide(drawerView: View, slideOffset: Float) {
@@ -87,7 +92,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         })
 
         // 로그인 상태 확인 함수 호출
-        //checkHasLogin()
+        checkHasLogin()
 
         mainViewModel = ViewModelProvider(this)[MainViewModel::class.java]
 
@@ -102,19 +107,20 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
 
         navHostFragment.navController.addOnDestinationChangedListener { a, b, c ->
             Log.e("bb", " a = $a , b = ${b.id} , ${R.id.userFragment} , c = $c")
-            if (b.id == R.id.userSettingFragment || b.id == R.id.homePartProductFragment) {
+            if (b.id == R.id.userSettingFragment || b.id == R.id.homePartProductFragment || b.id == R.id.settingMainFragment) {
                 binding.bottomNavigationView.isVisible = false
             } else if (b.id == R.id.userFragment || b.id == R.id.homeFragment) {
                 binding.bottomNavigationView.isVisible = true
             }
         }
 
+        binding.bottomNavigationView.isClickable = false
+
         binding.bottomNavigationView.setOnNavigationItemSelectedListener { menuItem ->
 
             when (menuItem.itemId) {
                 R.id.homeFragment -> {
                     binding.loadingView.isVisible = true
-
                     // 첫 번째 아이템이 클릭되었을 때의 처리
                     // 예: 네비게이션 뷰에서 특정 프래그먼트로 이동
                     navHostFragment.navController.navigate(R.id.homeFragment)
@@ -206,21 +212,10 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         finish()
     }
 
-    // 쉐어드프리퍼런스에서 데이터 들고 오는 함수
-    private fun getSharedData() {
-        val accessToken = SharedPreferencesData.getData(this, ACCESS_TOKEN)
-        val refreshToken = SharedPreferencesData.getData(this, REFRESH_TOKEN)
-        val nickname = SharedPreferencesData.getData(this, NICKNAME)
-        Log.e("getSharedData",
-            "accessToken : $accessToken, refreshToken : $refreshToken, nickname : $nickname ")
-    }
-
-
     // 홈프레그먼트에서 버튼 클릭시 동작 함수
     override fun onButtonClicked() {
 
         binding.drawerView.openDrawer(Gravity.LEFT)
-        Log.e("aa", "MyFragmentListener")
         binding.drawerView.bringToFront()
         binding.drawerView.setScrimColor(Color.TRANSPARENT)
     }
@@ -258,7 +253,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
             ) {
                 // FCM SDK (and your app) can post notifications.
             } else if (shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)) {
-                showPermissionRationalDialog()
+//                showPermissionRationalDialog()
             } else {
                 // Directly ask for the permission
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -282,10 +277,19 @@ class MainActivity : AppCompatActivity(), HomeFragment.MyFragmentListener {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == MOVE_DETAILED_CODE && resultCode == RESULT_OK) {
             val intent = this.intent
-            finish()
+
             startActivity(intent)
+            finish()
 
         }
+    }
+
+    // 화면 터치 시 키보드 내리기
+    override fun dispatchTouchEvent(ev: MotionEvent): Boolean {
+        val imm: InputMethodManager =
+            getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(currentFocus?.windowToken, 0)
+        return super.dispatchTouchEvent(ev)
     }
 
 }

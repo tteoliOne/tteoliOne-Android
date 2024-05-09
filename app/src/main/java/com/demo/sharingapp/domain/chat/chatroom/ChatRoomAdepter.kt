@@ -27,6 +27,7 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
 }){
     inner class ChatRoomViewHolder(private val binding: ItemChatRoomBinding) :RecyclerView.ViewHolder(binding.root){
         fun bind(item: GetChatRoomInfoData, position: Int){
+
             val currentTime = changeDate(item.sendDate)
             if (position+1 <= itemCount-1) {
                 val beforeTime = changeDate(currentList[position + 1].sendDate)
@@ -49,6 +50,13 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
             binding.timeTextView.text = String.format("%s:%02d ", hourString,minute)
             binding.leftTimeTextView.text = String.format("%s:%02d ", hourString,minute)
             binding.nicknameTextView.text = item.senderName
+
+            if (item.contentType=="notice"){
+                binding.dateTextView.visibility = View.VISIBLE
+                binding.dateTextView.text = item.content
+                binding.chatLayout.visibility= View.GONE
+            }
+
             if (item.mine){ // 자신일때
                 binding.layout.gravity= Gravity.END
                 binding.profileImageLayout.visibility= View.INVISIBLE
@@ -60,6 +68,7 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
                     binding.readCountTextView.visibility = View.VISIBLE
                 }else{
                     binding.readCountTextView.visibility = View.GONE
+
                 }
             }else{ // 상대방 일때
                 binding.leftTimeTextView.visibility = View.GONE
@@ -79,7 +88,6 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
                     binding.nicknameTextView.visibility= View.VISIBLE
 
                 }
-//                binding.profileImageLayout.visibility= View.VISIBLE
                 binding.layout.gravity= Gravity.START
                 Glide.with(binding.profileImageView)
                     .load(profile)
@@ -88,19 +96,6 @@ class ChatRoomAdepter(private val profile: String): ListAdapter<GetChatRoomInfoD
                 binding.descriptionTextView.text = item.content
             }
 
-//            if (item.mine){ // 자신일때
-//                binding.profileImageView.isVisible= true
-//                binding.layout.gravity= Gravity.START
-//                Glide.with(binding.profileImageView)
-//                    .load(item.profile)
-//                    .circleCrop()
-//                    .into(binding.profileImageView)
-//                binding.descriptionTextView.text = item.description
-//            }else{ // 상대방 일때
-//                binding.layout.gravity= Gravity.END
-//                binding.profileImageView.isVisible= false
-//                binding.descriptionTextView.text = item.description
-//            }
 
 
         }
