@@ -124,6 +124,7 @@
             android:background="@drawable/product_no_action_button_round"
             android:clickable="false"
             android:text="작성하기"
+            android:contextClickable="false"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"

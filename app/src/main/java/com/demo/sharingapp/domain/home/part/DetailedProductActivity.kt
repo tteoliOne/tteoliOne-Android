@@ -49,6 +49,7 @@ import com.demo.sharingapp.utils.Constants.SELLER_ID
 import com.demo.sharingapp.utils.Constants.USER_PROFILE
 import com.google.android.gms.maps.*
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.gson.JsonParser
@@ -69,10 +70,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
 
     private lateinit var googleMap: GoogleMap
     private lateinit var binding: ActivityDetailedProductBinding
-
-    //
-    private lateinit var stompConnection: Disposable
-    private lateinit var topic: Disposable
 
     private lateinit var accessToken: String
 
@@ -101,6 +98,9 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     private var sendUserNickname = ""
     private var profile = ""
     private var sellerId = 0L
+
+    private var marker: Marker? = null
+
 
     private lateinit var productImageArray: Array<String>
 
@@ -155,13 +155,14 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
             }
             popup.setOnMenuItemClickListener { menuItem: MenuItem ->
                 when (menuItem.itemId) {
-                    R.id.modifyMenu -> {
-                        // 메뉴 수정하기 클릭
+                    R.id.modifyMenu -> { // 메뉴 수정하기 클릭
+
                         clickModifyMenu()
                         return@setOnMenuItemClickListener true
                     }
                     R.id.removeMenu -> { // 삭제하기
                         RetrofitManager.instance.getRemoveProduct(this, productId)
+                        moveBack()
                         return@setOnMenuItemClickListener true
                     }
                     R.id.reportMenu -> { // 신고하기
@@ -218,9 +219,8 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
             putExtra(PRODUCT_TYPE, 1)
             putExtra(PRODUCT_PRODUCT_ID, productId)
             putExtra(PRODUCT_CATEGORY_ID, categoryId)
-            Log.e("productId",productId.toString())
-
         }
+        marker?.remove()
         startActivityForResult(intent, MOVE_MODIFY_CODE)
     }
 
@@ -416,7 +416,7 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
             .position(location)
             .title("공유 희망 장소")
 
-        googleMap.addMarker(markerOptions)
+        marker = googleMap.addMarker(markerOptions)
         googleMap.moveCamera(CameraUpdateFactory.newLatLng(location))
         googleMap.animateCamera(CameraUpdateFactory.zoomTo(15f))
     }
@@ -449,7 +449,6 @@ class DetailedProductActivity : AppCompatActivity(), OnMapReadyCallback,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == Constants.MOVE_MODIFY_CODE && resultCode == Activity.RESULT_OK) {
-            Log.e("시작", "시작")
             getDetailedData()
         }
     }

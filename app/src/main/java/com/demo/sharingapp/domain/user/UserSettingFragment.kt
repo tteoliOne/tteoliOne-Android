@@ -82,8 +82,8 @@ class UserSettingFragment : Fragment(R.layout.fragment_user_setting) {
             if (imageUri != null){
                 imageFile = imageToFile(imageUri!!)
             }
-            mainViewModel.updateValue(NICKNAME, nickname.toString())
-            Log.e("nick", nickname.toString())
+
+
             RetrofitManager.instance.patchChangeNickname(this@UserSettingFragment.requireContext(),
                 accessToken,
                 nickname.toString(),
@@ -92,6 +92,7 @@ class UserSettingFragment : Fragment(R.layout.fragment_user_setting) {
             ){success, message ->
                 if (success){
                     beforeFragment()  // 이전 프레그먼트로 이동 함수 호출
+                    mainViewModel.updateValue(NICKNAME, nickname.toString())
                 }else {
                     Toast.makeText(this@UserSettingFragment.requireContext(),message,Toast.LENGTH_SHORT).show()
                 }

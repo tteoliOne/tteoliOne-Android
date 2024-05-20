@@ -54,6 +54,8 @@ class ChatFragment: Fragment(R.layout.fragment_chat) {
         }
     }
 
+
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == MOVE_CHAT_CODE && resultCode == Activity.RESULT_OK) {

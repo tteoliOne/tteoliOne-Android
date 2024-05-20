@@ -135,7 +135,7 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
 
 
     // 상품 등록하는 데이터 받기
-    fun postProduct() {
+    fun postProduct(success:()->Unit) {
 
         val products = Products(userId = userId,
             categoryId = currentCategoryId.value ?: return,
@@ -153,7 +153,9 @@ class ProductViewModel(application: Application) : AndroidViewModel(application)
         if (currentReceipt.value != null && currentImageList.value != null) {
             RetrofitManager.instance.postProduct(context = getApplication(),accessToken = accessToken, request = products,
                 receipt = currentReceipt.value!!,
-                photos = currentImageList.value!!)
+                photos = currentImageList.value!!){
+                success()
+            }
 
         }
 

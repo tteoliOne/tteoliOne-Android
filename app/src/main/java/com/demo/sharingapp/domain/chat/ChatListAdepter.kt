@@ -39,6 +39,8 @@ class ChatListAdepter(val onClick:(item:GetChatListData) -> Unit): ListAdapter<G
                 if (item.unReadCount != 0L){
                     binding.unReadTextView.text = item.unReadCount.toString()
                     binding.unReadLayout.isVisible = true
+                }else{
+                    binding.unReadLayout.isVisible = false
                 }
             }else{
                 binding.descriptionTextView.text = ""

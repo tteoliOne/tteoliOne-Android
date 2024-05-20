@@ -28,6 +28,7 @@ import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants.ACCESS_TOKEN
 import com.demo.sharingapp.utils.Constants.LATITUDE
 import com.demo.sharingapp.utils.Constants.LONGITUDE
+import com.demo.sharingapp.utils.Constants.MOVE_ADD_PRODUCT_CODE
 import com.demo.sharingapp.utils.Constants.MOVE_DETAILED_CODE
 import com.demo.sharingapp.utils.Constants.NICKNAME
 import com.demo.sharingapp.utils.Constants.PRODUCT_ID
@@ -270,19 +271,25 @@ class HomeFragment : Fragment(R.layout.fragment_home), LogoutDialogInterface {
     // 상품 등록 버튼 클릭 함수
     private fun addProductButton() {
         binding.homeAddButton.setOnClickListener {
-            startActivity(Intent(this.requireActivity(), AddProductsActivity::class.java))
+            val intent = Intent(this.requireActivity(), AddProductsActivity::class.java)
+//            startActivity(Intent(this.requireActivity(), AddProductsActivity::class.java))
+            startActivityForResult(intent,MOVE_ADD_PRODUCT_CODE)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == MOVE_DETAILED_CODE && resultCode == RESULT_OK) {
+        if (resultCode == RESULT_OK){
+            if (requestCode == MOVE_DETAILED_CODE || requestCode == MOVE_ADD_PRODUCT_CODE) {
 
-            initProduct(accessToken,longitude,latitude,userId)
-//            val intent = this@HomeFragment.requireActivity().intent
-//            this@HomeFragment.requireActivity().finish()
-//            startActivity(intent)
+//                initProduct(accessToken,longitude,latitude,userId)
+            val intent = this@HomeFragment.requireActivity().intent
+                startActivity(intent)
+            this@HomeFragment.requireActivity().finish()
+
+            }
         }
+
     }
 
     // 로그아웃 알림창 띄우기

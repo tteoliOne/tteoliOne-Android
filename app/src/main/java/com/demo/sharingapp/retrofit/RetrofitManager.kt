@@ -1392,6 +1392,8 @@ class RetrofitManager() : Application() {
         request: Products,
         receipt: MultipartBody.Part,
         photos: List<MultipartBody.Part>,
+        success: ()->Unit
+
     ) {
         val token = accessToken
         val retrofit = initRetrofit(context)
@@ -1409,17 +1411,21 @@ class RetrofitManager() : Application() {
                 response: Response<ProductsResponse>,
             ) {
                 if (response.isSuccessful) {
-                    Toast.makeText(context, "상품이 등록 되었습니다.", Toast.LENGTH_SHORT).show()
-                    Log.e("Post", "success ${response.body()?.code}")
-                    Log.e("Post", "success ${response.body()?.success}")
+                    if(response.body()?.code == 0){
+                        Toast.makeText(context, response.body()?.data?.result, Toast.LENGTH_SHORT).show()
+                        success()
+                    }else{
+                        Toast.makeText(context, response.body()?.data?.result, Toast.LENGTH_SHORT).show()
+                    }
+
                 } else {
-                    Log.e("Post", "succes, but ${response.errorBody()}")
+                    Toast.makeText(context, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
 
                 }
             }
 
             override fun onFailure(call: Call<ProductsResponse>, t: Throwable) {
-                Log.e("Post", "fail ${t} $call")
+                Toast.makeText(context, "오류가 발생하였습니다.", Toast.LENGTH_SHORT).show()
             }
         })
 

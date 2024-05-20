@@ -52,6 +52,8 @@ object Constants{
 
     const val MOVE_DETAILED_CODE = 201
 
+    const val MOVE_ADD_PRODUCT_CODE = 205
+
     const val MOVE_MODIFY_CODE = 202
 
     const val MOVE_CHAT_CODE = 203

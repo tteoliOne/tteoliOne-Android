@@ -200,6 +200,7 @@ class LoginView : AppCompatActivity() {
                 Firebase.messaging.token.addOnCompleteListener {
                     val fmcToken = it.result
                     // 레트로핏에 토큰 보내는 함수 호출
+                    Log.e("fcm",fmcToken)
                     postKaKaoAccessToken(token.accessToken, fmcToken)
                 }
 

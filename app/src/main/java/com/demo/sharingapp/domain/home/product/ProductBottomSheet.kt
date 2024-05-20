@@ -95,10 +95,14 @@ class ProductBottomSheet( private val productType: Int) : BottomSheetDialogFragm
             }else{ // 상품 추가하기
                 if(isChangeImage) {
                     // 뷰 모델로 데이터 전달 함수 호출
-                    productViewModel.postProduct()
-                    this@ProductBottomSheet.requireActivity().finish()
-                    removeFindPlace()
-                    dismiss()
+                    productViewModel.postProduct(){
+                        val resultIntent = Intent()
+                        this.requireActivity().setResult(AppCompatActivity.RESULT_OK, resultIntent)
+                        this@ProductBottomSheet.requireActivity().finish()
+                        removeFindPlace()
+                        dismiss()
+                    }
+
                 }else{
                     view?.findViewById<TextView>(R.id.errorMessageTextView)?.isVisible=true
                 }

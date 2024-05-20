@@ -46,7 +46,7 @@ class MyFirebaseMessagingService: FirebaseMessagingService() {
             val title = message.notification?.title ?: ""
             val body = message.notification?.body ?: ""
 
-            val intent = Intent(this, MainActivity::class.java)
+            val intent = Intent(this, SplashActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 .putExtra(PUSH_MESSAGE, "gkdl")
 

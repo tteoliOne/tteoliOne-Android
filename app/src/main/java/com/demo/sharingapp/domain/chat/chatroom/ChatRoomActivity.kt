@@ -12,6 +12,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.PopupMenu
+import android.widget.ScrollView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
@@ -54,7 +55,7 @@ import kotlin.collections.ArrayList
 
 
 class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDialogInterface,
-    ReviewDialogInterface {
+    ReviewDialogInterface, LeaveChatRoomDialogInterface {
     private lateinit var chatRoomAdepter: ChatRoomAdepter
     private lateinit var linearLayoutManger: LinearLayoutManager
     private lateinit var sockClient: StompClient
@@ -66,7 +67,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
     private var serverState = false
 
-    private var exitOpponent = false
+    private var readCount = 1L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -130,6 +131,8 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         // 메시지 보내기
         sendMessage(chatRoomNum, productId, sendHeaderList, "chat", userId)
 
+
+
     }
 
     // 메뉴 버튼 클릭 함수
@@ -140,17 +143,8 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
             popup.setOnMenuItemClickListener { menuItem: MenuItem ->
                 when (menuItem.itemId) {
                     R.id.leaveMenu -> { // 나가기
-                        Log.e("chatMenu", "나가기")
-                        outType = 1
-                        RetrofitManager.instance.deleteChatRoomLeave(this,
-                            chatRoomId = chatRoomNum.toLong()){
-                            if (it == 0){
-                                sockClient.disconnect()
-                                val resultIntent = Intent()
-                                setResult(RESULT_OK, resultIntent)
-                                finish()
-                            }
-                        }
+
+                        leaveChatRoomDialog(chatRoomNum,sockClient)
 
                         return@setOnMenuItemClickListener true
                     }
@@ -192,6 +186,23 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         }
     }
 
+    // 방떠나기
+    private fun leaveChatRoom(
+        chatRoomNum: String,
+        sockClient: StompClient,
+    ) {
+        outType = 1
+        RetrofitManager.instance.deleteChatRoomLeave(this,
+            chatRoomId = chatRoomNum.toLong()) {
+            if (it == 0) {
+                sockClient.disconnect()
+                val resultIntent = Intent()
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+        }
+    }
+
     // 리사이클러뷰 초기설정 함수
     private fun initRecyclerView(profile: String) {
         chatRoomAdepter = ChatRoomAdepter(profile)
@@ -214,9 +225,6 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
             // 채팅 제목
             binding.nicknameTextView.text = getString(R.string.nickname_input, it.opponentNickname)
 
-            // 상대방 나감 여부
-            exitOpponent = it.exitOpponent
-
             // 상품 이미지
             Glide.with(binding.productImageView)
                 .load(it.productImage)
@@ -225,10 +233,15 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
             // 상품명
             binding.titleTextView.text = it.title
 
+            val chatDataList = it.chatList
+            if (chatDataList.size-1 >= 0){
+                readCount = chatDataList[chatDataList.size-1].readCount
+            }
+
+
             // 개당 가격
             val sharePrice = changePrice(it)
-            Log.e("sharePrice", sharePrice)
-            binding.buyPriceTextView.text = sharePrice
+            binding.buyPriceTextView.text = "개당 "+sharePrice+"원"
 
             if (it.checkSeller) { // 판매자일때
                 binding.requestButton.visibility = View.INVISIBLE
@@ -510,7 +523,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
             } else if (data.contentType == "notice") {
                 if (data.content.contains("돌아오셨습니다")) {
                     getChatRoomData(chatRoomNum)
-                    exitOpponent = false
+                    readCount = 0L
                 }else if(data.content.contains("상대방이 채팅방을 나갔습니다")){
                     val content = data.content
                     val currentMillis = LocalDateTime.now()
@@ -558,6 +571,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         userId: Long,
     ) {
         binding.sendButton.setOnClickListener {
+
             if (serverState) {
                 val currentMillis = LocalDateTime.now()
                     .atZone(ZoneId.systemDefault())
@@ -573,13 +587,9 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
                     .subscribe()
                 binding.chatEditText.text.clear()
 
-                val readCount = if (exitOpponent){
-                    0L
-                }else{
-                    1L
-                }
 
                 val a = listOf(GetChatRoomInfoData("", 0, 0, "", "chat", sendData, currentMillis, readCount, true))
+                Log.e("readCount",readCount.toString())
 
                 chatRoomAdepter.submitList(a + chatRoomAdepter.currentList)
 
@@ -596,8 +606,6 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
             outType = 0
             if (serverState) {
-//                RetrofitManager.instance.putLeaveChatRoom(this, chatRoomId = chatRoomNum)
-                Log.e("sockClient",sockClient.toString())
                 sockClient.disconnect()
             }
             val resultIntent = Intent()
@@ -687,6 +695,15 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 //        chatRoomAdepter.submitList()
     }
 
+    // 방 나가기 알림창 띄우기
+    private fun leaveChatRoomDialog(chatRoomNum: String, sockClient: StompClient){
+        val dialog =
+            LeaveCharRoomDialog(this,chatRoomNum,sockClient)
+        dialog.isCancelable = false
+        dialog.show(this.supportFragmentManager,
+            "leaveChatRoomDialog")
+    }
+
     // 요청 알림창 띄우기
     private fun requestShowDialog(
         productId: Long,
@@ -697,7 +714,7 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         // 알림창이 띄워져있는 동안 배경 클릭 막기
         dialog.isCancelable = false
         dialog.show(this.supportFragmentManager,
-            "SignupDialog")
+            "requestShowDialog")
     }
 
     // 승인 알림창 띄우기
@@ -785,6 +802,11 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
         }
     }
 
+    override fun leaveButtonClick(chatRoomNum: String, sockClient: StompClient) {
+        leaveChatRoom(chatRoomNum,sockClient)
+    }
+
+
     override fun onCompleteButtonClick(productId: Long, description: String, goodCount: String) {
         RetrofitManager.instance.postProductReview(context = this,
             productsId = productId,
@@ -802,6 +824,19 @@ class ChatRoomActivity : AppCompatActivity(), RequestDialogInterface, ApproveDia
 
         }
     }
+
+    override fun onBackPressed() {
+        outType = 0
+        if (serverState) {
+            sockClient.disconnect()
+        }
+        val resultIntent = Intent()
+        setResult(RESULT_OK, resultIntent)
+        finish()
+        super.onBackPressed()
+    }
+
+
 
 
 }
