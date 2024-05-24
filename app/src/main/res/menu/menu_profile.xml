@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item android:id="@+id/option_gallery"
+        android:title="앨범에서 이미지 선택" />
+
+    <item android:id="@+id/option_basic"
+        android:title="기본 이미지로 변경" />
+
+</menu>

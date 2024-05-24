@@ -24,6 +24,7 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentSettingProfileBinding
+import com.demo.sharingapp.domain.user.ProfileBottomSheet
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
@@ -59,11 +60,24 @@ class SettingProfileFragment: Fragment(R.layout.fragment_setting_profile) {
 
         }
 
-        binding.changeImageTextView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
+        binding.profileLayout.setOnClickListener {
+            // 바텀시트 설정
+            val bottomSheetFragment = ProfileBottomSheet(
+                moveGallery = {
+                    moveGallery() // 앨범으로 이동
+                },
+                clickBasic = {
+                    val packageName = this.requireContext().packageName
+                    val resourceId = R.drawable.profile_image_basics
+                    imageUri = Uri.parse("android.resource://$packageName/$resourceId")
+                    Glide.with(binding.userImageView)
+                        .load(imageUri)
+                        .circleCrop()
+                        .into(binding.userImageView)
+                }
+            )
+            bottomSheetFragment.show(this.requireActivity().supportFragmentManager, bottomSheetFragment.tag)
 
-            activityResult.launch(intent)
         }
 
         binding.saveButton.setOnClickListener {
@@ -96,6 +110,13 @@ class SettingProfileFragment: Fragment(R.layout.fragment_setting_profile) {
             findNavController().popBackStack()
         }
 
+    }
+
+    private fun moveGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+
+        activityResult.launch(intent)
     }
 
     // 갤러리

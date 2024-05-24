@@ -13,10 +13,13 @@ import android.os.Bundle
 import android.os.Handler
 import android.provider.MediaStore
 import android.util.Log
+import android.view.MenuItem
 import android.view.View
+import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.MenuRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +30,7 @@ import com.demo.sharingapp.R
 import com.demo.sharingapp.databinding.FragmentUserSettingBinding
 import com.demo.sharingapp.domain.MainViewModel
 import com.demo.sharingapp.domain.home.HomePartProductFragmentArgs
+import com.demo.sharingapp.domain.home.product.ProductBottomSheet
 import com.demo.sharingapp.retrofit.RetrofitManager
 import com.demo.sharingapp.shared.SharedPreferencesData
 import com.demo.sharingapp.utils.Constants
@@ -66,11 +70,24 @@ class UserSettingFragment : Fragment(R.layout.fragment_user_setting) {
                 .into(binding.userImageView)
         }
 
-        binding.changeImageTextView.setOnClickListener {
-            val intent = Intent(Intent.ACTION_PICK)
-            intent.type = "image/*"
+        binding.profileLayout.setOnClickListener {
+            // 바텀시트 설정
+            val bottomSheetFragment = ProfileBottomSheet(
+                moveGallery = {
+                    moveGallery() // 앨범으로 이동
+                },
+                clickBasic = {
+                    val packageName = this.requireContext().packageName
+                    val resourceId = R.drawable.profile_image_basics
+                    imageUri = Uri.parse("android.resource://$packageName/$resourceId")
+                    Glide.with(binding.userImageView)
+                        .load(imageUri)
+                        .circleCrop()
+                        .into(binding.userImageView)
+                }
+            )
+            bottomSheetFragment.show(this.requireActivity().supportFragmentManager, bottomSheetFragment.tag)
 
-            activityResult.launch(intent)
         }
 
         binding.saveButton.setOnClickListener {
@@ -109,6 +126,13 @@ class UserSettingFragment : Fragment(R.layout.fragment_user_setting) {
         }
 
 
+    }
+
+    private fun moveGallery() {
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+
+        activityResult.launch(intent)
     }
 
     // 이전 프레그먼트로 이동 함수
@@ -217,5 +241,7 @@ class UserSettingFragment : Fragment(R.layout.fragment_user_setting) {
                 .into(binding.userImageView)
         }
     }
+
+
 
 }
